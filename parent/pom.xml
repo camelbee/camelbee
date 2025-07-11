@@ -78,7 +78,7 @@
         <spotbugs-annotations.version>4.9.3</spotbugs-annotations.version>
         <spotbugs-maven-plugin.version>4.9.3.0</spotbugs-maven-plugin.version>
         <spotbugs.version>4.9.3</spotbugs.version>
-        <testcontainers-bom.version>1.21.0</testcontainers-bom.version>
+        <testcontainers-bom.version>1.21.3</testcontainers-bom.version>
         <snakeyaml.version>2.4</snakeyaml.version>
         <wiremock.version>3.13.0</wiremock.version>
         <nimbus-jose-jwt.version>10.3</nimbus-jose-jwt.version>
