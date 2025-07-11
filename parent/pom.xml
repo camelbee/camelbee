@@ -38,7 +38,7 @@
         <checkstyle.version>10.26.1</checkstyle.version>
         <commons-io.version>2.19.0</commons-io.version>
         <commons-lang3.version>3.17.0</commons-lang3.version>
-        <cxf-core.version>4.1.1</cxf-core.version>
+        <cxf-core.version>4.1.2</cxf-core.version>
         <cxf-codegen-plugin.version>4.0.5</cxf-codegen-plugin.version>
         <cxf-xjc-plugin.version>4.0.2</cxf-xjc-plugin.version>
         <cxf-xjc-dv.version>4.0.2</cxf-xjc-dv.version>
