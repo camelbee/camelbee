@@ -76,8 +76,6 @@ public class FetchJwksRouteTest extends CamelQuarkusTestSupport {
       isSetUp = true;
     }
 
-//    mockJwksEndpoint.reset();
-
   }
 
   @Test

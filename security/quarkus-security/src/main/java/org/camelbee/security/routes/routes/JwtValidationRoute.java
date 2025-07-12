@@ -153,7 +153,7 @@ public class JwtValidationRoute extends RouteBuilder {
 
     // Validate audience
     List<String> audience = claims.getAudience();
-    if (audience == null || audience.isEmpty() || !securityProperties.audience().equals(audience.getFirst())) {
+    if (audience == null || audience.isEmpty() || !securityProperties.audience().equals(audience.get(0))) {
       throw new TokenValidationException("ERROR-AUTH004", "Invalid token audience");
     }
 

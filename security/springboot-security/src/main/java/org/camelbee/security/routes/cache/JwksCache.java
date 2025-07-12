@@ -23,7 +23,7 @@ public class JwksCache {
   private long cacheDuration;
 
   /** Timestamp of the last cache update. */
-  private static long lastFetchTime = 0;
+  private long lastFetchTime = 0;
 
   /**
    * Updates the cache with a new JWKSet.

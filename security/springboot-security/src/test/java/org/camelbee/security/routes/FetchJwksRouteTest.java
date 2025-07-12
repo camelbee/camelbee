@@ -26,8 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
 @CamelSpringBootTest
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
@@ -50,7 +48,6 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
     }
 )
 @UseAdviceWith
-@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 class FetchJwksRouteTest {
 
   @Produce("direct:fetchJWKS")
@@ -69,8 +66,11 @@ class FetchJwksRouteTest {
   private RSAKey rsaKey;
   private String jwksResponse;
 
+  private static boolean isSetUp = false;
+
   @BeforeEach
   void setUp() throws Exception {
+
     rsaKey = new RSAKeyGenerator(2048)
         .keyID("123")
         .generate();
@@ -78,12 +78,17 @@ class FetchJwksRouteTest {
     JWKSet jwkSet = new JWKSet(rsaKey.toPublicJWK());
     jwksResponse = jwkSet.toString();
 
-    AdviceWith.adviceWith(camelContext, "jwks-retrieval",
-        advice -> {
-          advice.weaveById("invokeJwksUrlEnpoint")
-              .replace()
-              .to("mock:jwks");
-        });
+    if (!isSetUp) {
+      AdviceWith.adviceWith(camelContext, "jwks-retrieval",
+          advice -> {
+            advice.weaveById("invokeJwksUrlEnpoint")
+                .replace()
+                .to("mock:jwks");
+          });
+      camelContext.start();
+
+      isSetUp = true;
+    }
 
     exchange = ExchangeBuilder.anExchange(camelContext).build();
 
@@ -91,12 +96,12 @@ class FetchJwksRouteTest {
         e -> e.getIn().setBody(jwksResponse, String.class)
     );
 
-    camelContext.start();
   }
 
   @Test
   @Order(1)
   void testSuccessfulJwksFetch() throws Exception {
+
     mockJwksEndpoint.expectedMessageCount(1);
     producerTemplate.send(exchange);
     mockJwksEndpoint.assertIsSatisfied();
@@ -110,7 +115,7 @@ class FetchJwksRouteTest {
   @Test
   @Order(2)
   void testCacheReuse() throws Exception {
-
+    mockJwksEndpoint.reset();
     // The JWKS cache was populated by testSuccessfulJwksFetch()
     mockJwksEndpoint.expectedMessageCount(0);
     producerTemplate.send(exchange);
@@ -122,7 +127,7 @@ class FetchJwksRouteTest {
   void testCacheExpiry() throws Exception {
 
     Thread.sleep(3000); // Wait just over cache duration
-
+    mockJwksEndpoint.reset();
     mockJwksEndpoint.expectedMessageCount(1);
     producerTemplate.send(exchange);
     mockJwksEndpoint.assertIsSatisfied();

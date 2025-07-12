@@ -61,8 +61,8 @@
         <maven-pmd-plugin.version>3.26.0</maven-pmd-plugin.version>
         <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
         <maven-surefire-report-plugin.version>3.5.3</maven-surefire-report-plugin.version>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
 
         <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>
         <maven.compiler.testTarget>${maven.compiler.target}</maven.compiler.testTarget>
@@ -269,7 +269,7 @@
                 <version>${impsort-maven-plugin.version}</version>
                 <configuration>
                     <removeUnused>true</removeUnused>
-                    <compliance>21</compliance>
+                    <compliance>17</compliance>
                     <directories>src</directories>
                     <includes>**/*.java</includes>
                 </configuration>
@@ -306,86 +306,11 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>${maven-checkstyle-plugin.version}</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.puppycrawl.tools</groupId>
-                        <artifactId>checkstyle</artifactId>
-                        <version>${checkstyle.version}</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <excludeGeneratedSources>true</excludeGeneratedSources>
-                    <excludes>${project.build.directory}/generated-sources/**/*</excludes>
-                    <configLocation>${project.build.directory}/config/checkstyle/google-checks.xml</configLocation>
-                    <consoleOutput>true</consoleOutput>
-                    <failsOnError>true</failsOnError>
-                    <linkXRef>false</linkXRef>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>checkstyle</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>${spotbugs-maven-plugin.version}</version>
-                <configuration>
-                    <excludeFilterFile>${project.build.directory}/config/spotbugs/exclude.xml</excludeFilterFile>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.github.spotbugs</groupId>
-                        <artifactId>spotbugs</artifactId>
-                        <version>${spotbugs.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-
-            <plugin>
-                <groupId>org.sonarsource.scanner.maven</groupId>
-                <artifactId>sonar-maven-plugin</artifactId>
-                <version>${sonar-maven-plugin.version}</version>
-            </plugin>
-
-            <plugin>
                 <groupId>org.apache.camel</groupId>
                 <artifactId>camel-maven-plugin</artifactId>
                 <version>${camel-maven-plugin.version}</version>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>${maven-pmd-plugin.version}</version>
-                <configuration>
-                    <targetJdk>21</targetJdk>
-                    <linkXRef>false</linkXRef>
-                    <printFailingErrors>true</printFailingErrors>
-                    <excludeRoots>
-                        <excludeRoot>${project.build.directory}/generated-sources</excludeRoot>
-                    </excludeRoots>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>pmd-verify</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>check</goal>
-                            <goal>cpd-check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -613,7 +538,7 @@
                         <artifactId>maven-pmd-plugin</artifactId>
                         <version>${maven-pmd-plugin.version}</version>
                         <configuration>
-                            <targetJdk>21</targetJdk>
+                            <targetJdk>17</targetJdk>
                             <linkXRef>false</linkXRef>
                             <printFailingErrors>true</printFailingErrors>
                             <excludeRoots>
@@ -632,6 +557,7 @@
                         </executions>
                     </plugin>
 
+
                     <!-- ✅ SpotBugs -->
                     <plugin>
                         <groupId>com.github.spotbugs</groupId>
@@ -647,7 +573,17 @@
                                 <version>${spotbugs.version}</version>
                             </dependency>
                         </dependencies>
+                        <executions>
+                            <execution>
+                                <id>spotbugs-verify</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
+
                 </plugins>
             </build>
         </profile>
