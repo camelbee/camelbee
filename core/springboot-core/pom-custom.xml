@@ -20,7 +20,7 @@
     <groupId>io.camelbee</groupId>
     <artifactId>camelbee-springboot-core-custom</artifactId>
     <packaging>jar</packaging>
-    <version>2.0.2</version>
+    <version>2.0.3</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>

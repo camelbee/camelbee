@@ -18,7 +18,7 @@ The following files have been resolved:
    net.java.dev.jna:jna:jar:5.13.0:test[36m -- module com.sun.jna[0;1m [auto][m
    org.apache.commons:commons-compress:jar:1.24.0:test[36m -- module org.apache.commons.compress[m
    org.apache.commons:commons-lang3:jar:3.17.0:compile[36m -- module org.apache.commons.lang3[m
-   org.apache.cxf:cxf-core:jar:4.1.1:compile[36m -- module org.apache.cxf.core[0;1m [auto][m
+   org.apache.cxf:cxf-core:jar:4.1.2:compile[36m -- module org.apache.cxf.core[0;1m [auto][m
    org.apache.ws.xmlschema:xmlschema-core:jar:2.3.1:compile[36m -- module xmlschema.core[0;1;33m (auto)[m
    org.codehaus.woodstox:stax2-api:jar:4.2.2:compile[36m -- module org.codehaus.stax2[m
    org.eclipse.angus:angus-activation:jar:2.0.2:compile[36m -- module org.eclipse.angus.activation[m
@@ -32,7 +32,7 @@ The following files have been resolved:
    org.projectlombok:lombok:jar:1.18.38:provided[36m -- module lombok[m
    org.rnorth.duct-tape:duct-tape:jar:1.0.8:test[36m -- module duct.tape[0;1;33m (auto)[m
    org.slf4j:slf4j-api:jar:1.7.36:test[36m -- module org.slf4j[0;1m [auto][m
-   org.testcontainers:junit-jupiter:jar:1.21.0:test[36m -- module junit.jupiter[0;1;33m (auto)[m
-   org.testcontainers:testcontainers:jar:1.21.0:test[36m -- module testcontainers[0;1;33m (auto)[m
+   org.testcontainers:junit-jupiter:jar:1.21.3:test[36m -- module junit.jupiter[0;1;33m (auto)[m
+   org.testcontainers:testcontainers:jar:1.21.3:test[36m -- module testcontainers[0;1;33m (auto)[m
    org.yaml:snakeyaml:jar:2.4:compile[36m -- module org.yaml.snakeyaml[m
 

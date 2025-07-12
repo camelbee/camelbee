@@ -22,7 +22,7 @@
     <parent>
         <groupId>io.camelbee</groupId>
         <artifactId>camelbee-springboot-dependencies</artifactId>
-        <version>2.0.2</version>
+        <version>2.0.3</version>
         <relativePath>../../dependencies/springboot/pom.xml</relativePath>
     </parent>
 
@@ -35,12 +35,12 @@
         <dependency>
             <groupId>io.camelbee</groupId>
             <artifactId>camelbee-springboot-core</artifactId>
-            <version>${project.parent.version}</version>
+            <version>2.0.3</version>
         </dependency>
         <dependency>
             <groupId>io.camelbee</groupId>
             <artifactId>camelbee-springboot-security</artifactId>
-            <version>${project.parent.version}</version>
+            <version>2.0.3</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
