@@ -501,6 +501,7 @@
             <id>quality</id>
             <build>
                 <plugins>
+
                     <!-- ✅ Checkstyle -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -524,7 +525,7 @@
                         <executions>
                             <execution>
                                 <id>checkstyle</id>
-                                <phase>verify</phase>
+                                <phase>verify</phase> <!-- Back to verify phase -->
                                 <goals>
                                     <goal>check</goal>
                                 </goals>
@@ -548,7 +549,7 @@
                         <executions>
                             <execution>
                                 <id>pmd-verify</id>
-                                <phase>verify</phase>
+                                <phase>verify</phase> <!-- Back to verify phase -->
                                 <goals>
                                     <goal>check</goal>
                                     <goal>cpd-check</goal>
@@ -557,7 +558,6 @@
                         </executions>
                     </plugin>
 
-
                     <!-- ✅ SpotBugs -->
                     <plugin>
                         <groupId>com.github.spotbugs</groupId>
@@ -565,6 +565,8 @@
                         <version>${spotbugs-maven-plugin.version}</version>
                         <configuration>
                             <excludeFilterFile>${project.build.directory}/config/spotbugs/exclude.xml</excludeFilterFile>
+                            <effort>Max</effort>
+                            <threshold>Medium</threshold>
                         </configuration>
                         <dependencies>
                             <dependency>
@@ -576,7 +578,7 @@
                         <executions>
                             <execution>
                                 <id>spotbugs-verify</id>
-                                <phase>verify</phase>
+                                <phase>verify</phase> <!-- Back to verify phase -->
                                 <goals>
                                     <goal>check</goal>
                                 </goals>

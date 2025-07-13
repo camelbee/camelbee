@@ -21,4 +21,99 @@
     <Class name="~.*\.*Impl"/>
   </Match>
 
+  <!-- === Generated Code Exclusions === -->
+
+  <!-- Exclude all generated sources by source file path -->
+  <Match>
+    <Source name="~.*generated-sources.*"/>
+  </Match>
+
+  <!-- Google Protobuf classes -->
+  <Match>
+    <Package name="~com\.google\.protobuf.*"/>
+  </Match>
+
+  <!-- Google Type classes -->
+  <Match>
+    <Package name="~com\.google\.type.*"/>
+  </Match>
+
+  <!-- Any package containing 'proto' -->
+  <Match>
+    <Package name="~.*\.proto.*"/>
+  </Match>
+
+  <!-- Any package containing 'avro' -->
+  <Match>
+    <Package name="~.*\.avro.*"/>
+  </Match>
+
+  <!-- Any package containing 'generated' -->
+  <Match>
+    <Package name="~.*\.generated.*"/>
+  </Match>
+
+  <!-- OpenAPI generated code -->
+  <Match>
+    <Package name="~.*\.openapi.*"/>
+  </Match>
+
+  <!-- Exclude classes that end with common generated suffixes -->
+  <Match>
+    <Class name="~.*OuterClass.*"/>
+  </Match>
+
+  <Match>
+    <Class name="~.*Proto.*"/>
+  </Match>
+
+  <!-- Exclude specific SpotBugs rules for generated code -->
+  <Match>
+    <Bug pattern="MS_EXPOSE_REP"/>
+    <Class name="~.*\.proto\..*"/>
+  </Match>
+
+  <Match>
+    <Bug pattern="MS_EXPOSE_REP"/>
+    <Class name="~.*\.avro\..*"/>
+  </Match>
+
+  <Match>
+    <Bug pattern="MS_EXPOSE_REP"/>
+    <Class name="~.*Proto.*"/>
+  </Match>
+
+  <Match>
+    <Bug pattern="SING_SINGLETON_IMPLEMENTS_SERIALIZABLE"/>
+    <Class name="~.*\.proto\..*"/>
+  </Match>
+
+  <Match>
+    <Bug pattern="SING_SINGLETON_IMPLEMENTS_SERIALIZABLE"/>
+    <Class name="~.*\.avro\..*"/>
+  </Match>
+
+  <Match>
+    <Bug pattern="SING_SINGLETON_IMPLEMENTS_SERIALIZABLE"/>
+    <Class name="~.*Proto.*"/>
+  </Match>
+
+  <!-- Exclude getDecoder() method issues in Avro classes -->
+  <Match>
+    <Bug pattern="MS_EXPOSE_REP"/>
+    <Method name="getDecoder"/>
+  </Match>
+
+  <!-- Exclude getDefaultInstance() method issues -->
+  <Match>
+    <Bug pattern="MS_EXPOSE_REP"/>
+    <Method name="getDefaultInstance"/>
+  </Match>
+
+  <!-- Exclude getDescriptor() method issues -->
+  <Match>
+    <Bug pattern="MS_EXPOSE_REP"/>
+    <Method name="getDescriptor"/>
+  </Match>
+
 </FindBugsFilter>
