@@ -26,6 +26,7 @@
 		<relativePath>../../dependencies/quarkus/pom.xml</relativePath>
 	</parent>
 
+	<name>CamelBee Quarkus Starter</name>
 	<artifactId>camelbee-quarkus-starter</artifactId>
 	<packaging>pom</packaging>
 

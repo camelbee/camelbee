@@ -26,6 +26,7 @@
 		<relativePath>../../dependencies/quarkus/pom.xml</relativePath>
 	</parent>
 
+	<name>CamelBee Quarkus Security</name>
 	<artifactId>camelbee-quarkus-security</artifactId>
 	<packaging>jar</packaging>
 

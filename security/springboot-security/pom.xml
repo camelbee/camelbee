@@ -26,6 +26,7 @@
         <relativePath>../../dependencies/springboot/pom.xml</relativePath>
     </parent>
 
+    <name>CamelBee SpringBoot Security</name>
     <artifactId>camelbee-springboot-security</artifactId>
     <packaging>jar</packaging>
 
