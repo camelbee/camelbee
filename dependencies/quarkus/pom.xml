@@ -32,7 +32,7 @@
 
     <properties>
 
-        <quarkus.platform.version>3.26.3</quarkus.platform.version>
+        <quarkus.platform.version>3.26.4</quarkus.platform.version>
         <camel-quarkus.platform.version>${quarkus.platform.version}</camel-quarkus.platform.version>
         <quarkiverse-artemis.version>3.0.0</quarkiverse-artemis.version>
         <assertj-core.version>3.27.3</assertj-core.version>
