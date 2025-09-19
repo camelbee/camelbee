@@ -22,7 +22,7 @@
     <parent>
         <groupId>io.camelbee</groupId>
         <artifactId>camelbee-springboot-dependencies</artifactId>
-        <version>2.0.3</version>
+        <version>2.0.4</version>
         <relativePath>../../dependencies/springboot/pom.xml</relativePath>
     </parent>
 
