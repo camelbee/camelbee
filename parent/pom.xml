@@ -82,7 +82,7 @@
         <testcontainers-bom.version>1.21.3</testcontainers-bom.version>
         <snakeyaml.version>2.4</snakeyaml.version>
         <wiremock.version>3.13.1</wiremock.version>
-        <nimbus-jose-jwt.version>10.3</nimbus-jose-jwt.version>
+        <nimbus-jose-jwt.version>10.5</nimbus-jose-jwt.version>
         <os-maven-plugin.version>1.7.1</os-maven-plugin.version>
         <cxf-xjc-runtime.version>4.1.0</cxf-xjc-runtime.version>
         <cxf-xjc-ts.version>4.1.0</cxf-xjc-ts.version>
