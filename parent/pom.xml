@@ -43,7 +43,7 @@
         <cxf-xjc-plugin.version>4.0.2</cxf-xjc-plugin.version>
         <cxf-xjc-dv.version>4.0.2</cxf-xjc-dv.version>
         <dependency-lock-maven-plugin.version>1.0.2</dependency-lock-maven-plugin.version>
-        <formatter-maven-plugin.version>2.26.0</formatter-maven-plugin.version>
+        <formatter-maven-plugin.version>2.29.0</formatter-maven-plugin.version>
         <impsort-maven-plugin.version>1.12.0</impsort-maven-plugin.version>
         <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
         <jackson-databind-nullable.version>0.2.7</jackson-databind-nullable.version>
