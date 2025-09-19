@@ -324,16 +324,16 @@ The following files have been resolved:
    org.jvnet.staxex:stax-ex:jar:2.1.0:provided[36m -- module org.jvnet.staxex[m
    org.mapstruct:mapstruct:jar:1.6.3:compile[36m -- module org.mapstruct[0;1m [auto][m
    org.mockito:mockito-core:jar:5.18.0:test[36m -- module org.mockito[m
-   org.mockito:mockito-junit-jupiter:jar:5.18.0:test[36m -- module org.mockito.junit.jupiter[m
+   org.mockito:mockito-junit-jupiter:jar:5.19.0:test[36m -- module org.mockito.junit.jupiter[m
    org.objenesis:objenesis:jar:3.3:test[36m -- module org.objenesis[0;1m [auto][m
-   org.openapitools:jackson-databind-nullable:jar:0.2.6:compile[36m -- module org.openapitools.jackson.nullable[0;1m [auto][m
+   org.openapitools:jackson-databind-nullable:jar:0.2.7:compile[36m -- module org.openapitools.jackson.nullable[0;1m [auto][m
    org.opentest4j:opentest4j:jar:1.3.0:test[36m -- module org.opentest4j[m
    org.ow2.asm:asm-analysis:jar:9.8:test[36m -- module org.objectweb.asm.tree.analysis[m
    org.ow2.asm:asm-commons:jar:9.8:test[36m -- module org.objectweb.asm.commons[m
    org.ow2.asm:asm-tree:jar:9.8:test[36m -- module org.objectweb.asm.tree[m
    org.ow2.asm:asm-util:jar:9.8:test[36m -- module org.objectweb.asm.util[m
    org.ow2.asm:asm:jar:9.8:test[36m -- module org.objectweb.asm[m
-   org.projectlombok:lombok:jar:1.18.38:provided[36m -- module lombok[m
+   org.projectlombok:lombok:jar:1.18.42:provided[36m -- module lombok[m
    org.reactivestreams:reactive-streams:jar:1.0.4:provided[36m -- module org.reactivestreams[0;1m [auto][m
    org.rnorth.duct-tape:duct-tape:jar:1.0.8:test[36m -- module duct.tape[0;1;33m (auto)[m
    org.slf4j:slf4j-api:jar:2.0.17:compile[36m -- module org.slf4j[m
