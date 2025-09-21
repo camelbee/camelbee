@@ -36,7 +36,7 @@
         <camel-quarkus.platform.version>${quarkus.platform.version}</camel-quarkus.platform.version>
         <quarkiverse-artemis.version>3.0.0</quarkiverse-artemis.version>
         <assertj-core.version>3.27.5</assertj-core.version>
-        <quarkus-logging-json.version>3.3.0</quarkus-logging-json.version>
+        <quarkus-logging-json.version>3.3.1</quarkus-logging-json.version>
         <quarkiverse-artemis-jms.version>3.10.0</quarkiverse-artemis-jms.version>
         <camel-quarkus-rabbitmq.version>2.16.0</camel-quarkus-rabbitmq.version>
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
