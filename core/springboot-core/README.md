@@ -75,16 +75,19 @@ To enable specific features of the CamelBee library, add/modify the following pr
 
 ```
 camelbee:
-  # When context-enabled is true, it allows the CamelBee WebGL application to fetch the topology of the Camel Context.
+  # when enabled it allows the CamelBe WebGL application to fetch the topology of the Camel Context.
   context-enabled: true
-  # When producer-enabled is true, it allows the CamelBee WebGL application to trigger the consumer routes.
-  # producer-enabled SHOULD BE ONLY ENABLED FOR DEVELOPMENT AND TESTING PURPOSES, NOT FOR PRODUCTION.
+  # when enabled it allows the CamelBe WebGL application to trigger the consumer routes.
   producer-enabled: true
-  # When debugger-enabled is true, it intercepts and traces requests and responses of all Camel components and caches messages.
-  # debugger-enabled SHOULD BE ONLY ENABLED FOR DEVELOPMENT AND TESTING PURPOSES, FOR PRODUCTION IT COULD BE USED TEMPORARILY.
-  debugger-enabled: true
-  # Maximum time the tracer can remain idle before deactivation tracing of messages.
-  debugger-max-idle-time: 60000
+  # tracer-enabled SHOULD BE ONLY ENABLED FOR DEVELOPMENT PURPOSES, NOT FOR PRODUCTION.
+  # when enabled intercepts/traces request and responses of all camel components and caches messages.
+  tracer-enabled: true
+  # maximum time the tracer can remain idle before deactivation tracing of messages.
+  tracer-max-idle-time: 60000
+  # maximum collected trace messages
+  tracer-max-messages-count: 10000
+  # when enabled it logs the messages exchanged between endpoints
+  logging-enabled: true
 ```
 
 

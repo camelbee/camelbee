@@ -10,7 +10,7 @@ The following files have been resolved:
    com.github.spotbugs:spotbugs-annotations:jar:4.9.6:compile[36m -- module com.github.spotbugs.annotations[0;1m [auto][m
    com.google.code.findbugs:jsr305:jar:3.0.2:compile[36m -- module jsr305[0;1;33m (auto)[m
    com.sun.istack:istack-commons-runtime:jar:4.1.2:compile[36m -- module com.sun.istack.runtime[m
-   commons-io:commons-io:jar:2.19.0:compile[36m -- module org.apache.commons.io[m
+   commons-io:commons-io:jar:2.20.0:compile[36m -- module org.apache.commons.io[m
    jakarta.activation:jakarta.activation-api:jar:2.1.4:compile[36m -- module jakarta.activation[m
    jakarta.annotation:jakarta.annotation-api:jar:2.1.1:compile[36m -- module jakarta.annotation[m
    jakarta.xml.bind:jakarta.xml.bind-api:jar:4.0.2:compile[36m -- module jakarta.xml.bind[m
@@ -35,5 +35,5 @@ The following files have been resolved:
    org.slf4j:slf4j-api:jar:2.0.17:test[36m -- module org.slf4j[m
    org.testcontainers:junit-jupiter:jar:1.21.3:test[36m -- module junit.jupiter[0;1;33m (auto)[m
    org.testcontainers:testcontainers:jar:1.21.3:test[36m -- module testcontainers[0;1;33m (auto)[m
-   org.yaml:snakeyaml:jar:2.4:compile[36m -- module org.yaml.snakeyaml[m
+   org.yaml:snakeyaml:jar:2.5:compile[36m -- module org.yaml.snakeyaml[m
 

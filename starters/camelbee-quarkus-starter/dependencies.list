@@ -25,7 +25,7 @@ The following files have been resolved:
    com.sun.istack:istack-commons-runtime:jar:4.1.2:compile[36m -- module com.sun.istack.runtime[m
    commons-cli:commons-cli:jar:1.8.0:test[36m -- module org.apache.commons.cli[m
    commons-codec:commons-codec:jar:1.19.0:compile[36m -- module org.apache.commons.codec[m
-   commons-io:commons-io:jar:2.19.0:compile[36m -- module org.apache.commons.io[m
+   commons-io:commons-io:jar:2.20.0:compile[36m -- module org.apache.commons.io[m
    io.camelbee:camelbee-quarkus-core:jar:2.0.4:compile[36m -- module camelbee.quarkus.core[0;1;33m (auto)[m
    io.camelbee:camelbee-quarkus-security:jar:2.0.4:compile[36m -- module camelbee.quarkus.security[0;1;33m (auto)[m
    io.github.dmlloyd:jdk-classfile-backport:jar:24.0:test[36m -- module io.github.dmlloyd.classfile[m
@@ -52,7 +52,7 @@ The following files have been resolved:
    io.prometheus:simpleclient_tracer_common:jar:0.16.0:compile[36m -- module simpleclient.tracer.common[0;1;33m (auto)[m
    io.prometheus:simpleclient_tracer_otel:jar:0.16.0:compile[36m -- module simpleclient.tracer.otel[0;1;33m (auto)[m
    io.prometheus:simpleclient_tracer_otel_agent:jar:0.16.0:compile[36m -- module simpleclient.tracer.otel.agent[0;1;33m (auto)[m
-   io.quarkiverse.loggingjson:quarkus-logging-json:jar:3.3.0:compile[36m -- module quarkus.logging.json[0;1;33m (auto)[m
+   io.quarkiverse.loggingjson:quarkus-logging-json:jar:3.3.1:compile[36m -- module quarkus.logging.json[0;1;33m (auto)[m
    io.quarkus.arc:arc:jar:3.26.4:compile[36m -- module arc[0;1;33m (auto)[m
    io.quarkus.gizmo:gizmo2:jar:2.0.0.Beta6:test[36m -- module io.quarkus.gizmo2[m
    io.quarkus.gizmo:gizmo:jar:1.9.0:test[36m -- module gizmo[0;1;33m (auto)[m
@@ -336,5 +336,5 @@ The following files have been resolved:
    org.testcontainers:junit-jupiter:jar:1.21.3:test[36m -- module junit.jupiter[0;1;33m (auto)[m
    org.testcontainers:testcontainers:jar:1.21.3:test[36m -- module testcontainers[0;1;33m (auto)[m
    org.wildfly.common:wildfly-common:jar:2.0.1:compile[36m -- module org.wildfly.common[m
-   org.yaml:snakeyaml:jar:2.4:compile[36m -- module org.yaml.snakeyaml[m
+   org.yaml:snakeyaml:jar:2.5:compile[36m -- module org.yaml.snakeyaml[m
 

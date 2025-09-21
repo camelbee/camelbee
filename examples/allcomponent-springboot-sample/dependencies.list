@@ -26,7 +26,7 @@ The following files have been resolved:
    commons-beanutils:commons-beanutils:jar:1.10.1:compile[36m -- module org.apache.commons.beanutils[m
    commons-codec:commons-codec:jar:1.18.0:compile[36m -- module org.apache.commons.codec[m
    commons-collections:commons-collections:jar:3.2.2:compile[36m -- module commons.collections[0;1;33m (auto)[m
-   commons-io:commons-io:jar:2.19.0:compile[36m -- module org.apache.commons.io[m
+   commons-io:commons-io:jar:2.20.0:compile[36m -- module org.apache.commons.io[m
    de.dentrassi.crypto:pem-keystore:jar:3.0.0:compile[36m -- module pem.keystore[0;1;33m (auto)[m
    io.camelbee:camelbee-springboot-core:jar:2.0.4:compile[36m -- module camelbee.springboot.core[0;1;33m (auto)[m
    io.camelbee:camelbee-springboot-security:jar:2.0.4:compile[36m -- module camelbee.springboot.security[0;1;33m (auto)[m
@@ -309,5 +309,5 @@ The following files have been resolved:
    org.testcontainers:testcontainers:jar:1.21.3:test[36m -- module testcontainers[0;1;33m (auto)[m
    org.xerial.snappy:snappy-java:jar:1.1.10.5:runtime[36m -- module snappy.java[0;1;33m (auto)[m
    org.xmlunit:xmlunit-core:jar:2.10.4:test[36m -- module org.xmlunit[0;1m [auto][m
-   org.yaml:snakeyaml:jar:2.4:compile[36m -- module org.yaml.snakeyaml[m
+   org.yaml:snakeyaml:jar:2.5:compile[36m -- module org.yaml.snakeyaml[m
 

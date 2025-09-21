@@ -19,7 +19,7 @@ The following files have been resolved:
    com.sun.istack:istack-commons-runtime:jar:4.1.2:compile[36m -- module com.sun.istack.runtime[m
    com.vaadin.external.google:android-json:jar:0.0.20131108.vaadin1:test[36m -- module android.json[0;1;33m (auto)[m
    commons-codec:commons-codec:jar:1.18.0:compile[36m -- module org.apache.commons.codec[m
-   commons-io:commons-io:jar:2.19.0:compile[36m -- module org.apache.commons.io[m
+   commons-io:commons-io:jar:2.20.0:compile[36m -- module org.apache.commons.io[m
    io.micrometer:micrometer-commons:jar:1.15.4:compile[36m -- module micrometer.commons[0;1m [auto][m
    io.micrometer:micrometer-observation:jar:1.15.4:compile[36m -- module micrometer.observation[0;1m [auto][m
    jakarta.activation:jakarta.activation-api:jar:2.1.4:compile[36m -- module jakarta.activation[m
@@ -188,5 +188,5 @@ The following files have been resolved:
    org.testcontainers:junit-jupiter:jar:1.21.3:test[36m -- module junit.jupiter[0;1;33m (auto)[m
    org.testcontainers:testcontainers:jar:1.21.3:test[36m -- module testcontainers[0;1;33m (auto)[m
    org.xmlunit:xmlunit-core:jar:2.10.4:test[36m -- module org.xmlunit[0;1m [auto][m
-   org.yaml:snakeyaml:jar:2.4:compile[36m -- module org.yaml.snakeyaml[m
+   org.yaml:snakeyaml:jar:2.5:compile[36m -- module org.yaml.snakeyaml[m
 
