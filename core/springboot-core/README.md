@@ -20,13 +20,13 @@ Once the maven artifact is created, you can include it in your project by adding
   <parent>
     <groupId>io.camelbee</groupId>
     <artifactId>camelbee-springboot-starter</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.4</version>
   </parent>
 ```
 
-### Maven Installation Custom Without CamelBee Starter Project as parent but directly adding the core library
+### Custom Maven Installation: Adding Core Library Directly Without CamelBee Starter Parent
 
-If you prefer not to use `camelbee-springboot-starter` as the parent project, you can build `camelbee-springboot-core-custom` separately for your project using the provided `pom-custom.xml`. Follow these steps:
+If you'd rather not use `camelbee-springboot-starter` as your parent project, you can build and use `camelbee-springboot-core-custom` independently. This approach uses the provided `pom-custom.xml` file, which allows you to customize Java and Camel Spring Boot versions to match your existing project setup.
 
 1. Build the core library with the custom POM file:
 
@@ -38,7 +38,7 @@ Once the custom maven artifact is created, you can include it in your project by
   <dependency>
     <groupId>io.camelbee</groupId>
     <artifactId>camelbee-springboot-core-custom</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.4</version>
   </dependency>
 ```
 
