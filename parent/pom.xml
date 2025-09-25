@@ -37,7 +37,7 @@
         <camel-maven-plugin.version>4.14.0</camel-maven-plugin.version>
         <checkstyle.version>11.0.1</checkstyle.version>
         <commons-io.version>2.20.0</commons-io.version>
-        <commons-lang3.version>3.18.0</commons-lang3.version>
+        <commons-lang3.version>3.19.0</commons-lang3.version>
         <cxf-core.version>4.1.3</cxf-core.version>
         <cxf-codegen-plugin.version>4.0.5</cxf-codegen-plugin.version>
         <cxf-xjc-plugin.version>4.0.2</cxf-xjc-plugin.version>
