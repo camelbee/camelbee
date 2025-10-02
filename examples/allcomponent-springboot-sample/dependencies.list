@@ -184,7 +184,7 @@ The following files have been resolved:
    org.apache.camel:camel-xpath:jar:4.14.0:compile[36m -- module camel.xpath[0;1;33m (auto)[m
    org.apache.camel:camel-xslt:jar:4.14.0:compile[36m -- module camel.xslt[0;1;33m (auto)[m
    org.apache.commons:commons-compress:jar:1.24.0:test[36m -- module org.apache.commons.compress[m
-   org.apache.commons:commons-lang3:jar:3.18.0:compile[36m -- module org.apache.commons.lang3[m
+   org.apache.commons:commons-lang3:jar:3.19.0:compile[36m -- module org.apache.commons.lang3[m
    org.apache.cxf:cxf-core:jar:4.1.3:compile[36m -- module org.apache.cxf.core[0;1m [auto][m
    org.apache.httpcomponents.client5:httpclient5:jar:5.5:compile[36m -- module org.apache.httpcomponents.client5.httpclient5[0;1m [auto][m
    org.apache.httpcomponents.core5:httpcore5-h2:jar:5.3.5:compile[36m -- module org.apache.httpcomponents.core5.httpcore5.h2[0;1m [auto][m
