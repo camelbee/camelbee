@@ -1,4 +1,3 @@
-
 The following files have been resolved:
    ch.qos.logback:logback-classic:jar:1.5.18:compile[36m -- module ch.qos.logback.classic[m
    ch.qos.logback:logback-core:jar:1.5.18:compile[36m -- module ch.qos.logback.core[m
