@@ -53,48 +53,48 @@ The following files have been resolved:
    io.prometheus:simpleclient_tracer_otel:jar:0.16.0:compile[36m -- module simpleclient.tracer.otel[0;1;33m (auto)[m
    io.prometheus:simpleclient_tracer_otel_agent:jar:0.16.0:compile[36m -- module simpleclient.tracer.otel.agent[0;1;33m (auto)[m
    io.quarkiverse.loggingjson:quarkus-logging-json:jar:3.3.1:compile[36m -- module quarkus.logging.json[0;1;33m (auto)[m
-   io.quarkus.arc:arc:jar:3.28.1:compile[36m -- module arc[0;1;33m (auto)[m
+   io.quarkus.arc:arc:jar:3.28.2:compile[36m -- module arc[0;1;33m (auto)[m
    io.quarkus.gizmo:gizmo2:jar:2.0.0.Beta6:test[36m -- module io.quarkus.gizmo2[m
    io.quarkus.gizmo:gizmo:jar:1.9.0:test[36m -- module gizmo[0;1;33m (auto)[m
    io.quarkus.security:quarkus-security:jar:2.2.1:compile[36m -- module io.quarkus.security.api[0;1m [auto][m
-   io.quarkus:quarkus-arc:jar:3.28.1:compile[36m -- module quarkus.arc[0;1;33m (auto)[m
-   io.quarkus:quarkus-bootstrap-app-model:jar:3.28.1:test[36m -- module quarkus.bootstrap.app.model[0;1;33m (auto)[m
-   io.quarkus:quarkus-bootstrap-core:jar:3.28.1:test[36m -- module quarkus.bootstrap.core[0;1;33m (auto)[m
-   io.quarkus:quarkus-bootstrap-gradle-resolver:jar:3.28.1:test[36m -- module quarkus.bootstrap.gradle.resolver[0;1;33m (auto)[m
-   io.quarkus:quarkus-bootstrap-maven-resolver:jar:3.28.1:test[36m -- module quarkus.bootstrap.maven.resolver[0;1;33m (auto)[m
-   io.quarkus:quarkus-bootstrap-maven4-resolver:jar:3.28.1:test[36m -- module quarkus.bootstrap.maven4.resolver[0;1;33m (auto)[m
-   io.quarkus:quarkus-bootstrap-runner:jar:3.28.1:compile[36m -- module quarkus.bootstrap.runner[0;1;33m (auto)[m
-   io.quarkus:quarkus-builder:jar:3.28.1:test[36m -- module quarkus.builder[0;1;33m (auto)[m
-   io.quarkus:quarkus-class-change-agent:jar:3.28.1:test[36m -- module quarkus.klass.change.agent[0;1m [auto][m
-   io.quarkus:quarkus-classloader-commons:jar:3.28.1:compile[36m -- module quarkus.classloader.commons[0;1;33m (auto)[m
-   io.quarkus:quarkus-config-yaml:jar:3.28.1:compile[36m -- module quarkus.config.yaml[0;1;33m (auto)[m
-   io.quarkus:quarkus-core-deployment:jar:3.28.1:test[36m -- module quarkus.core.deployment[0;1;33m (auto)[m
-   io.quarkus:quarkus-core:jar:3.28.1:compile[36m -- module quarkus.core[0;1;33m (auto)[m
-   io.quarkus:quarkus-credentials:jar:3.28.1:compile[36m -- module quarkus.credentials[0;1;33m (auto)[m
-   io.quarkus:quarkus-development-mode-spi:jar:3.28.1:compile[36m -- module quarkus.development.mode.spi[0;1;33m (auto)[m
+   io.quarkus:quarkus-arc:jar:3.28.2:compile[36m -- module quarkus.arc[0;1;33m (auto)[m
+   io.quarkus:quarkus-bootstrap-app-model:jar:3.28.2:test[36m -- module quarkus.bootstrap.app.model[0;1;33m (auto)[m
+   io.quarkus:quarkus-bootstrap-core:jar:3.28.2:test[36m -- module quarkus.bootstrap.core[0;1;33m (auto)[m
+   io.quarkus:quarkus-bootstrap-gradle-resolver:jar:3.28.2:test[36m -- module quarkus.bootstrap.gradle.resolver[0;1;33m (auto)[m
+   io.quarkus:quarkus-bootstrap-maven-resolver:jar:3.28.2:test[36m -- module quarkus.bootstrap.maven.resolver[0;1;33m (auto)[m
+   io.quarkus:quarkus-bootstrap-maven4-resolver:jar:3.28.2:test[36m -- module quarkus.bootstrap.maven4.resolver[0;1;33m (auto)[m
+   io.quarkus:quarkus-bootstrap-runner:jar:3.28.2:compile[36m -- module quarkus.bootstrap.runner[0;1;33m (auto)[m
+   io.quarkus:quarkus-builder:jar:3.28.2:test[36m -- module quarkus.builder[0;1;33m (auto)[m
+   io.quarkus:quarkus-class-change-agent:jar:3.28.2:test[36m -- module quarkus.klass.change.agent[0;1m [auto][m
+   io.quarkus:quarkus-classloader-commons:jar:3.28.2:compile[36m -- module quarkus.classloader.commons[0;1;33m (auto)[m
+   io.quarkus:quarkus-config-yaml:jar:3.28.2:compile[36m -- module quarkus.config.yaml[0;1;33m (auto)[m
+   io.quarkus:quarkus-core-deployment:jar:3.28.2:test[36m -- module quarkus.core.deployment[0;1;33m (auto)[m
+   io.quarkus:quarkus-core:jar:3.28.2:compile[36m -- module quarkus.core[0;1;33m (auto)[m
+   io.quarkus:quarkus-credentials:jar:3.28.2:compile[36m -- module quarkus.credentials[0;1;33m (auto)[m
+   io.quarkus:quarkus-development-mode-spi:jar:3.28.2:compile[36m -- module quarkus.development.mode.spi[0;1;33m (auto)[m
    io.quarkus:quarkus-fs-util:jar:1.2.0:compile[36m -- module quarkus.fs.util[0;1;33m (auto)[m
-   io.quarkus:quarkus-hibernate-validator-spi:jar:3.28.1:test[36m -- module quarkus.hibernate.validator.spi[0;1;33m (auto)[m
-   io.quarkus:quarkus-hibernate-validator:jar:3.28.1:compile[36m -- module quarkus.hibernate.validator[0;1;33m (auto)[m
-   io.quarkus:quarkus-ide-launcher:jar:3.28.1:compile[36m -- module quarkus.ide.launcher[0;1;33m (auto)[m
-   io.quarkus:quarkus-jackson:jar:3.28.1:compile[36m -- module quarkus.jackson[0;1;33m (auto)[m
-   io.quarkus:quarkus-jaxp:jar:3.28.1:compile[36m -- module quarkus.jaxp[0;1;33m (auto)[m
-   io.quarkus:quarkus-jsonp:jar:3.28.1:compile[36m -- module quarkus.jsonp[0;1;33m (auto)[m
-   io.quarkus:quarkus-junit5-config:jar:3.28.1:test[36m -- module quarkus.junit5.config[0;1;33m (auto)[m
-   io.quarkus:quarkus-junit5:jar:3.28.1:test[36m -- module quarkus.junit5[0;1;33m (auto)[m
-   io.quarkus:quarkus-micrometer-registry-prometheus:jar:3.28.1:compile[36m -- module quarkus.micrometer.registry.prometheus[0;1;33m (auto)[m
-   io.quarkus:quarkus-micrometer:jar:3.28.1:compile[36m -- module quarkus.micrometer[0;1;33m (auto)[m
-   io.quarkus:quarkus-mutiny:jar:3.28.1:compile[36m -- module quarkus.mutiny[0;1;33m (auto)[m
-   io.quarkus:quarkus-netty:jar:3.28.1:compile[36m -- module quarkus.netty[0;1;33m (auto)[m
-   io.quarkus:quarkus-security-runtime-spi:jar:3.28.1:compile[36m -- module quarkus.security.runtime.spi[0;1;33m (auto)[m
-   io.quarkus:quarkus-smallrye-context-propagation:jar:3.28.1:compile[36m -- module quarkus.smallrye.context.propagation[0;1;33m (auto)[m
-   io.quarkus:quarkus-smallrye-health:jar:3.28.1:compile[36m -- module quarkus.smallrye.health[0;1;33m (auto)[m
-   io.quarkus:quarkus-test-common:jar:3.28.1:test[36m -- module quarkus.test.common[0;1;33m (auto)[m
-   io.quarkus:quarkus-tls-registry-spi:jar:3.28.1:compile[36m -- module quarkus.tls.registry.spi[0;1;33m (auto)[m
-   io.quarkus:quarkus-tls-registry:jar:3.28.1:compile[36m -- module quarkus.tls.registry[0;1;33m (auto)[m
-   io.quarkus:quarkus-vertx-http:jar:3.28.1:compile[36m -- module quarkus.vertx.http[0;1;33m (auto)[m
-   io.quarkus:quarkus-vertx-latebound-mdc-provider:jar:3.28.1:compile[36m -- module quarkus.vertx.latebound.mdc.provider[0;1;33m (auto)[m
-   io.quarkus:quarkus-vertx:jar:3.28.1:compile[36m -- module quarkus.vertx[0;1;33m (auto)[m
-   io.quarkus:quarkus-virtual-threads:jar:3.28.1:compile[36m -- module quarkus.virtual.threads[0;1;33m (auto)[m
+   io.quarkus:quarkus-hibernate-validator-spi:jar:3.28.2:test[36m -- module quarkus.hibernate.validator.spi[0;1;33m (auto)[m
+   io.quarkus:quarkus-hibernate-validator:jar:3.28.2:compile[36m -- module quarkus.hibernate.validator[0;1;33m (auto)[m
+   io.quarkus:quarkus-ide-launcher:jar:3.28.2:compile[36m -- module quarkus.ide.launcher[0;1;33m (auto)[m
+   io.quarkus:quarkus-jackson:jar:3.28.2:compile[36m -- module quarkus.jackson[0;1;33m (auto)[m
+   io.quarkus:quarkus-jaxp:jar:3.28.2:compile[36m -- module quarkus.jaxp[0;1;33m (auto)[m
+   io.quarkus:quarkus-jsonp:jar:3.28.2:compile[36m -- module quarkus.jsonp[0;1;33m (auto)[m
+   io.quarkus:quarkus-junit5-config:jar:3.28.2:test[36m -- module quarkus.junit5.config[0;1;33m (auto)[m
+   io.quarkus:quarkus-junit5:jar:3.28.2:test[36m -- module quarkus.junit5[0;1;33m (auto)[m
+   io.quarkus:quarkus-micrometer-registry-prometheus:jar:3.28.2:compile[36m -- module quarkus.micrometer.registry.prometheus[0;1;33m (auto)[m
+   io.quarkus:quarkus-micrometer:jar:3.28.2:compile[36m -- module quarkus.micrometer[0;1;33m (auto)[m
+   io.quarkus:quarkus-mutiny:jar:3.28.2:compile[36m -- module quarkus.mutiny[0;1;33m (auto)[m
+   io.quarkus:quarkus-netty:jar:3.28.2:compile[36m -- module quarkus.netty[0;1;33m (auto)[m
+   io.quarkus:quarkus-security-runtime-spi:jar:3.28.2:compile[36m -- module quarkus.security.runtime.spi[0;1;33m (auto)[m
+   io.quarkus:quarkus-smallrye-context-propagation:jar:3.28.2:compile[36m -- module quarkus.smallrye.context.propagation[0;1;33m (auto)[m
+   io.quarkus:quarkus-smallrye-health:jar:3.28.2:compile[36m -- module quarkus.smallrye.health[0;1;33m (auto)[m
+   io.quarkus:quarkus-test-common:jar:3.28.2:test[36m -- module quarkus.test.common[0;1;33m (auto)[m
+   io.quarkus:quarkus-tls-registry-spi:jar:3.28.2:compile[36m -- module quarkus.tls.registry.spi[0;1;33m (auto)[m
+   io.quarkus:quarkus-tls-registry:jar:3.28.2:compile[36m -- module quarkus.tls.registry[0;1;33m (auto)[m
+   io.quarkus:quarkus-vertx-http:jar:3.28.2:compile[36m -- module quarkus.vertx.http[0;1;33m (auto)[m
+   io.quarkus:quarkus-vertx-latebound-mdc-provider:jar:3.28.2:compile[36m -- module quarkus.vertx.latebound.mdc.provider[0;1;33m (auto)[m
+   io.quarkus:quarkus-vertx:jar:3.28.2:compile[36m -- module quarkus.vertx[0;1;33m (auto)[m
+   io.quarkus:quarkus-virtual-threads:jar:3.28.2:compile[36m -- module quarkus.virtual.threads[0;1;33m (auto)[m
    io.rest-assured:json-path:jar:5.5.6:test[36m -- module json.path[0;1;33m (auto)[m
    io.rest-assured:rest-assured-common:jar:5.5.6:test[36m -- module rest.assured.common[0;1;33m (auto)[m
    io.rest-assured:rest-assured:jar:5.5.6:test[36m -- module rest.assured[0;1;33m (auto)[m

@@ -31,7 +31,6 @@ import org.apache.camel.CamelContext;
 import org.camelbee.constants.CamelBeeConstants;
 import org.camelbee.debugger.model.route.CamelBeeContext;
 import org.camelbee.debugger.model.route.CamelRoute;
-import org.camelbee.debugger.service.MessageService;
 import org.camelbee.debugger.service.RouteContextService;
 import org.eclipse.microprofile.config.Config;
 
