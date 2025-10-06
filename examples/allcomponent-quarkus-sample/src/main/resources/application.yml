@@ -15,8 +15,6 @@
 camelbee:
   # when enabled it allows the CamelBe WebGL application to fetch the topology of the Camel Context.
   context-enabled: true
-  # when enabled it allows the CamelBe WebGL application to trigger the consumer routes.
-  producer-enabled: true
   # tracer-enabled SHOULD BE ONLY ENABLED FOR DEVELOPMENT PURPOSES, NOT FOR PRODUCTION.
   # when enabled intercepts/traces request and responses of all camel components and caches messages.
   tracer-enabled: true
