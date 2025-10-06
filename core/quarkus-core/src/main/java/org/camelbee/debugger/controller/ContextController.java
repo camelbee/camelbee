@@ -19,7 +19,6 @@ package org.camelbee.debugger.controller;
 import io.quarkus.arc.properties.IfBuildProperty;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -30,10 +29,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.camel.CamelContext;
 import org.camelbee.constants.CamelBeeConstants;
-import org.camelbee.debugger.model.exchange.MessageList;
 import org.camelbee.debugger.model.route.CamelBeeContext;
 import org.camelbee.debugger.model.route.CamelRoute;
-import org.camelbee.debugger.service.MessageService;
 import org.camelbee.debugger.service.RouteContextService;
 import org.eclipse.microprofile.config.Config;
 
@@ -46,9 +43,6 @@ public class ContextController {
 
   @Inject
   CamelContext camelContext;
-
-  @Inject
-  MessageService messageService;
 
   @Inject
   RouteContextService routeContextService;
@@ -88,32 +82,6 @@ public class ContextController {
     return Response
         .ok(new CamelBeeContext(routes, name, jvm, jvmInputParameters, garbageCollectors, framework, camelVersion))
         .build();
-  }
-
-  @GET
-  @Consumes("application/json")
-  @Produces("application/json")
-  @Path("/camelbee/messages")
-  public Response getMessages() {
-    return Response.ok(new MessageList(messageService.getMessageList())).build();
-
-  }
-
-  /**
-   * Delete messages.
-   *
-   * @return String The success message.
-   */
-  @DELETE
-  @Consumes("application/json")
-  @Produces("application/json")
-  @Path("/camelbee/messages")
-  public Response deleteMessages() {
-
-    messageService.reset();
-
-    return Response.ok("deleted.").build();
-
   }
 
 }

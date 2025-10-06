@@ -22,21 +22,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.camel.CamelContext;
 import org.camelbee.constants.CamelBeeConstants;
-import org.camelbee.debugger.model.exchange.MessageList;
 import org.camelbee.debugger.model.route.CamelBeeContext;
 import org.camelbee.debugger.model.route.CamelRoute;
-import org.camelbee.debugger.service.MessageService;
 import org.camelbee.debugger.service.RouteContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * ContextController exposes routes topology and messages.
+ * ContextController exposes routes topology and messages with version control.
  */
 @RestController
 @CrossOrigin(origins = {"https://www.camelbee.io", "http://localhost:8083"})
@@ -45,9 +42,6 @@ public class ContextController {
 
   @Autowired
   CamelContext camelContext;
-
-  @Autowired
-  MessageService messageService;
 
   @Autowired
   RouteContextService routeContextService;
@@ -79,25 +73,6 @@ public class ContextController {
         .collect(Collectors.joining(", "));
 
     return ResponseEntity.ok(new CamelBeeContext(routes, name, jvm, jvmInputParameters, garbageCollectors, framework, camelVersion));
-  }
-
-  @GetMapping(value = "/camelbee/messages")
-  public ResponseEntity<MessageList> getMessages() {
-    return ResponseEntity.ok(new MessageList(messageService.getMessageList()));
-  }
-
-  /**
-   * Delete messages.
-   *
-   * @return String The success message.
-   */
-  @DeleteMapping(value = "/camelbee/messages")
-  public ResponseEntity<String> deleteMessages() {
-
-    messageService.reset();
-
-    return ResponseEntity.ok("deleted.");
-
   }
 
 }

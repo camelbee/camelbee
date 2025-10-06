@@ -20,13 +20,13 @@ Once the maven artifact is created, you can include it in your project by adding
   <parent>
     <groupId>io.camelbee</groupId>
     <artifactId>camelbee-springboot-starter</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.4</version>
   </parent>
 ```
 
-### Maven Installation Custom Without CamelBee Starter Project as parent but directly adding the core library
+### Custom Maven Installation: Adding Core Library Directly Without CamelBee Starter Parent
 
-If you prefer not to use `camelbee-springboot-starter` as the parent project, you can build `camelbee-springboot-core-custom` separately for your project using the provided `pom-custom.xml`. Follow these steps:
+If you'd rather not use `camelbee-springboot-starter` as your parent project, you can build and use `camelbee-springboot-core-custom` independently. This approach uses the provided `pom-custom.xml` file, which allows you to customize Java and Camel Spring Boot versions to match your existing project setup.
 
 1. Build the core library with the custom POM file:
 
@@ -38,7 +38,7 @@ Once the custom maven artifact is created, you can include it in your project by
   <dependency>
     <groupId>io.camelbee</groupId>
     <artifactId>camelbee-springboot-core-custom</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.4</version>
   </dependency>
 ```
 
@@ -75,16 +75,17 @@ To enable specific features of the CamelBee library, add/modify the following pr
 
 ```
 camelbee:
-  # When context-enabled is true, it allows the CamelBee WebGL application to fetch the topology of the Camel Context.
+  # when enabled it allows the CamelBe WebGL application to fetch the topology of the Camel Context.
   context-enabled: true
-  # When producer-enabled is true, it allows the CamelBee WebGL application to trigger the consumer routes.
-  # producer-enabled SHOULD BE ONLY ENABLED FOR DEVELOPMENT AND TESTING PURPOSES, NOT FOR PRODUCTION.
-  producer-enabled: true
-  # When debugger-enabled is true, it intercepts and traces requests and responses of all Camel components and caches messages.
-  # debugger-enabled SHOULD BE ONLY ENABLED FOR DEVELOPMENT AND TESTING PURPOSES, FOR PRODUCTION IT COULD BE USED TEMPORARILY.
-  debugger-enabled: true
-  # Maximum time the tracer can remain idle before deactivation tracing of messages.
-  debugger-max-idle-time: 60000
+  # tracer-enabled SHOULD BE ONLY ENABLED FOR DEVELOPMENT PURPOSES, NOT FOR PRODUCTION.
+  # when enabled intercepts/traces request and responses of all camel components and caches messages.
+  tracer-enabled: true
+  # maximum time the tracer can remain idle before deactivation tracing of messages.
+  tracer-max-idle-time: 60000
+  # maximum collected trace messages
+  tracer-max-messages-count: 10000
+  # when enabled it logs the messages exchanged between endpoints
+  logging-enabled: true
 ```
 
 

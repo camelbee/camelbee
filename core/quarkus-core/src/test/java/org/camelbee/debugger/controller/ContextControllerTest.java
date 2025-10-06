@@ -24,10 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 import org.apache.camel.CamelContext;
 import org.camelbee.constants.CamelBeeConstants;
-import org.camelbee.debugger.model.exchange.Message;
-import org.camelbee.debugger.model.exchange.MessageEventType;
-import org.camelbee.debugger.model.exchange.MessageList;
-import org.camelbee.debugger.model.exchange.MessageType;
 import org.camelbee.debugger.model.route.CamelBeeContext;
 import org.camelbee.debugger.model.route.CamelRoute;
 import org.camelbee.debugger.model.route.CamelRouteOutput;
@@ -149,90 +145,6 @@ class ContextControllerTest {
     assertEquals("-", route2Output.getDelimiter());
     assertEquals("vm", route2Output.getType());
     assertNull(route2Output.getOutputs());
-  }
-
-  @Test
-  void getMessagesShouldReturnMessageListWithDifferentEventTypes() {
-    // Arrange
-    List<Message> mockMessages = Arrays.asList(
-        new Message("id1", MessageEventType.CREATED, "body1", "headers1", TEST_ROUTE_ID_1, "endpoint1", "endpointId1", MessageType.REQUEST, null),
-        new Message("id2", MessageEventType.SENDING, "body2", "headers2", TEST_ROUTE_ID_1, "endpoint2", "endpointId2", MessageType.RESPONSE, null),
-        new Message("id3", MessageEventType.SENT, "body3", "headers3", TEST_ROUTE_ID_2, "endpoint3", "endpointId3", MessageType.REQUEST, null),
-        new Message("id4", MessageEventType.COMPLETED, "body4", "headers4", TEST_ROUTE_ID_2, "endpoint4", "endpointId4", MessageType.RESPONSE, null)
-    );
-    when(messageService.getMessageList()).thenReturn(mockMessages);
-
-    // Act
-    Response response = contextController.getMessages();
-
-    // Assert
-    assertEquals(200, response.getStatus());
-    MessageList messageList = (MessageList) response.getEntity();
-    assertNotNull(messageList);
-    assertEquals(4, messageList.getMessages().size());
-
-    // Verify different message event types
-    assertEquals(MessageEventType.CREATED, messageList.getMessages().get(0).getExchangeEventType());
-    assertEquals(MessageEventType.SENDING, messageList.getMessages().get(1).getExchangeEventType());
-    assertEquals(MessageEventType.SENT, messageList.getMessages().get(2).getExchangeEventType());
-    assertEquals(MessageEventType.COMPLETED, messageList.getMessages().get(3).getExchangeEventType());
-
-    // Verify other message properties
-    Message firstMessage = messageList.getMessages().get(0);
-    assertEquals("id1", firstMessage.getExchangeId());
-    assertEquals("body1", firstMessage.getMessageBody());
-    assertEquals("headers1", firstMessage.getHeaders());
-    assertEquals(TEST_ROUTE_ID_1, firstMessage.getRouteId());
-    assertEquals("endpoint1", firstMessage.getEndpoint());
-    assertEquals("endpointId1", firstMessage.getEndpointId());
-    assertEquals(MessageType.REQUEST, firstMessage.getMessageType());
-    assertNull(firstMessage.getException());
-    assertNotNull(firstMessage.getTimeStamp());
-  }
-
-  @Test
-  void getMessagesShouldHandleMessagesWithNullEventType() {
-    // Arrange
-    List<Message> mockMessages = Arrays.asList(
-        new Message("id1", null, "body1", "headers1", TEST_ROUTE_ID_1, "endpoint1", "endpointId1", MessageType.REQUEST, null)
-    );
-    when(messageService.getMessageList()).thenReturn(mockMessages);
-
-    // Act
-    Response response = contextController.getMessages();
-
-    // Assert
-    assertEquals(200, response.getStatus());
-    MessageList messageList = (MessageList) response.getEntity();
-    assertNotNull(messageList);
-    assertEquals(1, messageList.getMessages().size());
-    assertNull(messageList.getMessages().get(0).getExchangeEventType());
-  }
-
-  @Test
-  void getMessagesShouldReturnEmptyListWhenNoMessages() {
-    // Arrange
-    when(messageService.getMessageList()).thenReturn(new ArrayList<>());
-
-    // Act
-    Response response = contextController.getMessages();
-
-    // Assert
-    assertEquals(200, response.getStatus());
-    MessageList messageList = (MessageList) response.getEntity();
-    assertNotNull(messageList);
-    assertTrue(messageList.getMessages().isEmpty());
-  }
-
-  @Test
-  void deleteMessagesShouldResetMessageService() {
-    // Act
-    Response response = contextController.deleteMessages();
-
-    // Assert
-    assertEquals(200, response.getStatus());
-    assertEquals("deleted.", response.getEntity());
-    verify(messageService).reset();
   }
 
   @Test
