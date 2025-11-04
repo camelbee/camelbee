@@ -88,7 +88,7 @@
         <cxf-xjc-ts.version>4.1.0</cxf-xjc-ts.version>
         <cxf-xjc-ts.version>4.1.0</cxf-xjc-ts.version>
         <saaj-impl.version>3.0.4</saaj-impl.version>
-        <avro-maven-plugin.version>1.12.0</avro-maven-plugin.version>
+        <avro-maven-plugin.version>1.12.1</avro-maven-plugin.version>
         <maven-replacer-plugin.version>1.5.3</maven-replacer-plugin.version>
         <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
         <jakarta.xml.ws-api.version>4.0.2</jakarta.xml.ws-api.version>
