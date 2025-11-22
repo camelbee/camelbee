@@ -44,7 +44,8 @@
         <camel-quarkus.platform.group-id>${quarkus.platform.group-id}</camel-quarkus.platform.group-id>
         <camel-quarkus.platform.artifact-id>quarkus-camel-bom</camel-quarkus.platform.artifact-id>
         <org.awaitility.awaitility>4.3.0</org.awaitility.awaitility>
-
+        <org.jetbrains.kotlin.kotlin-reflect.version>1.9.25</org.jetbrains.kotlin.kotlin-reflect.version>
+        <com.google.crypto.tink.version>1.15.0</com.google.crypto.tink.version>
     </properties>
 
     <dependencyManagement>
@@ -79,6 +80,20 @@
                 <groupId>org.awaitility</groupId>
                 <artifactId>awaitility</artifactId>
                 <version>${org.awaitility.awaitility}</version>
+            </dependency>
+
+            <!-- Required for native compilation of jms component -->
+            <dependency>
+              <groupId>org.jetbrains.kotlin</groupId>
+              <artifactId>kotlin-reflect</artifactId>
+              <version>${org.jetbrains.kotlin.kotlin-reflect.version}</version>
+            </dependency>
+
+            <!-- Required for native compilation of jwt-->
+            <dependency>
+              <groupId>com.google.crypto.tink</groupId>
+              <artifactId>tink</artifactId>
+              <version>${com.google.crypto.tink.version}</version>
             </dependency>
 
         </dependencies>
