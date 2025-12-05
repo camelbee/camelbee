@@ -8,6 +8,7 @@
   <packaging>pom</packaging>
   <version>2.0.5</version>
 
+
   <name>CamelBee</name>
   <description>CamelBee Root Pom</description>
   <url>https://github.com/egekaraosmanoglu/camelbee</url>
