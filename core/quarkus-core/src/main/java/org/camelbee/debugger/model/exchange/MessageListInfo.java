@@ -16,11 +16,13 @@
 
 package org.camelbee.debugger.model.exchange;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import java.time.Instant;
 
 /**
  * Contains metadata about the message list for efficient change detection.
  */
+@RegisterForReflection
 public class MessageListInfo {
 
   private final int count;
