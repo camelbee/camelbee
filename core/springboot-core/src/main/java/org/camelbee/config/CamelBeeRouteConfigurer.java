@@ -19,6 +19,9 @@ package org.camelbee.config;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.spi.UnitOfWorkFactory;
 import org.camelbee.logging.CamelBeeUnitOfWork;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,15 +31,27 @@ import org.springframework.stereotype.Component;
 public class CamelBeeRouteConfigurer {
 
   /**
+   * The logger.
+   */
+  private static final Logger LOGGER = LoggerFactory.getLogger(CamelBeeRouteConfigurer.class);
+
+  @Value("${camelbee.route-configurer-enabled:true}")
+  private boolean routeConfigurerEnabled;
+
+  /**
    * Configures a route for a CamelBee enabled Camel application.
    *
    * @param routeBuilder The routebuilder to be configured.
    */
   public void configureRoute(RouteBuilder routeBuilder) {
 
-    routeBuilder.getContext().setStreamCaching(true);
-    routeBuilder.getContext().setUseMDCLogging(true);
-    routeBuilder.getContext().getCamelContextExtension().addContextPlugin(UnitOfWorkFactory.class, CamelBeeUnitOfWork::new);
+    if (routeConfigurerEnabled) {
+      routeBuilder.getContext().setStreamCaching(true);
+      routeBuilder.getContext().setUseMDCLogging(true);
+      routeBuilder.getContext().getCamelContextExtension().addContextPlugin(UnitOfWorkFactory.class, CamelBeeUnitOfWork::new);
+    } else {
+      LOGGER.debug("CamelBee route configuration disabled via camelbee.route-configurer-enabled=false");
+    }
   }
 
 }

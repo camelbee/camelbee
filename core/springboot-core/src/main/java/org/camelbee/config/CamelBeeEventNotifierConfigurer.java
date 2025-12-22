@@ -16,11 +16,15 @@
 
 package org.camelbee.config;
 
+import jakarta.annotation.PostConstruct;
 import org.apache.camel.CamelContext;
 import org.apache.camel.support.EventNotifierSupport;
 import org.camelbee.notifier.CamelBeeEventNotifier;
 import org.camelbee.tracers.TracerService;
-import org.springframework.context.annotation.Bean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -30,16 +34,32 @@ import org.springframework.context.annotation.Configuration;
 public class CamelBeeEventNotifierConfigurer {
 
   /**
-   * Creates EventNotifierSupport bean.
-   *
-   * @param camelContext  The camelContext.
-   * @param tracerService The tracerService.
-   * @return EventNotifierSupport bean.
+   * The logger.
    */
-  @Bean
-  public EventNotifierSupport eventNotifier(CamelContext camelContext, TracerService tracerService) {
-    final CamelBeeEventNotifier camelBeeEventNotifier = new CamelBeeEventNotifier(tracerService);
-    camelContext.getManagementStrategy().addEventNotifier(camelBeeEventNotifier);
-    return camelBeeEventNotifier;
+  private static final Logger LOGGER = LoggerFactory.getLogger(CamelBeeEventNotifierConfigurer.class);
+
+  @Autowired
+  private CamelContext camelContext;
+
+  @Autowired
+  private TracerService tracerService;
+
+  @Value("${camelbee.notifier-enabled:true}")
+  private boolean notifierEnabled;
+
+  /**
+   * Creates EventNotifierSupport bean.
+   */
+  @PostConstruct
+  public void onStart() {
+    if (notifierEnabled) {
+      // Only when notifier is enabled do we create the notifier
+      // The notifiers themselves will check tracer-enabled and logging-enabled
+      final CamelBeeEventNotifier camelBeeEventNotifier = new CamelBeeEventNotifier(tracerService);
+      camelContext.getManagementStrategy().addEventNotifier(camelBeeEventNotifier);
+    } else {
+      LOGGER.debug("CamelBee event notifier disabled via camelbee.notifier-enabled=false");
+    }
   }
+
 }
