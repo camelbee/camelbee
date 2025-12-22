@@ -44,7 +44,7 @@
         <camel-quarkus.platform.group-id>${quarkus.platform.group-id}</camel-quarkus.platform.group-id>
         <camel-quarkus.platform.artifact-id>quarkus-camel-bom</camel-quarkus.platform.artifact-id>
         <org.awaitility.awaitility>4.3.0</org.awaitility.awaitility>
-        <org.jetbrains.kotlin.kotlin-reflect.version>2.2.21</org.jetbrains.kotlin.kotlin-reflect.version>
+        <org.jetbrains.kotlin.kotlin-reflect.version>2.3.0</org.jetbrains.kotlin.kotlin-reflect.version>
         <com.google.crypto.tink.version>1.20.0</com.google.crypto.tink.version>
     </properties>
 
