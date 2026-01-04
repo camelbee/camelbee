@@ -51,7 +51,7 @@ The following files have been resolved:
    io.prometheus:simpleclient_tracer_common:jar:0.16.0:compile[36m -- module simpleclient.tracer.common[0;1;33m (auto)[m
    io.prometheus:simpleclient_tracer_otel:jar:0.16.0:compile[36m -- module simpleclient.tracer.otel[0;1;33m (auto)[m
    io.prometheus:simpleclient_tracer_otel_agent:jar:0.16.0:compile[36m -- module simpleclient.tracer.otel.agent[0;1;33m (auto)[m
-   io.quarkiverse.loggingjson:quarkus-logging-json:jar:3.4.0:compile[36m -- module quarkus.logging.json[0;1;33m (auto)[m
+   io.quarkiverse.loggingjson:quarkus-logging-json:jar:3.4.1:compile[36m -- module quarkus.logging.json[0;1;33m (auto)[m
    io.quarkus.arc:arc:jar:3.30.5:compile[36m -- module arc[0;1;33m (auto)[m
    io.quarkus.gizmo:gizmo2:jar:2.0.0.Beta10:test[36m -- module io.quarkus.gizmo2[m
    io.quarkus.gizmo:gizmo:jar:1.9.0:test[36m -- module gizmo[0;1;33m (auto)[m
