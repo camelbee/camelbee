@@ -35,7 +35,7 @@
         <argLine>-Duser.language=en</argLine>
         <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
         <camel-maven-plugin.version>4.16.0</camel-maven-plugin.version>
-        <checkstyle.version>12.3.1</checkstyle.version>
+        <checkstyle.version>13.0.0</checkstyle.version>
         <commons-io.version>2.21.0</commons-io.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
         <cxf-core.version>4.1.4</cxf-core.version>
@@ -83,7 +83,7 @@
         <junit-jupiter.version>1.21.4</junit-jupiter.version>
         <snakeyaml.version>2.5</snakeyaml.version>
         <wiremock.version>3.13.2</wiremock.version>
-        <nimbus-jose-jwt.version>10.6</nimbus-jose-jwt.version>
+        <nimbus-jose-jwt.version>10.7</nimbus-jose-jwt.version>
         <os-maven-plugin.version>1.7.1</os-maven-plugin.version>
         <cxf-xjc-runtime.version>4.1.1</cxf-xjc-runtime.version>
         <cxf-xjc-ts.version>4.1.0</cxf-xjc-ts.version>
