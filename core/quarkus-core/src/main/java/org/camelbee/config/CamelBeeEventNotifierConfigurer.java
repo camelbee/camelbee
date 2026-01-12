@@ -23,6 +23,9 @@ import jakarta.inject.Singleton;
 import org.apache.camel.CamelContext;
 import org.camelbee.notifier.CamelBeeEventNotifier;
 import org.camelbee.tracers.TracerService;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * CamelBeeEventNotifierConfigurer.
@@ -30,11 +33,19 @@ import org.camelbee.tracers.TracerService;
 @Singleton
 public class CamelBeeEventNotifierConfigurer {
 
+  /**
+   * The logger.
+   */
+  private static final Logger LOGGER = LoggerFactory.getLogger(CamelBeeEventNotifierConfigurer.class);
+
   @Inject
   CamelContext camelContext;
 
   @Inject
   TracerService tracerService;
+
+  @ConfigProperty(name = "camelbee.notifier-enabled", defaultValue = "true")
+  boolean notifierEnabled;
 
   /**
    * Creates EventNotifierSupport bean.
@@ -43,8 +54,14 @@ public class CamelBeeEventNotifierConfigurer {
    */
   @SuppressWarnings("java:S1128")
   public void onStart(@Observes StartupEvent ev) {
-    final CamelBeeEventNotifier camelBeeEventNotifier = new CamelBeeEventNotifier(tracerService);
-    camelContext.getManagementStrategy().addEventNotifier(camelBeeEventNotifier);
+    if (notifierEnabled) {
+      // Only when notifier is enabled do we create the notifier
+      // The notifiers themselves will check tracer-enabled and logging-enabled
+      final CamelBeeEventNotifier camelBeeEventNotifier = new CamelBeeEventNotifier(tracerService);
+      camelContext.getManagementStrategy().addEventNotifier(camelBeeEventNotifier);
+    } else {
+      LOGGER.debug("CamelBee event notifier disabled via camelbee.notifier-enabled=false");
+    }
   }
 
 }
