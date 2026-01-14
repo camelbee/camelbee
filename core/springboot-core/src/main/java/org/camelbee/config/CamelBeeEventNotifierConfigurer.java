@@ -18,7 +18,6 @@ package org.camelbee.config;
 
 import jakarta.annotation.PostConstruct;
 import org.apache.camel.CamelContext;
-import org.apache.camel.support.EventNotifierSupport;
 import org.camelbee.notifier.CamelBeeEventNotifier;
 import org.camelbee.tracers.TracerService;
 import org.slf4j.Logger;
