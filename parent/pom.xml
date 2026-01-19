@@ -93,7 +93,7 @@
         <maven-replacer-plugin.version>1.5.3</maven-replacer-plugin.version>
         <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
         <jakarta.xml.ws-api.version>4.0.2</jakarta.xml.ws-api.version>
-        <swagger-annotations-jakarta.version>2.2.41</swagger-annotations-jakarta.version>
+        <swagger-annotations-jakarta.version>2.2.42</swagger-annotations-jakarta.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
         <proto-google-common-protos.version>2.64.1</proto-google-common-protos.version>
     </properties>
