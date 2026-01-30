@@ -34,7 +34,7 @@
     <properties>
         <argLine>-Duser.language=en</argLine>
         <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
-        <camel-maven-plugin.version>4.17.0</camel-maven-plugin.version>
+        <camel-maven-plugin.version>4.16.0</camel-maven-plugin.version>
         <checkstyle.version>13.0.0</checkstyle.version>
         <commons-io.version>2.21.0</commons-io.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
@@ -91,11 +91,14 @@
         <saaj-impl.version>3.0.4</saaj-impl.version>
         <avro-maven-plugin.version>1.12.0</avro-maven-plugin.version>
         <maven-replacer-plugin.version>1.5.3</maven-replacer-plugin.version>
-        <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
         <jakarta.xml.ws-api.version>4.0.2</jakarta.xml.ws-api.version>
         <swagger-annotations-jakarta.version>2.2.42</swagger-annotations-jakarta.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
+        <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
         <proto-google-common-protos.version>2.65.0</proto-google-common-protos.version>
+        <protobuf.version>4.33.2</protobuf.version>
+        <protoc.version>${protobuf.version}</protoc.version>
+        <grpc.version>1.73.0</grpc.version>
     </properties>
 
 
@@ -179,6 +182,12 @@
               <groupId>javax.annotation</groupId>
               <artifactId>javax.annotation-api</artifactId>
               <version>${javax.annotation-api.version}</version>
+            </dependency>
+
+            <dependency>
+              <groupId>com.google.protobuf</groupId>
+              <artifactId>protobuf-java</artifactId>
+              <version>${protobuf.version}</version>
             </dependency>
 
             <dependency>
