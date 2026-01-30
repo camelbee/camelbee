@@ -96,9 +96,9 @@
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
         <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
         <proto-google-common-protos.version>2.65.0</proto-google-common-protos.version>
-        <protobuf.version>4.33.2</protobuf.version>
+        <protobuf.version>4.33.4</protobuf.version>
         <protoc.version>${protobuf.version}</protoc.version>
-        <grpc.version>1.73.0</grpc.version>
+        <grpc.version>1.78.0</grpc.version>
     </properties>
 
 
@@ -160,6 +160,11 @@
                 <version>${maven-replacer-plugin.version}</version>
             </dependency>
 
+            <!--
+              Using the org.xolstice protobuf-maven-plugin as it is the de-facto standard,
+              widely adopted, and battle-tested in production builds.
+              Chosen over io.github.ascopes as it has broader ecosystem adoption.
+            -->
             <dependency>
                 <groupId>org.xolstice.maven.plugins</groupId>
                 <artifactId>protobuf-maven-plugin</artifactId>
