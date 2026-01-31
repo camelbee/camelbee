@@ -29,6 +29,15 @@ public class MessageListInfo {
   private final Instant lastModified;
   private final Instant lastResetTime;
 
+  /**
+   * MessageListInfo Constructor.
+   *
+   * @param count         The count.
+   * @param resetVersion  The resetVersion.
+   * @param addVersion    The addVersion.
+   * @param lastModified  The lastModified.
+   * @param lastResetTime The lastResetTime.
+   */
   public MessageListInfo(int count, long resetVersion, long addVersion, Instant lastModified, Instant lastResetTime) {
     this.count = count;
     this.resetVersion = resetVersion;

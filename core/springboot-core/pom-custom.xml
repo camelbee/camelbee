@@ -20,7 +20,7 @@
     <groupId>io.camelbee</groupId>
     <artifactId>camelbee-springboot-core-custom</artifactId>
     <packaging>jar</packaging>
-    <version>2.0.6</version>
+    <version>2.0.8</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -38,7 +38,7 @@
         <maven.compiler.version>3.11.0</maven.compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>17</java.version>
+        <java.version>21</java.version>
         <ch.qos.logback.version>1.2.3</ch.qos.logback.version>
         <ch.qos.logback.contrib.version>0.1.5</ch.qos.logback.contrib.version>
         <jackson.databind.version>2.11.4</jackson.databind.version>
@@ -145,8 +145,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>17</source>
-                    <target>17</target>
+                    <source>21</source>
+                    <target>21</target>
                 </configuration>
             </plugin>
 

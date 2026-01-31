@@ -40,6 +40,11 @@
 
   <!-- Any package containing 'proto' -->
   <Match>
+    <Package name="~.*\.grpc.*"/>
+  </Match>
+
+  <!-- Any package containing 'proto' -->
+  <Match>
     <Package name="~.*\.proto.*"/>
   </Match>
 
@@ -75,6 +80,11 @@
 
   <Match>
     <Bug pattern="MS_EXPOSE_REP"/>
+    <Class name="~.*\.grpc\..*"/>
+  </Match>
+
+  <Match>
+    <Bug pattern="MS_EXPOSE_REP"/>
     <Class name="~.*\.avro\..*"/>
   </Match>
 
@@ -86,6 +96,11 @@
   <Match>
     <Bug pattern="SING_SINGLETON_IMPLEMENTS_SERIALIZABLE"/>
     <Class name="~.*\.proto\..*"/>
+  </Match>
+
+  <Match>
+    <Bug pattern="SING_SINGLETON_IMPLEMENTS_SERIALIZABLE"/>
+    <Class name="~.*\.grpc\..*"/>
   </Match>
 
   <Match>
