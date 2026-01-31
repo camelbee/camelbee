@@ -47,7 +47,7 @@
         <impsort-maven-plugin.version>1.13.0</impsort-maven-plugin.version>
         <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
         <jackson-databind-nullable.version>0.2.8</jackson-databind-nullable.version>
-        <java.version>17</java.version>
+        <java.version>21</java.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <lombok.version>1.18.42</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
@@ -61,8 +61,8 @@
         <maven-pmd-plugin.version>3.28.0</maven-pmd-plugin.version>
         <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
         <maven-surefire-report-plugin.version>3.5.4</maven-surefire-report-plugin.version>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
 
         <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>
         <maven.compiler.testTarget>${maven.compiler.target}</maven.compiler.testTarget>
@@ -324,7 +324,7 @@
                 <version>${impsort-maven-plugin.version}</version>
                 <configuration>
                     <removeUnused>true</removeUnused>
-                    <compliance>17</compliance>
+                    <compliance>21</compliance>
                     <directories>src</directories>
                     <includes>**/*.java</includes>
                 </configuration>
@@ -594,7 +594,7 @@
                         <artifactId>maven-pmd-plugin</artifactId>
                         <version>${maven-pmd-plugin.version}</version>
                         <configuration>
-                            <targetJdk>17</targetJdk>
+                            <targetJdk>21</targetJdk>
                             <linkXRef>false</linkXRef>
                             <printFailingErrors>true</printFailingErrors>
                             <excludeRoots>

@@ -21,8 +21,8 @@
 		<maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
 		<maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
 		<maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
-		<maven.compiler.source>17</maven.compiler.source>
-		<maven.compiler.target>17</maven.compiler.target>
+		<maven.compiler.source>21</maven.compiler.source>
+		<maven.compiler.target>21</maven.compiler.target>
 		<maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>
 		<maven.compiler.testTarget>${maven.compiler.target}</maven.compiler.testTarget>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -117,8 +117,8 @@
 						<compilerArgs>
 							<arg>-Xlint:unchecked</arg>
 						</compilerArgs>
-						<source>17</source>
-						<target>17</target>
+						<source>21</source>
+						<target>21</target>
 					</configuration>
 				</plugin>
 				<plugin>
