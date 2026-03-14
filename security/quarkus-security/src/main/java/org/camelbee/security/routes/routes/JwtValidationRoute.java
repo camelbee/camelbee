@@ -84,6 +84,7 @@ public class JwtValidationRoute extends RouteBuilder {
           try {
             claims = jwtProcessor.process(token, null);
           } catch (Exception e) {
+            log.warn("JWT signature/processing failed: {}", e.getMessage());
             throw new TokenValidationException("ERROR-AUTH007", "Token validation failed", e);
           }
 
@@ -148,24 +149,32 @@ public class JwtValidationRoute extends RouteBuilder {
 
     // Validate issuer
     if (!securityProperties.issuer().equals(claims.getIssuer())) {
+      log.warn("JWT validation failed: invalid issuer '{}', expected '{}'", claims.getIssuer(), securityProperties.issuer());
       throw new TokenValidationException("ERROR-AUTH003", "Invalid token issuer");
     }
 
     // Validate audience
     List<String> audience = claims.getAudience();
-    if (audience == null || audience.isEmpty() || !securityProperties.audience().equals(audience.get(0))) {
+    if (audience == null || audience.isEmpty() || !audience.contains(securityProperties.audience())) {
+      log.warn("JWT validation failed: invalid audience '{}', expected '{}'", audience, securityProperties.audience());
       throw new TokenValidationException("ERROR-AUTH004", "Invalid token audience");
     }
 
-    // Validate expiration with skew
+    // Validate expiration
     Date exp = claims.getExpirationTime();
-    if (exp != null && now > (exp.getTime() + skewMillis)) {
+    if (exp == null) {
+      log.warn("JWT validation failed: token has no expiration time, subject '{}'", claims.getSubject());
+      throw new TokenValidationException("ERROR-AUTH005", "Token must have an expiration time");
+    }
+    if (now > (exp.getTime() + skewMillis)) {
+      log.warn("JWT validation failed: token expired at {}, subject '{}'", exp, claims.getSubject());
       throw new TokenExpiredException("ERROR-AUTH005", "Token has expired");
     }
 
     // Validate not-before with skew
     Date nbf = claims.getNotBeforeTime();
     if (nbf != null && now < (nbf.getTime() - skewMillis)) {
+      log.warn("JWT validation failed: token not yet valid until {}, subject '{}'", nbf, claims.getSubject());
       throw new TokenValidationException("ERROR-AUTH006", "Token not yet valid");
     }
   }

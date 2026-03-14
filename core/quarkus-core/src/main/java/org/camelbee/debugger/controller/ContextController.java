@@ -59,7 +59,7 @@ public class ContextController {
   @Consumes("application/json")
   @Produces("application/json")
   @Path("/camelbee/routes")
-  public Response getWidgets() {
+  public Response getRoutes() {
 
     List<CamelRoute> routes = routeContextService.getCamelRoutes();
 

@@ -30,7 +30,9 @@ import org.camelbee.debugger.model.route.CamelRouteOutput;
 import org.eclipse.microprofile.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
 
 /**
  * RouteContextService.
@@ -200,6 +202,9 @@ public class RouteContextService {
       int startIndex = inputUri.indexOf(REST_OPENAPI_COMPONENT) + REST_OPENAPI_COMPONENT.length();
 
       int endIndex = inputUri.indexOf("?", startIndex);
+      if (endIndex == -1) {
+        endIndex = inputUri.length();
+      }
 
       String openApiPath = inputUri.substring(startIndex, endIndex);
       List<String> operationIds = null;
@@ -226,7 +231,7 @@ public class RouteContextService {
 
     List<String> operationIds = new ArrayList<>();
 
-    Yaml yaml = new Yaml();
+    Yaml yaml = new Yaml(new SafeConstructor(new LoaderOptions()));
 
     try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(openApiPath)) {
 

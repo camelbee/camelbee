@@ -22,15 +22,13 @@ public interface SecurityProperties {
   boolean enabled();
 
   /**
-   * The expected issuer of the JWT token.
+   * The expected issuer of the JWT token. Must be configured explicitly.
    */
-  @WithDefault("test-issuer")
   String issuer();
 
   /**
-   * The expected audience of the JWT token.
+   * The expected audience of the JWT token. Must be configured explicitly.
    */
-  @WithDefault("test-audience")
   String audience();
 
   /**

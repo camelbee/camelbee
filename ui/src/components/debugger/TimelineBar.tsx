@@ -12,6 +12,7 @@ export function TimelineBar() {
       <button
         onClick={stepBack}
         disabled={timelineIndex <= 0}
+        aria-label="Step back"
         className="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 hover:bg-gray-600 disabled:opacity-40"
       >
         ◀
@@ -23,12 +24,14 @@ export function TimelineBar() {
         max={total}
         value={timelineIndex}
         onChange={(e) => setTimelineIndex(Number(e.target.value))}
+        aria-label="Timeline position"
         className="h-1.5 flex-1 cursor-pointer appearance-none rounded-full bg-gray-700 accent-blue-500"
       />
 
       <button
         onClick={stepForward}
         disabled={timelineIndex >= total}
+        aria-label="Step forward"
         className="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 hover:bg-gray-600 disabled:opacity-40"
       >
         ▶

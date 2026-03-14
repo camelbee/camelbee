@@ -82,7 +82,7 @@ public class ExchangeCreatedEventTracer {
 
       final var requestHeaders = ExchangeUtils.getHeaders(exchange);
 
-      return addCreatedMessage(exchange, directRequestBody, requestHeaders);
+      return processCreatedMessage(exchange, directRequestBody, requestHeaders);
 
     } catch (Exception e) {
       LOGGER.warn("Could not trace ExchangeCreatedEvent: {} with exception: {}", exchange, e);
@@ -91,7 +91,7 @@ public class ExchangeCreatedEventTracer {
 
   }
 
-  private Message addCreatedMessage(Exchange exchange, String directRequestBody, String requestHeaders) {
+  private Message processCreatedMessage(Exchange exchange, String directRequestBody, String requestHeaders) {
 
     final String currentRouteName = (String) exchange.getProperty(Exchange.TO_ENDPOINT);
 

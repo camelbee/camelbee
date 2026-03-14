@@ -65,7 +65,7 @@ class ContextControllerTest {
   }
 
   @Test
-  void getWidgetsShouldReturnRoutesAndSystemInfo() {
+  void getRoutesShouldReturnRoutesAndSystemInfo() {
     // Arrange
     List<CamelRouteOutput> nestedOutputs = Arrays.asList(
         new CamelRouteOutput("nested1", "Nested Output 1", ",", "log", null),
@@ -90,7 +90,7 @@ class ContextControllerTest {
     when(camelContext.getVersion()).thenReturn("3.18.0");
 
     // Act
-    Response response = contextController.getWidgets();
+    Response response = contextController.getRoutes();
 
     // Assert
     assertEquals(200, response.getStatus());
@@ -148,14 +148,14 @@ class ContextControllerTest {
   }
 
   @Test
-  void getWidgetsShouldHandleEmptyRoutes() {
+  void getRoutesShouldHandleEmptyRoutes() {
     // Arrange
     when(routeContextService.getCamelRoutes()).thenReturn(new ArrayList<>());
     when(camelContext.getName()).thenReturn("TestContext");
     when(camelContext.getVersion()).thenReturn("3.18.0");
 
     // Act
-    Response response = contextController.getWidgets();
+    Response response = contextController.getRoutes();
 
     // Assert
     assertEquals(200, response.getStatus());
@@ -165,7 +165,7 @@ class ContextControllerTest {
   }
 
   @Test
-  void getWidgetsShouldHandleNullRouteOutputs() {
+  void getRoutesShouldHandleNullRouteOutputs() {
     // Arrange
     List<CamelRoute> mockRoutes = Arrays.asList(
         new CamelRoute(TEST_ROUTE_ID_1, "direct:start1", null, false, "direct:error1")
@@ -176,7 +176,7 @@ class ContextControllerTest {
     when(camelContext.getVersion()).thenReturn("3.18.0");
 
     // Act
-    Response response = contextController.getWidgets();
+    Response response = contextController.getRoutes();
 
     // Assert
     assertEquals(200, response.getStatus());
@@ -187,14 +187,14 @@ class ContextControllerTest {
   }
 
   @Test
-  void getWidgetsShouldIncludeSystemProperties() {
+  void getRoutesShouldIncludeSystemProperties() {
     // Arrange
     when(routeContextService.getCamelRoutes()).thenReturn(new ArrayList<>());
     when(camelContext.getName()).thenReturn("TestContext");
     when(camelContext.getVersion()).thenReturn("3.18.0");
 
     // Act
-    Response response = contextController.getWidgets();
+    Response response = contextController.getRoutes();
 
     // Assert
     assertEquals(200, response.getStatus());

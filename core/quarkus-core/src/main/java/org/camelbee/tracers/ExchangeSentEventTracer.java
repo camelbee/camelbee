@@ -89,6 +89,11 @@ public class ExchangeSentEventTracer {
 
     Deque<String> routeStack = (Deque<String>) exchange.getProperty(CURRENT_ROUTE_TRACE_STACK);
 
+    if (routeStack == null || routeStack.isEmpty()) {
+      LOGGER.warn("Empty or null route stack in ExchangeSentEvent for exchange: {}", exchange.getExchangeId());
+      return null;
+    }
+
     final String currentRoute = routeStack.pop();
     String callerRoute = routeStack.peek();
 

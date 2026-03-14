@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDebuggerStore } from '@/store/debuggerStore';
 import { buildInteractionsForEdge, type Interaction } from '@/utils/messageMatching';
 import type { MessageEdge } from '@/utils/routeGraph';
@@ -33,9 +33,8 @@ export function MessagePanel({ edges }: MessagePanelProps) {
   }, [edge, slicedMessages]);
 
   // Reset interaction index when edge changes
-  useMemo(() => {
+  useEffect(() => {
     setInteractionIdx(Math.max(0, interactions.length - 1));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEdgeId, interactions.length]);
 
   if (!selectedEdgeId || !edge) return null;
@@ -60,6 +59,7 @@ export function MessagePanel({ edges }: MessagePanelProps) {
         </span>
         <button
           onClick={() => selectEdge(null)}
+          aria-label="Close message panel"
           className="text-gray-400 hover:text-gray-200"
         >
           ✕

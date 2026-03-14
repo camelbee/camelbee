@@ -40,7 +40,7 @@ import org.camelbee.tracers.TracerService;
 public class TracerController {
 
   private enum TraceStatus {
-    ACTIVE, DEACTIVE
+    ACTIVE, INACTIVE
   }
 
   @Inject
@@ -64,7 +64,7 @@ public class TracerController {
     if (traceStatus == TraceStatus.ACTIVE) {
       tracerService.activateTracing(true);
       tracerService.keepTracingActive();
-    } else if (traceStatus == TraceStatus.DEACTIVE) {
+    } else if (traceStatus == TraceStatus.INACTIVE) {
       tracerService.activateTracing(false);
     }
 

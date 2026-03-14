@@ -76,7 +76,7 @@ public class ExchangeSentEventTracer {
       final String responseSentBody = ExchangeUtils.readBodyAsString(exchange, true);
       final var requestHeaders = ExchangeUtils.getHeaders(exchange);
 
-      return addSentMessage(exchange, responseSentBody, requestHeaders);
+      return processSentMessage(exchange, responseSentBody, requestHeaders);
 
     } catch (Exception e) {
       LOGGER.warn("Could not trace ExchangeSentEvent: {} with exception: {}", exchange, e);
@@ -85,9 +85,14 @@ public class ExchangeSentEventTracer {
 
   }
 
-  private Message addSentMessage(Exchange exchange, String responseSentBody, String requestHeaders) {
+  private Message processSentMessage(Exchange exchange, String responseSentBody, String requestHeaders) {
 
     Deque<String> routeStack = (Deque<String>) exchange.getProperty(CURRENT_ROUTE_TRACE_STACK);
+
+    if (routeStack == null || routeStack.isEmpty()) {
+      LOGGER.warn("Empty or null route stack in ExchangeSentEvent for exchange: {}", exchange.getExchangeId());
+      return null;
+    }
 
     final String currentRoute = routeStack.pop();
     String callerRoute = routeStack.peek();

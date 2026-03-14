@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react';
 import type { CamelBeeContext } from '@/types';
 import { useTraceStatus, useDeleteMessages } from '@/api';
 import { useDebuggerStore } from '@/store/debuggerStore';
@@ -12,6 +13,14 @@ export function Toolbar({ context }: ToolbarProps) {
   const setFilterText = useDebuggerStore((s) => s.setFilterText);
   const filterText = useDebuggerStore((s) => s.filterText);
   const clearMessages = useDebuggerStore((s) => s.clearMessages);
+
+  const [localFilter, setLocalFilter] = useState(filterText);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  useEffect(() => {
+    debounceRef.current = setTimeout(() => setFilterText(localFilter), 250);
+    return () => clearTimeout(debounceRef.current);
+  }, [localFilter, setFilterText]);
 
   const traceStatus = useTraceStatus();
   const deleteMessages = useDeleteMessages();
@@ -29,7 +38,7 @@ export function Toolbar({ context }: ToolbarProps) {
         },
       });
     } else {
-      traceStatus.mutate('DEACTIVE', {
+      traceStatus.mutate('INACTIVE', {
         onSuccess: () => setTracing(false),
       });
     }
@@ -58,9 +67,10 @@ export function Toolbar({ context }: ToolbarProps) {
       {/* Filter */}
       <input
         type="text"
+        aria-label="Filter messages"
         placeholder="Filter messages…"
-        value={filterText}
-        onChange={(e) => setFilterText(e.target.value)}
+        value={localFilter}
+        onChange={(e) => setLocalFilter(e.target.value)}
         className="w-48 rounded border border-gray-600 bg-gray-800 px-2 py-1 text-xs text-gray-200 placeholder-gray-500 focus:border-blue-500 focus:outline-none"
       />
 

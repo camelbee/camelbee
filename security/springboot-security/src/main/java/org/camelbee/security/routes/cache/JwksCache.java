@@ -2,6 +2,7 @@ package org.camelbee.security.routes.cache;
 
 import com.nimbusds.jose.jwk.JWKSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -18,12 +19,12 @@ public class JwksCache {
   /** Cache to store JWKSet with their identifiers. */
   private static final ConcurrentHashMap<String, JWKSet> jwksCache = new ConcurrentHashMap<>();
 
+  /** Timestamp of the last cache update. */
+  private static final AtomicLong lastFetchTime = new AtomicLong(0);
+
   /** Cache duration in milliseconds. */
   @Value("${camelbee.security.jwks-cache-duration:3600000}")
   private long cacheDuration;
-
-  /** Timestamp of the last cache update. */
-  private long lastFetchTime = 0;
 
   /**
    * Updates the cache with a new JWKSet.
@@ -33,7 +34,7 @@ public class JwksCache {
    */
   public void updateCache(JWKSet jwkSet) {
     jwksCache.put("current", jwkSet);
-    lastFetchTime = System.currentTimeMillis();
+    lastFetchTime.set(System.currentTimeMillis());
   }
 
   /**
@@ -52,7 +53,7 @@ public class JwksCache {
    * @return true if the cache is empty or has expired, false otherwise
    */
   public boolean shouldRefresh() {
-    return jwksCache.isEmpty() || System.currentTimeMillis() - lastFetchTime > cacheDuration;
+    return jwksCache.isEmpty() || System.currentTimeMillis() - lastFetchTime.get() > cacheDuration;
   }
 
   /**

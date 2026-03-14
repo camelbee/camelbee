@@ -34,4 +34,4 @@ export interface MessageListWithInfo {
 }
 
 /** TraceStatus sent to POST /camelbee/tracer/status */
-export type TraceStatus = 'ACTIVE' | 'DEACTIVE';
+export type TraceStatus = 'ACTIVE' | 'INACTIVE';

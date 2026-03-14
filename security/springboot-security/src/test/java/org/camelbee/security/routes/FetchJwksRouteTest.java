@@ -81,7 +81,7 @@ class FetchJwksRouteTest {
     if (!isSetUp) {
       AdviceWith.adviceWith(camelContext, "jwks-retrieval",
           advice -> {
-            advice.weaveById("invokeJwksUrlEnpoint")
+            advice.weaveById("invokeJwksUrlEndpoint")
                 .replace()
                 .to("mock:jwks");
           });

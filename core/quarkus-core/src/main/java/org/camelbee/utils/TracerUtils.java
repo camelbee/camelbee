@@ -16,7 +16,7 @@
 
 package org.camelbee.utils;
 
-import static org.camelbee.constants.CamelBeeConstants.CAMEL_FAILED_EVENT_IDENTITIY_HASHCODE;
+import static org.camelbee.constants.CamelBeeConstants.CAMEL_FAILED_EVENT_IDENTITY_HASHCODE;
 
 import org.apache.camel.Exchange;
 
@@ -27,22 +27,6 @@ public class TracerUtils {
 
   private TracerUtils() {
     // Private constructor
-  }
-
-  /**
-   * Return all the headers concatenated.
-   *
-   * @param exchange The exchange.
-   * @return String The headers.
-   */
-  public static String getHeaders(Exchange exchange) {
-
-    var headers = new StringBuilder();
-
-    exchange.getIn().getHeaders()
-        .forEach((p, q) -> headers.append(p).append(":").append(q).append("\n"));
-
-    return headers.toString();
   }
 
   /**
@@ -69,10 +53,10 @@ public class TracerUtils {
       Integer eventIdentityHashCode = System.identityHashCode(cause);
 
       Object previousEventIdentityHashCode = exchange
-          .getProperty(CAMEL_FAILED_EVENT_IDENTITIY_HASHCODE);
+          .getProperty(CAMEL_FAILED_EVENT_IDENTITY_HASHCODE);
 
       if (!eventIdentityHashCode.equals(previousEventIdentityHashCode)) {
-        exchange.setProperty(CAMEL_FAILED_EVENT_IDENTITIY_HASHCODE, eventIdentityHashCode);
+        exchange.setProperty(CAMEL_FAILED_EVENT_IDENTITY_HASHCODE, eventIdentityHashCode);
 
         errorMessage = cause.getLocalizedMessage();
       }

@@ -88,7 +88,7 @@ public class ExchangeSendingEventTracer {
       final String requestBody = ExchangeUtils.readBodyAsString(exchange, false);
       final var requestHeaders = ExchangeUtils.getHeaders(exchange);
 
-      return addSendingMessage(exchange, endpointUri, requestBody, requestHeaders);
+      return processSendingMessage(exchange, endpointUri, requestBody, requestHeaders);
 
     } catch (Exception e) {
       LOGGER.warn("Could not trace ExchangeSendingEvent Exchange: {} with exception: {}", exchange, e);
@@ -97,7 +97,7 @@ public class ExchangeSendingEventTracer {
 
   }
 
-  private Message addSendingMessage(Exchange exchange, String endpointUri, String requestBody, String requestHeaders) {
+  private Message processSendingMessage(Exchange exchange, String endpointUri, String requestBody, String requestHeaders) {
 
     final String endpointId = ((DefaultExchange) exchange).getExchangeExtension().getHistoryNodeId();
 

@@ -15,7 +15,7 @@ export async function apiFetch<T>(
   try {
     return JSON.parse(text) as T;
   } catch {
-    return text as T;
+    throw new Error(`Expected JSON response but received: ${text.substring(0, 200)}`);
   }
 }
 

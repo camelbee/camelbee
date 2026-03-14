@@ -68,7 +68,7 @@ public class FetchJwksRouteTest extends CamelQuarkusTestSupport {
 
       AdviceWith.adviceWith(camelContext, "jwks-retrieval",
           advice -> {
-            advice.weaveById("invokeJwksUrlEnpoint")
+            advice.weaveById("invokeJwksUrlEndpoint")
                 .replace()
                 .to("mock:jwks");
           });
