@@ -85,8 +85,6 @@ public class TracerController {
   public Response getMessages(@QueryParam("index") int fromIndex, @QueryParam("addVersion") long addVersion,
       @QueryParam("resetVersion") long resetVersion) {
 
-    //when we start polling the messages we need to activate tracing as well
-    tracerService.activateTracing(true);
     tracerService.keepTracingActive();
 
     return Response.ok(messageService.getMessagesFrom(fromIndex, addVersion, resetVersion)).build();

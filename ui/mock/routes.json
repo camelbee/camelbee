@@ -1,0 +1,388 @@
+{
+  "name": "camelbee-quarkus-sample",
+  "jvm": "Eclipse Adoptium - 21.0.2",
+  "jvmInputParameters": "-Xmx1024m -Xms512m -XX:+UseG1GC -Dquarkus.http.host=0.0.0.0",
+  "garbageCollectors": "G1 Young Generation, G1 Old Generation",
+  "framework": "Quarkus - 3.30.6",
+  "camelVersion": "4.16.0",
+  "routes": [
+    {
+      "id": "errorHandlerRoute",
+      "input": "From[direct:errorHandler]",
+      "rest": false,
+      "errorHandler": null,
+      "outputs": [
+        {
+          "id": "to-error-log",
+          "description": "To[log:error-handler?level=ERROR]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        },
+        {
+          "id": "to-error-mock",
+          "description": "To[mock:error]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        }
+      ]
+    },
+    {
+      "id": "postMusician",
+      "input": "From[rest://post:/testapi/v1/musician?consumerComponentName=platform-http&consumes=application%2Fjson&description=Save+a+musician&produces=application%2Fjson&routeId=postMusician]",
+      "rest": true,
+      "errorHandler": null,
+      "outputs": [
+        {
+          "id": "to1",
+          "description": "To[direct:postMusician]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        }
+      ]
+    },
+    {
+      "id": "getMusician",
+      "input": "From[rest://get:/testapi/v1/musician?consumerComponentName=platform-http&description=Get+a+musician&produces=application%2Fjson&routeId=getMusician]",
+      "rest": true,
+      "errorHandler": null,
+      "outputs": [
+        {
+          "id": "to2",
+          "description": "To[direct:getMusician]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        }
+      ]
+    },
+    {
+      "id": "postMusicianRoute",
+      "input": "From[direct:postMusician]",
+      "rest": false,
+      "errorHandler": "direct:errorHandler",
+      "outputs": [
+        {
+          "id": "to3",
+          "description": "To[bean-validator://camelbee]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        },
+        {
+          "id": "to4",
+          "description": "To[direct:musicianProcessor]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        }
+      ]
+    },
+    {
+      "id": "getMusicianRoute",
+      "input": "From[direct:getMusician]",
+      "rest": false,
+      "errorHandler": "direct:errorHandler",
+      "outputs": [
+        {
+          "id": "to5",
+          "description": "To[direct:musicianProcessor]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        }
+      ]
+    },
+    {
+      "id": "kafkaConsumerRoute",
+      "input": "From[kafka:camelbee-northbound-topic]",
+      "rest": false,
+      "errorHandler": "direct:errorHandler",
+      "outputs": [
+        {
+          "id": "to6",
+          "description": "To[direct:musicianProcessor]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        }
+      ]
+    },
+    {
+      "id": "jmsConsumerRoute",
+      "input": "From[jms:queue:camelbee-northbound-queue?disableReplyTo=true&jmsMessageType=Text]",
+      "rest": false,
+      "errorHandler": "direct:errorHandler",
+      "outputs": [
+        {
+          "id": "to7",
+          "description": "To[direct:musicianProcessor]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        }
+      ]
+    },
+    {
+      "id": "fileConsumerRoute",
+      "input": "From[file://inputdir/?delete=true]",
+      "rest": false,
+      "errorHandler": "direct:errorHandler",
+      "outputs": [
+        {
+          "id": "to8",
+          "description": "To[direct:musicianProcessor]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        }
+      ]
+    },
+    {
+      "id": "timerRoute",
+      "input": "From[timer://foo?fixedRate=true&period=500000]",
+      "rest": false,
+      "errorHandler": "direct:errorHandler",
+      "outputs": [
+        {
+          "id": "to9",
+          "description": "To[direct:musicianProcessor]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        }
+      ]
+    },
+    {
+      "id": "mqttConsumerRoute",
+      "input": "From[paho-mqtt5:camelbee-northbound-topic?brokerUrl=tcp://localhost:1883]",
+      "rest": false,
+      "errorHandler": "direct:errorHandler",
+      "outputs": [
+        {
+          "id": "to10",
+          "description": "To[direct:musicianProcessor]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        }
+      ]
+    },
+    {
+      "id": "mongodbConsumerRoute",
+      "input": "From[mongodb:mongoClient?database=camelbee&collection=musicians-in&createCollection=true]",
+      "rest": false,
+      "errorHandler": "direct:errorHandler",
+      "outputs": [
+        {
+          "id": "to11",
+          "description": "To[direct:musicianProcessor]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        }
+      ]
+    },
+    {
+      "id": "musicianProcessorRoute",
+      "input": "From[direct:musicianProcessor]",
+      "rest": false,
+      "errorHandler": "direct:errorHandler",
+      "outputs": [
+        {
+          "id": "to12",
+          "description": "To[direct:invokeHttpBin]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        },
+        {
+          "id": "to13",
+          "description": "To[direct:invokeKafka]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        },
+        {
+          "id": "to14",
+          "description": "To[direct:invokeMqtt]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        },
+        {
+          "id": "to15",
+          "description": "To[direct:invokeMockC]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        },
+        {
+          "id": "toD1",
+          "description": "DynamicTo[direct:invokeJms]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDynamicDefinition",
+          "outputs": []
+        },
+        {
+          "id": "enrich1",
+          "description": "Enrich[constant{direct:invokeMongoDb}]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.EnrichDefinition",
+          "outputs": []
+        },
+        {
+          "id": "recipientList1",
+          "description": "RecipientList[constant{direct:invokeFile,direct:invokeMockA}]",
+          "delimiter": ",",
+          "type": "org.apache.camel.model.RecipientListDefinition",
+          "outputs": []
+        },
+        {
+          "id": "routingSlip1",
+          "description": "RoutingSlip[constant{direct:invokeMockB}]",
+          "delimiter": ",",
+          "type": "org.apache.camel.model.RoutingSlipDefinition",
+          "outputs": []
+        }
+      ]
+    },
+    {
+      "id": "invokeHttpBinRoute",
+      "input": "From[direct:invokeHttpBin]",
+      "rest": false,
+      "errorHandler": "direct:errorHandler",
+      "outputs": [
+        {
+          "id": "httpBinEndpoint",
+          "description": "DynamicTo[http:localhost/stream/${header.hhId}?bridgeEndpoint=true]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDynamicDefinition",
+          "outputs": []
+        }
+      ]
+    },
+    {
+      "id": "invokeKafkaRoute",
+      "input": "From[direct:invokeKafka]",
+      "rest": false,
+      "errorHandler": "direct:errorHandler",
+      "outputs": [
+        {
+          "id": "kafkaEndpoint",
+          "description": "To[kafka:camelbee-southbound-topic]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        }
+      ]
+    },
+    {
+      "id": "invokeMqttRoute",
+      "input": "From[direct:invokeMqtt]",
+      "rest": false,
+      "errorHandler": "direct:errorHandler",
+      "outputs": [
+        {
+          "id": "mqttEndpoint",
+          "description": "To[paho-mqtt5:camelbee-southbound-topic?brokerUrl=tcp://localhost:1883]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        }
+      ]
+    },
+    {
+      "id": "invokeJmsRoute",
+      "input": "From[direct:invokeJms]",
+      "rest": false,
+      "errorHandler": "direct:errorHandler",
+      "outputs": [
+        {
+          "id": "jmsEndpoint",
+          "description": "To[jms:queue:camelbee-southbound-queue?disableReplyTo=true&jmsMessageType=Text]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        }
+      ]
+    },
+    {
+      "id": "invokeMongoDbRoute",
+      "input": "From[direct:invokeMongoDb]",
+      "rest": false,
+      "errorHandler": "direct:errorHandler",
+      "outputs": [
+        {
+          "id": "mongoDbEndpoint",
+          "description": "To[mongodb:mongoClient?database=camelbee&collection=musicians-out&operation=insert]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        }
+      ]
+    },
+    {
+      "id": "invokeFileRoute",
+      "input": "From[direct:invokeFile]",
+      "rest": false,
+      "errorHandler": "direct:errorHandler",
+      "outputs": [
+        {
+          "id": "fileEndpoint",
+          "description": "To[file://outputdir]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        }
+      ]
+    },
+    {
+      "id": "invokeMockARoute",
+      "input": "From[direct:invokeMockA]",
+      "rest": false,
+      "errorHandler": "direct:errorHandler",
+      "outputs": [
+        {
+          "id": "mockAEndpoint",
+          "description": "To[mock:A]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        }
+      ]
+    },
+    {
+      "id": "invokeMockBRoute",
+      "input": "From[direct:invokeMockB]",
+      "rest": false,
+      "errorHandler": "direct:errorHandler",
+      "outputs": [
+        {
+          "id": "mockBEndpoint",
+          "description": "To[mock:B]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        }
+      ]
+    },
+    {
+      "id": "invokeMockCRoute",
+      "input": "From[direct:invokeMockC]",
+      "rest": false,
+      "errorHandler": "direct:errorHandler",
+      "outputs": [
+        {
+          "id": "mockCEndpoint",
+          "description": "To[mock:C]",
+          "delimiter": null,
+          "type": "org.apache.camel.model.ToDefinition",
+          "outputs": []
+        }
+      ]
+    }
+  ]
+}

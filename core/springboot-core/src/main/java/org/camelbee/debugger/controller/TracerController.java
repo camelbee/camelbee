@@ -79,8 +79,6 @@ public class TracerController {
   public ResponseEntity<MessageListWithInfo> getMessages(@RequestParam("index") int fromIndex, @RequestParam("addVersion") long addVersion,
       @RequestParam("resetVersion") long resetVersion) {
 
-    //when we start polling the messages we need to activate tracing as well
-    tracerService.activateTracing(true);
     tracerService.keepTracingActive();
 
     return ResponseEntity.ok(messageService.getMessagesFrom(fromIndex, addVersion, resetVersion));

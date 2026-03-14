@@ -1,0 +1,200 @@
+# HELP jvm_memory_used_bytes The amount of used memory
+# TYPE jvm_memory_used_bytes gauge
+jvm_memory_used_bytes{area="heap",id="G1 Eden Space"} 4.2E7
+jvm_memory_used_bytes{area="heap",id="G1 Old Gen"} 2.8E7
+jvm_memory_used_bytes{area="heap",id="G1 Survivor Space"} 5242880.0
+jvm_memory_used_bytes{area="nonheap",id="Metaspace"} 6.5E7
+jvm_memory_used_bytes{area="nonheap",id="CodeCache"} 1.2E7
+jvm_memory_used_bytes{area="nonheap",id="Compressed Class Space"} 8388608.0
+# HELP jvm_memory_max_bytes The maximum amount of memory
+# TYPE jvm_memory_max_bytes gauge
+jvm_memory_max_bytes{area="heap",id="G1 Eden Space"} 2.68435456E8
+jvm_memory_max_bytes{area="heap",id="G1 Old Gen"} 1.073741824E9
+jvm_memory_max_bytes{area="heap",id="G1 Survivor Space"} 2.6843546E7
+jvm_memory_max_bytes{area="nonheap",id="Metaspace"} -1.0
+jvm_memory_max_bytes{area="nonheap",id="CodeCache"} 5.0331648E7
+jvm_memory_max_bytes{area="nonheap",id="Compressed Class Space"} 1.073741824E9
+# HELP jvm_memory_committed_bytes The amount of committed memory
+# TYPE jvm_memory_committed_bytes gauge
+jvm_memory_committed_bytes{area="heap",id="G1 Eden Space"} 1.34217728E8
+jvm_memory_committed_bytes{area="heap",id="G1 Old Gen"} 5.36870912E8
+jvm_memory_committed_bytes{area="heap",id="G1 Survivor Space"} 2.6843546E7
+jvm_memory_committed_bytes{area="nonheap",id="Metaspace"} 7.1303168E7
+jvm_memory_committed_bytes{area="nonheap",id="CodeCache"} 1.6777216E7
+jvm_memory_committed_bytes{area="nonheap",id="Compressed Class Space"} 1.048576E7
+# HELP system_cpu_usage The recent cpu usage for the whole system
+# TYPE system_cpu_usage gauge
+system_cpu_usage 0.15
+# HELP process_cpu_usage The recent cpu usage for the JVM process
+# TYPE process_cpu_usage gauge
+process_cpu_usage 0.08
+# HELP system_cpu_count The number of processors available to the JVM
+# TYPE system_cpu_count gauge
+system_cpu_count 8.0
+# HELP system_load_average_1m The sum of the number of runnable entities
+# TYPE system_load_average_1m gauge
+system_load_average_1m 2.45
+# HELP jvm_threads_live_threads The current number of live threads
+# TYPE jvm_threads_live_threads gauge
+jvm_threads_live_threads 42.0
+# HELP jvm_threads_daemon_threads The current number of daemon threads
+# TYPE jvm_threads_daemon_threads gauge
+jvm_threads_daemon_threads 38.0
+# HELP jvm_threads_peak_threads The peak live thread count
+# TYPE jvm_threads_peak_threads gauge
+jvm_threads_peak_threads 48.0
+# HELP jvm_threads_started_threads_total The total number of application threads started in the JVM
+# TYPE jvm_threads_started_threads_total counter
+jvm_threads_started_threads_total 158.0
+# HELP jvm_threads_states_threads The current number of threads having a given state
+# TYPE jvm_threads_states_threads gauge
+jvm_threads_states_threads{state="runnable"} 12.0
+jvm_threads_states_threads{state="blocked"} 0.0
+jvm_threads_states_threads{state="waiting"} 18.0
+jvm_threads_states_threads{state="timed-waiting"} 12.0
+jvm_threads_states_threads{state="new"} 0.0
+jvm_threads_states_threads{state="terminated"} 0.0
+# HELP jvm_gc_pause_seconds GC pause duration
+# TYPE jvm_gc_pause_seconds summary
+jvm_gc_pause_seconds_count{action="end of minor GC",cause="G1 Evacuation Pause",gc="G1 Young Generation"} 24.0
+jvm_gc_pause_seconds_sum{action="end of minor GC",cause="G1 Evacuation Pause",gc="G1 Young Generation"} 0.185
+jvm_gc_pause_seconds_count{action="end of major GC",cause="G1 Humongous Allocation",gc="G1 Old Generation"} 2.0
+jvm_gc_pause_seconds_sum{action="end of major GC",cause="G1 Humongous Allocation",gc="G1 Old Generation"} 0.084
+# HELP jvm_gc_pause_seconds_max GC pause duration max
+# TYPE jvm_gc_pause_seconds_max gauge
+jvm_gc_pause_seconds_max{action="end of minor GC",cause="G1 Evacuation Pause",gc="G1 Young Generation"} 0.012
+jvm_gc_pause_seconds_max{action="end of major GC",cause="G1 Humongous Allocation",gc="G1 Old Generation"} 0.045
+# HELP jvm_gc_memory_allocated_bytes_total Incremented for an increase in the size of the young generation memory pool after one GC
+# TYPE jvm_gc_memory_allocated_bytes_total counter
+jvm_gc_memory_allocated_bytes_total 3.221225472E9
+# HELP jvm_gc_memory_promoted_bytes_total Count of positive increases in the size of the old generation memory pool
+# TYPE jvm_gc_memory_promoted_bytes_total counter
+jvm_gc_memory_promoted_bytes_total 2.68435456E7
+# HELP jvm_gc_live_data_size_bytes Size of long-lived heap memory pool after reclamation
+# TYPE jvm_gc_live_data_size_bytes gauge
+jvm_gc_live_data_size_bytes 2.4E7
+# HELP jvm_gc_max_data_size_bytes Max size of long-lived heap memory pool
+# TYPE jvm_gc_max_data_size_bytes gauge
+jvm_gc_max_data_size_bytes 1.073741824E9
+# HELP jvm_buffer_count_buffers An estimate of the number of buffers in the pool
+# TYPE jvm_buffer_count_buffers gauge
+jvm_buffer_count_buffers{id="direct"} 14.0
+jvm_buffer_count_buffers{id="mapped"} 0.0
+# HELP jvm_buffer_memory_used_bytes An estimate of the memory that the JVM is using for this buffer pool
+# TYPE jvm_buffer_memory_used_bytes gauge
+jvm_buffer_memory_used_bytes{id="direct"} 253952.0
+jvm_buffer_memory_used_bytes{id="mapped"} 0.0
+# HELP jvm_buffer_total_capacity_bytes An estimate of the total capacity of the buffers in this pool
+# TYPE jvm_buffer_total_capacity_bytes gauge
+jvm_buffer_total_capacity_bytes{id="direct"} 253952.0
+jvm_buffer_total_capacity_bytes{id="mapped"} 0.0
+# HELP jvm_classes_loaded_classes The number of classes currently loaded
+# TYPE jvm_classes_loaded_classes gauge
+jvm_classes_loaded_classes 15842.0
+# HELP jvm_classes_unloaded_classes_total The total number of classes unloaded since the JVM has started
+# TYPE jvm_classes_unloaded_classes_total counter
+jvm_classes_unloaded_classes_total 3.0
+# HELP process_uptime_seconds The uptime of the Java process
+# TYPE process_uptime_seconds gauge
+process_uptime_seconds 7245.0
+# HELP process_start_time_seconds The start time of the Java process
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.710312E9
+# HELP camel_exchanges_total Total number of processed exchanges
+# TYPE camel_exchanges_total counter
+camel_exchanges_total{camelContext="camelbee-quarkus-sample",routeId="postMusician",serviceName="MicrometerRoutePolicyService"} 45.0
+camel_exchanges_total{camelContext="camelbee-quarkus-sample",routeId="getMusician",serviceName="MicrometerRoutePolicyService"} 32.0
+camel_exchanges_total{camelContext="camelbee-quarkus-sample",routeId="postMusicianRoute",serviceName="MicrometerRoutePolicyService"} 45.0
+camel_exchanges_total{camelContext="camelbee-quarkus-sample",routeId="getMusicianRoute",serviceName="MicrometerRoutePolicyService"} 32.0
+camel_exchanges_total{camelContext="camelbee-quarkus-sample",routeId="kafkaConsumerRoute",serviceName="MicrometerRoutePolicyService"} 35.0
+camel_exchanges_total{camelContext="camelbee-quarkus-sample",routeId="jmsConsumerRoute",serviceName="MicrometerRoutePolicyService"} 22.0
+camel_exchanges_total{camelContext="camelbee-quarkus-sample",routeId="fileConsumerRoute",serviceName="MicrometerRoutePolicyService"} 8.0
+camel_exchanges_total{camelContext="camelbee-quarkus-sample",routeId="timerRoute",serviceName="MicrometerRoutePolicyService"} 14.0
+camel_exchanges_total{camelContext="camelbee-quarkus-sample",routeId="mqttConsumerRoute",serviceName="MicrometerRoutePolicyService"} 18.0
+camel_exchanges_total{camelContext="camelbee-quarkus-sample",routeId="mongodbConsumerRoute",serviceName="MicrometerRoutePolicyService"} 12.0
+camel_exchanges_total{camelContext="camelbee-quarkus-sample",routeId="musicianProcessorRoute",serviceName="MicrometerRoutePolicyService"} 186.0
+camel_exchanges_total{camelContext="camelbee-quarkus-sample",routeId="invokeHttpBinRoute",serviceName="MicrometerRoutePolicyService"} 186.0
+camel_exchanges_total{camelContext="camelbee-quarkus-sample",routeId="invokeKafkaRoute",serviceName="MicrometerRoutePolicyService"} 186.0
+camel_exchanges_total{camelContext="camelbee-quarkus-sample",routeId="invokeMqttRoute",serviceName="MicrometerRoutePolicyService"} 186.0
+camel_exchanges_total{camelContext="camelbee-quarkus-sample",routeId="invokeMockCRoute",serviceName="MicrometerRoutePolicyService"} 186.0
+camel_exchanges_total{camelContext="camelbee-quarkus-sample",routeId="invokeJmsRoute",serviceName="MicrometerRoutePolicyService"} 186.0
+camel_exchanges_total{camelContext="camelbee-quarkus-sample",routeId="invokeMongoDbRoute",serviceName="MicrometerRoutePolicyService"} 186.0
+camel_exchanges_total{camelContext="camelbee-quarkus-sample",routeId="invokeFileRoute",serviceName="MicrometerRoutePolicyService"} 186.0
+camel_exchanges_total{camelContext="camelbee-quarkus-sample",routeId="invokeMockARoute",serviceName="MicrometerRoutePolicyService"} 186.0
+camel_exchanges_total{camelContext="camelbee-quarkus-sample",routeId="invokeMockBRoute",serviceName="MicrometerRoutePolicyService"} 186.0
+camel_exchanges_total{camelContext="camelbee-quarkus-sample",routeId="errorHandlerRoute",serviceName="MicrometerRoutePolicyService"} 7.0
+# HELP camel_exchanges_failed_total Number of failed exchanges
+# TYPE camel_exchanges_failed_total counter
+camel_exchanges_failed_total{camelContext="camelbee-quarkus-sample",routeId="postMusician",serviceName="MicrometerRoutePolicyService"} 0.0
+camel_exchanges_failed_total{camelContext="camelbee-quarkus-sample",routeId="getMusician",serviceName="MicrometerRoutePolicyService"} 0.0
+camel_exchanges_failed_total{camelContext="camelbee-quarkus-sample",routeId="postMusicianRoute",serviceName="MicrometerRoutePolicyService"} 2.0
+camel_exchanges_failed_total{camelContext="camelbee-quarkus-sample",routeId="getMusicianRoute",serviceName="MicrometerRoutePolicyService"} 1.0
+camel_exchanges_failed_total{camelContext="camelbee-quarkus-sample",routeId="kafkaConsumerRoute",serviceName="MicrometerRoutePolicyService"} 1.0
+camel_exchanges_failed_total{camelContext="camelbee-quarkus-sample",routeId="jmsConsumerRoute",serviceName="MicrometerRoutePolicyService"} 0.0
+camel_exchanges_failed_total{camelContext="camelbee-quarkus-sample",routeId="fileConsumerRoute",serviceName="MicrometerRoutePolicyService"} 0.0
+camel_exchanges_failed_total{camelContext="camelbee-quarkus-sample",routeId="timerRoute",serviceName="MicrometerRoutePolicyService"} 0.0
+camel_exchanges_failed_total{camelContext="camelbee-quarkus-sample",routeId="mqttConsumerRoute",serviceName="MicrometerRoutePolicyService"} 0.0
+camel_exchanges_failed_total{camelContext="camelbee-quarkus-sample",routeId="mongodbConsumerRoute",serviceName="MicrometerRoutePolicyService"} 0.0
+camel_exchanges_failed_total{camelContext="camelbee-quarkus-sample",routeId="musicianProcessorRoute",serviceName="MicrometerRoutePolicyService"} 5.0
+camel_exchanges_failed_total{camelContext="camelbee-quarkus-sample",routeId="invokeHttpBinRoute",serviceName="MicrometerRoutePolicyService"} 3.0
+camel_exchanges_failed_total{camelContext="camelbee-quarkus-sample",routeId="invokeKafkaRoute",serviceName="MicrometerRoutePolicyService"} 1.0
+camel_exchanges_failed_total{camelContext="camelbee-quarkus-sample",routeId="invokeMqttRoute",serviceName="MicrometerRoutePolicyService"} 0.0
+camel_exchanges_failed_total{camelContext="camelbee-quarkus-sample",routeId="invokeMockCRoute",serviceName="MicrometerRoutePolicyService"} 0.0
+camel_exchanges_failed_total{camelContext="camelbee-quarkus-sample",routeId="invokeJmsRoute",serviceName="MicrometerRoutePolicyService"} 0.0
+camel_exchanges_failed_total{camelContext="camelbee-quarkus-sample",routeId="invokeMongoDbRoute",serviceName="MicrometerRoutePolicyService"} 1.0
+camel_exchanges_failed_total{camelContext="camelbee-quarkus-sample",routeId="invokeFileRoute",serviceName="MicrometerRoutePolicyService"} 0.0
+camel_exchanges_failed_total{camelContext="camelbee-quarkus-sample",routeId="invokeMockARoute",serviceName="MicrometerRoutePolicyService"} 0.0
+camel_exchanges_failed_total{camelContext="camelbee-quarkus-sample",routeId="invokeMockBRoute",serviceName="MicrometerRoutePolicyService"} 0.0
+camel_exchanges_failed_total{camelContext="camelbee-quarkus-sample",routeId="errorHandlerRoute",serviceName="MicrometerRoutePolicyService"} 0.0
+# HELP camel_exchanges_succeeded_total Number of succeeded exchanges
+# TYPE camel_exchanges_succeeded_total counter
+camel_exchanges_succeeded_total{camelContext="camelbee-quarkus-sample",routeId="postMusician",serviceName="MicrometerRoutePolicyService"} 45.0
+camel_exchanges_succeeded_total{camelContext="camelbee-quarkus-sample",routeId="getMusician",serviceName="MicrometerRoutePolicyService"} 32.0
+camel_exchanges_succeeded_total{camelContext="camelbee-quarkus-sample",routeId="postMusicianRoute",serviceName="MicrometerRoutePolicyService"} 43.0
+camel_exchanges_succeeded_total{camelContext="camelbee-quarkus-sample",routeId="getMusicianRoute",serviceName="MicrometerRoutePolicyService"} 31.0
+camel_exchanges_succeeded_total{camelContext="camelbee-quarkus-sample",routeId="musicianProcessorRoute",serviceName="MicrometerRoutePolicyService"} 181.0
+camel_exchanges_succeeded_total{camelContext="camelbee-quarkus-sample",routeId="errorHandlerRoute",serviceName="MicrometerRoutePolicyService"} 7.0
+# HELP camel_exchange_event_notifier_seconds_max Time taken to send message to the endpoint
+# TYPE camel_exchange_event_notifier_seconds_max gauge
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="platform-http:///testapi/v1/musician?httpMethodRestrict=POST",eventType="ExchangeCompletedEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.592
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="platform-http:///testapi/v1/musician?httpMethodRestrict=GET",eventType="ExchangeCompletedEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.169
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="direct://musicianProcessor",eventType="ExchangeSentEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.222
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="direct://invokeHttpBin",eventType="ExchangeSentEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.105
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="http://localhost?bridgeEndpoint=true",eventType="ExchangeSentEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.046
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="direct://invokeKafka",eventType="ExchangeSentEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.016
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="kafka://camelbee-southbound-topic",eventType="ExchangeSentEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.008
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="direct://invokeMqtt",eventType="ExchangeSentEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.019
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="paho-mqtt5://camelbee-southbound-topic?brokerUrl=tcp://localhost:1883",eventType="ExchangeSentEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.013
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="direct://invokeMockC",eventType="ExchangeSentEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.001
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="mock://C",eventType="ExchangeSentEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.001
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="direct://invokeJms",eventType="ExchangeSentEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.046
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="jms://queue:camelbee-southbound-queue?disableReplyTo=true&jmsMessageType=Text",eventType="ExchangeSentEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.043
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="direct://invokeMongoDb",eventType="ExchangeSentEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.087
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="mongodb://mongoClient?collection=musicians-out&database=camelbee&operation=insert",eventType="ExchangeSentEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.011
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="direct://invokeFile",eventType="ExchangeSentEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.005
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="file://outputdir",eventType="ExchangeSentEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.003
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="direct://invokeMockA",eventType="ExchangeSentEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.001
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="mock://A",eventType="ExchangeSentEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.001
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="direct://invokeMockB",eventType="ExchangeSentEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.001
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="mock://B",eventType="ExchangeSentEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.001
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="bean-validator://camelbee",eventType="ExchangeSentEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.337
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="kafka://camelbee-northbound-topic",eventType="ExchangeCompletedEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.245
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="jms://queue:camelbee-northbound-queue?disableReplyTo=true&jmsMessageType=Text",eventType="ExchangeCompletedEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.144
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="file://inputdir/?delete=true",eventType="ExchangeCompletedEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.312
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="timer://foo?fixedRate=true&period=500000",eventType="ExchangeCompletedEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.198
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="paho-mqtt5://camelbee-northbound-topic?brokerUrl=tcp://localhost:1883",eventType="ExchangeCompletedEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.178
+camel_exchange_event_notifier_seconds_max{camelContext="camelbee-quarkus-sample",endpointName="mongodb://mongoClient?collection=musicians-in&createCollection=true&database=camelbee",eventType="ExchangeCompletedEvent",failed="false",serviceName="MicrometerEventNotifierService"} 0.126
+# HELP camel_exchange_event_notifier_seconds Time taken to send message to the endpoint
+# TYPE camel_exchange_event_notifier_seconds summary
+camel_exchange_event_notifier_seconds_count{camelContext="camelbee-quarkus-sample",endpointName="platform-http:///testapi/v1/musician?httpMethodRestrict=POST",eventType="ExchangeCompletedEvent",failed="false",serviceName="MicrometerEventNotifierService"} 45.0
+camel_exchange_event_notifier_seconds_sum{camelContext="camelbee-quarkus-sample",endpointName="platform-http:///testapi/v1/musician?httpMethodRestrict=POST",eventType="ExchangeCompletedEvent",failed="false",serviceName="MicrometerEventNotifierService"} 12.458
+camel_exchange_event_notifier_seconds_count{camelContext="camelbee-quarkus-sample",endpointName="platform-http:///testapi/v1/musician?httpMethodRestrict=GET",eventType="ExchangeCompletedEvent",failed="false",serviceName="MicrometerEventNotifierService"} 32.0
+camel_exchange_event_notifier_seconds_sum{camelContext="camelbee-quarkus-sample",endpointName="platform-http:///testapi/v1/musician?httpMethodRestrict=GET",eventType="ExchangeCompletedEvent",failed="false",serviceName="MicrometerEventNotifierService"} 4.256
+camel_exchange_event_notifier_seconds_count{camelContext="camelbee-quarkus-sample",endpointName="direct://musicianProcessor",eventType="ExchangeSentEvent",failed="false",serviceName="MicrometerEventNotifierService"} 186.0
+camel_exchange_event_notifier_seconds_sum{camelContext="camelbee-quarkus-sample",endpointName="direct://musicianProcessor",eventType="ExchangeSentEvent",failed="false",serviceName="MicrometerEventNotifierService"} 38.724
+# HELP camel_routes_running_routes Number of running routes
+# TYPE camel_routes_running_routes gauge
+camel_routes_running_routes{camelContext="camelbee-quarkus-sample"} 21.0
+# HELP camel_routes_added_routes Number of added routes
+# TYPE camel_routes_added_routes gauge
+camel_routes_added_routes{camelContext="camelbee-quarkus-sample"} 21.0

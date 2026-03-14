@@ -1,0 +1,872 @@
+{
+  "messages": [
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "Accept:application/json\nCamelHttpMethod:POST\nCamelHttpPath:/testapi/v1/musician\nCamelInterceptedEndpoint:platform-http:///testapi/v1/musician?httpMethodRestrict=POST\nContent-Type:application/json\n",
+      "routeId": "postMusician",
+      "messageType": "REQUEST",
+      "timeStamp": "1699195807100"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "Accept:application/json\nCamelHttpMethod:POST\nCamelInterceptedEndpoint:direct://postMusician\nContent-Type:application/json\n",
+      "routeId": "postMusician",
+      "endpoint": "direct://postMusician",
+      "messageType": "REQUEST",
+      "timeStamp": "1699195807105"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:bean-validator://camelbee\nContent-Type:application/json\n",
+      "routeId": "direct://postMusician",
+      "endpoint": "bean-validator://camelbee",
+      "messageType": "REQUEST",
+      "timeStamp": "1699195807110"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:bean-validator://camelbee\nContent-Type:application/json\n",
+      "routeId": "direct://postMusician",
+      "endpoint": "bean-validator://camelbee",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699195807150"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:direct://musicianProcessor\nContent-Type:application/json\n",
+      "routeId": "direct://postMusician",
+      "endpoint": "direct://musicianProcessor",
+      "messageType": "REQUEST",
+      "timeStamp": "1699195807155"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeHttpBin\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeHttpBin",
+      "messageType": "REQUEST",
+      "timeStamp": "1699195807160"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "\"John Coltrane\"",
+      "headers": "CamelHttpMethod:GET\nCamelHttpPath:/stream/2\nCamelInterceptedEndpoint:http://localhost?bridgeEndpoint=true\nContent-Type:application/json\nhhId:2\n",
+      "routeId": "direct://invokeHttpBin",
+      "endpoint": "http://localhost?bridgeEndpoint=true",
+      "messageType": "REQUEST",
+      "timeStamp": "1699195807200"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"url\": \"http://localhost/stream/2\", \"args\": {}, \"headers\": {\"Accept-Encoding\": \"gzip, deflate\", \"Host\": \"localhost\", \"Connection\": \"keep-alive\"}, \"origin\": \"172.22.0.1\", \"id\": 0}",
+      "headers": "Access-Control-Allow-Credentials:true\nAccess-Control-Allow-Origin:*\nCamelHttpMethod:GET\nCamelHttpResponseCode:200\nCamelHttpResponseText:OK\nCamelInterceptedEndpoint:http://localhost?bridgeEndpoint=true\nContent-Type:application/json\n",
+      "routeId": "direct://invokeHttpBin",
+      "endpoint": "http://localhost?bridgeEndpoint=true",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699195807350"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"url\": \"http://localhost/stream/2\", \"args\": {}, \"headers\": {\"Accept-Encoding\": \"gzip, deflate\", \"Host\": \"localhost\"}, \"origin\": \"172.22.0.1\", \"id\": 0}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeHttpBin\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeHttpBin",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699195807355"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"url\": \"http://localhost/stream/2\", \"args\": {}, \"origin\": \"172.22.0.1\", \"id\": 0}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeKafka\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeKafka",
+      "messageType": "REQUEST",
+      "timeStamp": "1699195807360"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"url\": \"http://localhost/stream/2\", \"args\": {}, \"origin\": \"172.22.0.1\", \"id\": 0}",
+      "headers": "CamelInterceptedEndpoint:kafka://camelbee-southbound-topic\nContent-Type:application/json\nkafka.KEY:musician-001\n",
+      "routeId": "direct://invokeKafka",
+      "endpoint": "kafka://camelbee-southbound-topic",
+      "messageType": "REQUEST",
+      "timeStamp": "1699195807365"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"url\": \"http://localhost/stream/2\", \"args\": {}, \"origin\": \"172.22.0.1\", \"id\": 0}",
+      "headers": "CamelInterceptedEndpoint:kafka://camelbee-southbound-topic\nContent-Type:application/json\nkafka.KEY:musician-001\nkafka.OFFSET:142\nkafka.PARTITION:0\nkafka.TOPIC:camelbee-southbound-topic\n",
+      "routeId": "direct://invokeKafka",
+      "endpoint": "kafka://camelbee-southbound-topic",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699195807420"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"url\": \"http://localhost/stream/2\", \"args\": {}, \"origin\": \"172.22.0.1\", \"id\": 0}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeKafka\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeKafka",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699195807425"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"url\": \"http://localhost/stream/2\", \"origin\": \"172.22.0.1\"}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeMqtt\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeMqtt",
+      "messageType": "REQUEST",
+      "timeStamp": "1699195807430"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"url\": \"http://localhost/stream/2\", \"origin\": \"172.22.0.1\"}",
+      "headers": "CamelInterceptedEndpoint:paho-mqtt5://camelbee-southbound-topic?brokerUrl=tcp://localhost:1883\nContent-Type:application/json\n",
+      "routeId": "direct://invokeMqtt",
+      "endpoint": "paho-mqtt5://camelbee-southbound-topic?brokerUrl=tcp://localhost:1883",
+      "messageType": "REQUEST",
+      "timeStamp": "1699195807435"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"url\": \"http://localhost/stream/2\", \"origin\": \"172.22.0.1\"}",
+      "headers": "CamelInterceptedEndpoint:paho-mqtt5://camelbee-southbound-topic?brokerUrl=tcp://localhost:1883\nContent-Type:application/json\n",
+      "routeId": "direct://invokeMqtt",
+      "endpoint": "paho-mqtt5://camelbee-southbound-topic?brokerUrl=tcp://localhost:1883",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699195807480"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"url\": \"http://localhost/stream/2\", \"origin\": \"172.22.0.1\"}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeMqtt\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeMqtt",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699195807485"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeMockC\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeMockC",
+      "messageType": "REQUEST",
+      "timeStamp": "1699195807490"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:mock://C\nContent-Type:application/json\n",
+      "routeId": "direct://invokeMockC",
+      "endpoint": "mock://C",
+      "messageType": "REQUEST",
+      "timeStamp": "1699195807492"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:mock://C\nContent-Type:application/json\n",
+      "routeId": "direct://invokeMockC",
+      "endpoint": "mock://C",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699195807494"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeMockC\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeMockC",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699195807496"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeJms\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeJms",
+      "messageType": "REQUEST",
+      "timeStamp": "1699195807500"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:jms://queue:camelbee-southbound-queue?disableReplyTo=true&jmsMessageType=Text\nContent-Type:application/json\n",
+      "routeId": "direct://invokeJms",
+      "endpoint": "jms://queue:camelbee-southbound-queue?disableReplyTo=true&jmsMessageType=Text",
+      "messageType": "REQUEST",
+      "timeStamp": "1699195807505"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:jms://queue:camelbee-southbound-queue?disableReplyTo=true&jmsMessageType=Text\nContent-Type:application/json\n",
+      "routeId": "direct://invokeJms",
+      "endpoint": "jms://queue:camelbee-southbound-queue?disableReplyTo=true&jmsMessageType=Text",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699195807550"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeJms\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeJms",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699195807555"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeMongoDb\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeMongoDb",
+      "messageType": "REQUEST",
+      "timeStamp": "1699195807560"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"_id\":\"65f1a2b3c4d5e6f7a8b9c001\",\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:mongodb://mongoClient?collection=musicians-out&database=camelbee&operation=insert\nContent-Type:application/json\n",
+      "routeId": "direct://invokeMongoDb",
+      "endpoint": "mongodb://mongoClient?collection=musicians-out&database=camelbee&operation=insert",
+      "messageType": "REQUEST",
+      "timeStamp": "1699195807565"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"_id\":\"65f1a2b3c4d5e6f7a8b9c001\",\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:mongodb://mongoClient?collection=musicians-out&database=camelbee&operation=insert\nContent-Type:application/json\n",
+      "routeId": "direct://invokeMongoDb",
+      "endpoint": "mongodb://mongoClient?collection=musicians-out&database=camelbee&operation=insert",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699195807620"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"_id\":\"65f1a2b3c4d5e6f7a8b9c001\",\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeMongoDb\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeMongoDb",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699195807625"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeFile\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeFile",
+      "messageType": "REQUEST",
+      "timeStamp": "1699195807630"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelFileName:musician-001.json\nCamelInterceptedEndpoint:file://outputdir\nContent-Type:application/json\n",
+      "routeId": "direct://invokeFile",
+      "endpoint": "file://outputdir",
+      "messageType": "REQUEST",
+      "timeStamp": "1699195807635"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelFileName:musician-001.json\nCamelInterceptedEndpoint:file://outputdir\nContent-Type:application/json\n",
+      "routeId": "direct://invokeFile",
+      "endpoint": "file://outputdir",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699195807640"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeFile\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeFile",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699195807645"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeMockA\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeMockA",
+      "messageType": "REQUEST",
+      "timeStamp": "1699195807650"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:mock://A\nContent-Type:application/json\n",
+      "routeId": "direct://invokeMockA",
+      "endpoint": "mock://A",
+      "messageType": "REQUEST",
+      "timeStamp": "1699195807652"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:mock://A\nContent-Type:application/json\n",
+      "routeId": "direct://invokeMockA",
+      "endpoint": "mock://A",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699195807654"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeMockA\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeMockA",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699195807656"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeMockB\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeMockB",
+      "messageType": "REQUEST",
+      "timeStamp": "1699195807660"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:mock://B\nContent-Type:application/json\n",
+      "routeId": "direct://invokeMockB",
+      "endpoint": "mock://B",
+      "messageType": "REQUEST",
+      "timeStamp": "1699195807662"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:mock://B\nContent-Type:application/json\n",
+      "routeId": "direct://invokeMockB",
+      "endpoint": "mock://B",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699195807664"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeMockB\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeMockB",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699195807666"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"status\":\"processed\",\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:direct://musicianProcessor\nContent-Type:application/json\n",
+      "routeId": "direct://postMusician",
+      "endpoint": "direct://musicianProcessor",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699195807700"
+    },
+    {
+      "exchangeId": "A1B2C3D4E5F60001-0000000000000000",
+      "messageBody": "{\"status\":\"processed\",\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelHttpResponseCode:200\nCamelInterceptedEndpoint:direct://postMusician\nContent-Type:application/json\n",
+      "routeId": "postMusician",
+      "endpoint": "direct://postMusician",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699195807710"
+    },
+    {
+      "exchangeId": "B2C3D4E5F6A70002-0000000000000000",
+      "headers": "breadcrumbId:B2C3D4E5F6A70002-0000000000000000\nCamelInterceptedEndpoint:timer://foo?fixedRate=true&period=500000\nCamelMessageTimestamp:1699196307000\nfiredTime:Sun Nov 05 15:58:27 CET 2023\n",
+      "routeId": "timerRoute",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196307020"
+    },
+    {
+      "exchangeId": "B2C3D4E5F6A70002-0000000000000000",
+      "messageBody": "timerTestMessage",
+      "headers": "breadcrumbId:B2C3D4E5F6A70002-0000000000000000\nCamelInterceptedEndpoint:direct://musicianProcessor\nCamelMessageTimestamp:1699196307000\nfiredTime:Sun Nov 05 15:58:27 CET 2023\n",
+      "routeId": "timerRoute",
+      "endpoint": "direct://musicianProcessor",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196307025"
+    },
+    {
+      "exchangeId": "B2C3D4E5F6A70002-0000000000000000",
+      "messageBody": "timerTestMessage",
+      "headers": "CamelInterceptedEndpoint:direct://invokeHttpBin\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeHttpBin",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196307030"
+    },
+    {
+      "exchangeId": "B2C3D4E5F6A70002-0000000000000000",
+      "messageBody": "\"timerTestMessage\"",
+      "headers": "CamelHttpMethod:GET\nCamelHttpPath:/stream/2\nCamelInterceptedEndpoint:http://localhost?bridgeEndpoint=true\nContent-Type:application/json\nhhId:2\n",
+      "routeId": "direct://invokeHttpBin",
+      "endpoint": "http://localhost?bridgeEndpoint=true",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196307050"
+    },
+    {
+      "exchangeId": "B2C3D4E5F6A70002-0000000000000000",
+      "messageBody": "{\"url\": \"http://localhost/stream/2\", \"args\": {}, \"headers\": {\"Host\": \"localhost\", \"Connection\": \"keep-alive\"}, \"origin\": \"172.22.0.1\", \"id\": 0}\n{\"url\": \"http://localhost/stream/2\", \"args\": {}, \"headers\": {\"Host\": \"localhost\"}, \"origin\": \"172.22.0.1\", \"id\": 1}",
+      "headers": "Access-Control-Allow-Credentials:true\nAccess-Control-Allow-Origin:*\nCamelHttpResponseCode:200\nCamelHttpResponseText:OK\nCamelInterceptedEndpoint:http://localhost?bridgeEndpoint=true\nContent-Type:application/json\nServer:gunicorn/19.9.0\n",
+      "routeId": "direct://invokeHttpBin",
+      "endpoint": "http://localhost?bridgeEndpoint=true",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699196307200"
+    },
+    {
+      "exchangeId": "B2C3D4E5F6A70002-0000000000000000",
+      "messageBody": "{\"url\": \"http://localhost/stream/2\", \"args\": {}, \"origin\": \"172.22.0.1\", \"id\": 0}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeHttpBin\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeHttpBin",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699196307205"
+    },
+    {
+      "exchangeId": "B2C3D4E5F6A70002-0000000000000000",
+      "messageBody": "timerTestMessage",
+      "headers": "CamelInterceptedEndpoint:direct://invokeKafka\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeKafka",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196307210"
+    },
+    {
+      "exchangeId": "B2C3D4E5F6A70002-0000000000000000",
+      "messageBody": "timerTestMessage",
+      "headers": "CamelInterceptedEndpoint:kafka://camelbee-southbound-topic\nkafka.KEY:timer-001\n",
+      "routeId": "direct://invokeKafka",
+      "endpoint": "kafka://camelbee-southbound-topic",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196307215"
+    },
+    {
+      "exchangeId": "B2C3D4E5F6A70002-0000000000000000",
+      "messageBody": "timerTestMessage",
+      "headers": "CamelInterceptedEndpoint:kafka://camelbee-southbound-topic\nkafka.KEY:timer-001\nkafka.OFFSET:143\nkafka.PARTITION:0\n",
+      "routeId": "direct://invokeKafka",
+      "endpoint": "kafka://camelbee-southbound-topic",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699196307260"
+    },
+    {
+      "exchangeId": "B2C3D4E5F6A70002-0000000000000000",
+      "messageBody": "timerTestMessage",
+      "headers": "CamelInterceptedEndpoint:direct://invokeKafka\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeKafka",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699196307265"
+    },
+    {
+      "exchangeId": "B2C3D4E5F6A70002-0000000000000000",
+      "messageBody": "{\"status\":\"processed\",\"source\":\"timer\"}",
+      "headers": "CamelInterceptedEndpoint:direct://musicianProcessor\n",
+      "routeId": "timerRoute",
+      "endpoint": "direct://musicianProcessor",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699196307500"
+    },
+    {
+      "exchangeId": "C3D4E5F6A7B80003-0000000000000000",
+      "messageBody": "{\"name\":\"Miles Davis\",\"instrument\":\"Trumpet\"}",
+      "headers": "breadcrumbId:C3D4E5F6A7B80003-0000000000000000\nCamelInterceptedEndpoint:kafka://camelbee-northbound-topic\nkafka.OFFSET:55\nkafka.PARTITION:0\nkafka.TOPIC:camelbee-northbound-topic\n",
+      "routeId": "kafkaConsumerRoute",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196400100"
+    },
+    {
+      "exchangeId": "C3D4E5F6A7B80003-0000000000000000",
+      "messageBody": "{\"name\":\"Miles Davis\",\"instrument\":\"Trumpet\"}",
+      "headers": "CamelInterceptedEndpoint:direct://musicianProcessor\nContent-Type:application/json\n",
+      "routeId": "kafkaConsumerRoute",
+      "endpoint": "direct://musicianProcessor",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196400110"
+    },
+    {
+      "exchangeId": "C3D4E5F6A7B80003-0000000000000000",
+      "messageBody": "{\"name\":\"Miles Davis\",\"instrument\":\"Trumpet\"}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeHttpBin\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeHttpBin",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196400120"
+    },
+    {
+      "exchangeId": "C3D4E5F6A7B80003-0000000000000000",
+      "messageBody": "{\"name\":\"Miles Davis\",\"instrument\":\"Trumpet\"}",
+      "headers": "CamelHttpMethod:GET\nCamelHttpPath:/stream/3\nCamelInterceptedEndpoint:http://localhost?bridgeEndpoint=true\nContent-Type:application/json\nhhId:3\n",
+      "routeId": "direct://invokeHttpBin",
+      "endpoint": "http://localhost?bridgeEndpoint=true",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196400130"
+    },
+    {
+      "exchangeId": "C3D4E5F6A7B80003-0000000000000000",
+      "messageBody": "{\"url\": \"http://localhost/stream/3\", \"origin\": \"172.22.0.1\", \"id\": 0}",
+      "headers": "CamelHttpResponseCode:200\nCamelHttpResponseText:OK\nCamelInterceptedEndpoint:http://localhost?bridgeEndpoint=true\nContent-Type:application/json\n",
+      "routeId": "direct://invokeHttpBin",
+      "endpoint": "http://localhost?bridgeEndpoint=true",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699196400250"
+    },
+    {
+      "exchangeId": "C3D4E5F6A7B80003-0000000000000000",
+      "messageBody": "{\"url\": \"http://localhost/stream/3\", \"origin\": \"172.22.0.1\", \"id\": 0}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeHttpBin\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeHttpBin",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699196400255"
+    },
+    {
+      "exchangeId": "C3D4E5F6A7B80003-0000000000000000",
+      "messageBody": "{\"status\":\"processed\",\"name\":\"Miles Davis\"}",
+      "headers": "CamelInterceptedEndpoint:direct://musicianProcessor\nContent-Type:application/json\n",
+      "routeId": "kafkaConsumerRoute",
+      "endpoint": "direct://musicianProcessor",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699196400600"
+    },
+    {
+      "exchangeId": "D4E5F6A7B8C90004-0000000000000000",
+      "messageBody": "{\"name\":\"Thelonious Monk\",\"instrument\":\"Piano\"}",
+      "headers": "CamelInterceptedEndpoint:jms://queue:camelbee-northbound-queue?disableReplyTo=true&jmsMessageType=Text\nJMSCorrelationID:ID:broker-12345-1699196500\nJMSDestination:queue://camelbee-northbound-queue\nJMSMessageID:ID:broker-12345-1699196500-1\n",
+      "routeId": "jmsConsumerRoute",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196500100"
+    },
+    {
+      "exchangeId": "D4E5F6A7B8C90004-0000000000000000",
+      "messageBody": "{\"name\":\"Thelonious Monk\",\"instrument\":\"Piano\"}",
+      "headers": "CamelInterceptedEndpoint:direct://musicianProcessor\nContent-Type:application/json\n",
+      "routeId": "jmsConsumerRoute",
+      "endpoint": "direct://musicianProcessor",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196500110"
+    },
+    {
+      "exchangeId": "D4E5F6A7B8C90004-0000000000000000",
+      "messageBody": "{\"name\":\"Thelonious Monk\",\"instrument\":\"Piano\"}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeHttpBin\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeHttpBin",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196500120"
+    },
+    {
+      "exchangeId": "D4E5F6A7B8C90004-0000000000000000",
+      "messageBody": "{\"name\":\"Thelonious Monk\",\"instrument\":\"Piano\"}",
+      "headers": "CamelHttpMethod:GET\nCamelHttpPath:/stream/4\nCamelInterceptedEndpoint:http://localhost?bridgeEndpoint=true\nContent-Type:application/json\nhhId:4\n",
+      "routeId": "direct://invokeHttpBin",
+      "endpoint": "http://localhost?bridgeEndpoint=true",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196500130"
+    },
+    {
+      "exchangeId": "D4E5F6A7B8C90004-0000000000000000",
+      "messageBody": "{\"url\": \"http://localhost/stream/4\", \"origin\": \"172.22.0.1\", \"id\": 0}",
+      "headers": "CamelHttpResponseCode:200\nCamelInterceptedEndpoint:http://localhost?bridgeEndpoint=true\nContent-Type:application/json\n",
+      "routeId": "direct://invokeHttpBin",
+      "endpoint": "http://localhost?bridgeEndpoint=true",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699196500280"
+    },
+    {
+      "exchangeId": "D4E5F6A7B8C90004-0000000000000000",
+      "messageBody": "{\"status\":\"processed\",\"name\":\"Thelonious Monk\"}",
+      "headers": "CamelInterceptedEndpoint:direct://musicianProcessor\nContent-Type:application/json\n",
+      "routeId": "jmsConsumerRoute",
+      "endpoint": "direct://musicianProcessor",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699196500800"
+    },
+    {
+      "exchangeId": "E5F6A7B8C9DA0005-0000000000000000",
+      "messageBody": "{\"name\":\"Charlie Parker\",\"instrument\":\"Alto Saxophone\"}",
+      "headers": "Accept:application/json\nCamelHttpMethod:POST\nCamelHttpPath:/testapi/v1/musician\nCamelInterceptedEndpoint:platform-http:///testapi/v1/musician?httpMethodRestrict=POST\nContent-Type:application/json\n",
+      "routeId": "postMusician",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196600100"
+    },
+    {
+      "exchangeId": "E5F6A7B8C9DA0005-0000000000000000",
+      "messageBody": "{\"name\":\"Charlie Parker\",\"instrument\":\"Alto Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:direct://postMusician\nContent-Type:application/json\n",
+      "routeId": "postMusician",
+      "endpoint": "direct://postMusician",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196600105"
+    },
+    {
+      "exchangeId": "E5F6A7B8C9DA0005-0000000000000000",
+      "messageBody": "{\"name\":\"Charlie Parker\",\"instrument\":\"Alto Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:bean-validator://camelbee\nContent-Type:application/json\n",
+      "routeId": "direct://postMusician",
+      "endpoint": "bean-validator://camelbee",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196600110"
+    },
+    {
+      "exchangeId": "E5F6A7B8C9DA0005-0000000000000000",
+      "messageBody": "{\"name\":\"Charlie Parker\",\"instrument\":\"Alto Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:bean-validator://camelbee\nContent-Type:application/json\n",
+      "routeId": "direct://postMusician",
+      "endpoint": "bean-validator://camelbee",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699196600115"
+    },
+    {
+      "exchangeId": "E5F6A7B8C9DA0005-0000000000000000",
+      "messageBody": "{\"name\":\"Charlie Parker\",\"instrument\":\"Alto Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:direct://musicianProcessor\nContent-Type:application/json\n",
+      "routeId": "direct://postMusician",
+      "endpoint": "direct://musicianProcessor",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196600120"
+    },
+    {
+      "exchangeId": "E5F6A7B8C9DA0005-0000000000000000",
+      "messageBody": "{\"name\":\"Charlie Parker\",\"instrument\":\"Alto Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeHttpBin\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeHttpBin",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196600130"
+    },
+    {
+      "exchangeId": "E5F6A7B8C9DA0005-0000000000000000",
+      "messageBody": "{\"name\":\"Charlie Parker\",\"instrument\":\"Alto Saxophone\"}",
+      "headers": "CamelHttpMethod:GET\nCamelHttpPath:/stream/5\nCamelInterceptedEndpoint:http://localhost?bridgeEndpoint=true\nContent-Type:application/json\nhhId:5\n",
+      "routeId": "direct://invokeHttpBin",
+      "endpoint": "http://localhost?bridgeEndpoint=true",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196600140"
+    },
+    {
+      "exchangeId": "E5F6A7B8C9DA0005-0000000000000000",
+      "headers": "CamelInterceptedEndpoint:http://localhost?bridgeEndpoint=true\nContent-Type:application/json\n",
+      "routeId": "direct://invokeHttpBin",
+      "endpoint": "http://localhost?bridgeEndpoint=true",
+      "messageType": "ERROR_RESPONSE",
+      "exception": "java.net.ConnectException: Connection refused (Connection refused)\n\tat java.base/sun.nio.ch.Net.pollConnect(Native Method)\n\tat java.base/sun.nio.ch.Net.pollConnectNow(Net.java:682)\n\tat java.base/sun.nio.ch.SocketChannelImpl.finishConnect(SocketChannelImpl.java:946)\n\tat org.apache.hc.core5.reactor.InternalDataChannel.onConnected(InternalDataChannel.java:95)",
+      "timeStamp": "1699196600500"
+    },
+    {
+      "exchangeId": "E5F6A7B8C9DA0005-0000000000000000",
+      "messageBody": "{\"error\":\"ConnectException\",\"route\":\"invokeHttpBinRoute\"}",
+      "headers": "CamelExceptionCaught:java.net.ConnectException: Connection refused\nCamelInterceptedEndpoint:direct://errorHandler\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://errorHandler",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196600510"
+    },
+    {
+      "exchangeId": "E5F6A7B8C9DA0005-0000000000000000",
+      "messageBody": "{\"error\":\"ConnectException\",\"route\":\"invokeHttpBinRoute\"}",
+      "headers": "CamelExceptionCaught:java.net.ConnectException: Connection refused\nCamelInterceptedEndpoint:log://error-handler?level=ERROR\n",
+      "routeId": "direct://errorHandler",
+      "endpoint": "log://error-handler?level=ERROR",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196600515"
+    },
+    {
+      "exchangeId": "E5F6A7B8C9DA0005-0000000000000000",
+      "messageBody": "{\"error\":\"ConnectException\",\"route\":\"invokeHttpBinRoute\"}",
+      "headers": "CamelExceptionCaught:java.net.ConnectException: Connection refused\nCamelInterceptedEndpoint:log://error-handler?level=ERROR\n",
+      "routeId": "direct://errorHandler",
+      "endpoint": "log://error-handler?level=ERROR",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699196600520"
+    },
+    {
+      "exchangeId": "E5F6A7B8C9DA0005-0000000000000000",
+      "messageBody": "{\"error\":\"ConnectException\",\"route\":\"invokeHttpBinRoute\"}",
+      "headers": "CamelExceptionCaught:java.net.ConnectException: Connection refused\nCamelInterceptedEndpoint:mock://error\n",
+      "routeId": "direct://errorHandler",
+      "endpoint": "mock://error",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196600525"
+    },
+    {
+      "exchangeId": "E5F6A7B8C9DA0005-0000000000000000",
+      "messageBody": "{\"error\":\"ConnectException\",\"route\":\"invokeHttpBinRoute\"}",
+      "headers": "CamelExceptionCaught:java.net.ConnectException: Connection refused\nCamelInterceptedEndpoint:mock://error\n",
+      "routeId": "direct://errorHandler",
+      "endpoint": "mock://error",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699196600530"
+    },
+    {
+      "exchangeId": "E5F6A7B8C9DA0005-0000000000000000",
+      "messageBody": "{\"error\":\"ConnectException\",\"route\":\"invokeHttpBinRoute\"}",
+      "headers": "CamelExceptionCaught:java.net.ConnectException: Connection refused\nCamelInterceptedEndpoint:direct://errorHandler\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://errorHandler",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699196600535"
+    },
+    {
+      "exchangeId": "F6A7B8C9DA0B0006-0000000000000000",
+      "messageBody": "{\"name\":\"Ella Fitzgerald\",\"instrument\":\"Vocals\"}",
+      "headers": "CamelInterceptedEndpoint:paho-mqtt5://camelbee-northbound-topic?brokerUrl=tcp://localhost:1883\nContent-Type:application/json\n",
+      "routeId": "mqttConsumerRoute",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196700100"
+    },
+    {
+      "exchangeId": "F6A7B8C9DA0B0006-0000000000000000",
+      "messageBody": "{\"name\":\"Ella Fitzgerald\",\"instrument\":\"Vocals\"}",
+      "headers": "CamelInterceptedEndpoint:direct://musicianProcessor\nContent-Type:application/json\n",
+      "routeId": "mqttConsumerRoute",
+      "endpoint": "direct://musicianProcessor",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196700110"
+    },
+    {
+      "exchangeId": "F6A7B8C9DA0B0006-0000000000000000",
+      "messageBody": "{\"name\":\"Ella Fitzgerald\",\"instrument\":\"Vocals\"}",
+      "headers": "CamelInterceptedEndpoint:direct://invokeHttpBin\nContent-Type:application/json\n",
+      "routeId": "direct://musicianProcessor",
+      "endpoint": "direct://invokeHttpBin",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196700120"
+    },
+    {
+      "exchangeId": "F6A7B8C9DA0B0006-0000000000000000",
+      "messageBody": "{\"url\": \"http://localhost/stream/6\", \"origin\": \"172.22.0.1\"}",
+      "headers": "CamelHttpResponseCode:200\nCamelInterceptedEndpoint:http://localhost?bridgeEndpoint=true\nContent-Type:application/json\n",
+      "routeId": "direct://invokeHttpBin",
+      "endpoint": "http://localhost?bridgeEndpoint=true",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699196700250"
+    },
+    {
+      "exchangeId": "F6A7B8C9DA0B0006-0000000000000000",
+      "messageBody": "{\"status\":\"processed\",\"name\":\"Ella Fitzgerald\"}",
+      "headers": "CamelInterceptedEndpoint:direct://musicianProcessor\nContent-Type:application/json\n",
+      "routeId": "mqttConsumerRoute",
+      "endpoint": "direct://musicianProcessor",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699196700600"
+    },
+    {
+      "exchangeId": "A7B8C9DA0B1C0007-0000000000000000",
+      "messageBody": "{\"_id\":\"65f1a2b3c4d5e6f7a8b9c099\",\"name\":\"Art Blakey\",\"instrument\":\"Drums\"}",
+      "headers": "CamelInterceptedEndpoint:mongodb://mongoClient?collection=musicians-in&createCollection=true&database=camelbee\nContent-Type:application/json\n",
+      "routeId": "mongodbConsumerRoute",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196800100"
+    },
+    {
+      "exchangeId": "A7B8C9DA0B1C0007-0000000000000000",
+      "messageBody": "{\"name\":\"Art Blakey\",\"instrument\":\"Drums\"}",
+      "headers": "CamelInterceptedEndpoint:direct://musicianProcessor\nContent-Type:application/json\n",
+      "routeId": "mongodbConsumerRoute",
+      "endpoint": "direct://musicianProcessor",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196800110"
+    },
+    {
+      "exchangeId": "A7B8C9DA0B1C0007-0000000000000000",
+      "messageBody": "{\"status\":\"processed\",\"name\":\"Art Blakey\"}",
+      "headers": "CamelInterceptedEndpoint:direct://musicianProcessor\nContent-Type:application/json\n",
+      "routeId": "mongodbConsumerRoute",
+      "endpoint": "direct://musicianProcessor",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699196800600"
+    },
+    {
+      "exchangeId": "B8C9DA0B1C2D0008-0000000000000000",
+      "messageBody": "John Coltrane,Saxophone,1926",
+      "headers": "CamelFileName:musicians-batch.csv\nCamelInterceptedEndpoint:file://inputdir/?delete=true\nContent-Type:text/plain\n",
+      "routeId": "fileConsumerRoute",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196900100"
+    },
+    {
+      "exchangeId": "B8C9DA0B1C2D0008-0000000000000000",
+      "messageBody": "John Coltrane,Saxophone,1926",
+      "headers": "CamelFileName:musicians-batch.csv\nCamelInterceptedEndpoint:direct://musicianProcessor\nContent-Type:text/plain\n",
+      "routeId": "fileConsumerRoute",
+      "endpoint": "direct://musicianProcessor",
+      "messageType": "REQUEST",
+      "timeStamp": "1699196900110"
+    },
+    {
+      "exchangeId": "B8C9DA0B1C2D0008-0000000000000000",
+      "messageBody": "{\"status\":\"processed\",\"source\":\"file\"}",
+      "headers": "CamelInterceptedEndpoint:direct://musicianProcessor\nContent-Type:application/json\n",
+      "routeId": "fileConsumerRoute",
+      "endpoint": "direct://musicianProcessor",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699196900600"
+    },
+    {
+      "exchangeId": "C9DA0B1C2D3E0009-0000000000000000",
+      "messageBody": null,
+      "headers": "Accept:application/json\nCamelHttpMethod:GET\nCamelHttpPath:/testapi/v1/musician\nCamelInterceptedEndpoint:platform-http:///testapi/v1/musician?httpMethodRestrict=GET\n",
+      "routeId": "getMusician",
+      "messageType": "REQUEST",
+      "timeStamp": "1699197000100"
+    },
+    {
+      "exchangeId": "C9DA0B1C2D3E0009-0000000000000000",
+      "headers": "CamelInterceptedEndpoint:direct://getMusician\nContent-Type:application/json\n",
+      "routeId": "getMusician",
+      "endpoint": "direct://getMusician",
+      "messageType": "REQUEST",
+      "timeStamp": "1699197000105"
+    },
+    {
+      "exchangeId": "C9DA0B1C2D3E0009-0000000000000000",
+      "headers": "CamelInterceptedEndpoint:direct://musicianProcessor\nContent-Type:application/json\n",
+      "routeId": "direct://getMusician",
+      "endpoint": "direct://musicianProcessor",
+      "messageType": "REQUEST",
+      "timeStamp": "1699197000110"
+    },
+    {
+      "exchangeId": "C9DA0B1C2D3E0009-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelInterceptedEndpoint:direct://musicianProcessor\nContent-Type:application/json\n",
+      "routeId": "direct://getMusician",
+      "endpoint": "direct://musicianProcessor",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699197000500"
+    },
+    {
+      "exchangeId": "C9DA0B1C2D3E0009-0000000000000000",
+      "messageBody": "{\"name\":\"John Coltrane\",\"instrument\":\"Saxophone\"}",
+      "headers": "CamelHttpResponseCode:200\nCamelInterceptedEndpoint:direct://getMusician\nContent-Type:application/json\n",
+      "routeId": "getMusician",
+      "endpoint": "direct://getMusician",
+      "messageType": "RESPONSE",
+      "timeStamp": "1699197000505"
+    }
+  ],
+  "info": {
+    "count": 136,
+    "resetVersion": 0,
+    "addVersion": 1,
+    "lastModified": "1699197000505",
+    "lastResetTime": "1699195800000"
+  }
+}

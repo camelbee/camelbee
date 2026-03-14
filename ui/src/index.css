@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* React Flow dark theme overrides */
+.react-flow__background {
+  background-color: #030712; /* gray-950 */
+}
+
+.react-flow__controls button {
+  background-color: #1f2937; /* gray-800 */
+  border-color: #374151; /* gray-700 */
+  color: #d1d5db; /* gray-300 */
+  fill: #d1d5db;
+}
+
+.react-flow__controls button:hover {
+  background-color: #374151;
+}
+
+.react-flow__minimap {
+  background-color: #111827 !important; /* gray-900 */
+}
+
+/* Animated dash-flow for active edges */
+@keyframes dash-flow {
+  to {
+    stroke-dashoffset: -24;
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "status": "UP",
+  "checks": [
+    {
+      "name": "camel-health-check",
+      "status": "UP",
+      "data": {
+        "context.name": "camelbee-quarkus-sample",
+        "context.version": "4.16.0",
+        "context.status": "Started",
+        "context.phase": "5",
+        "check.kind": "ALL"
+      }
+    },
+    {
+      "name": "camel-routes",
+      "status": "UP",
+      "data": {
+        "route.count": "21",
+        "route.status.started": "21",
+        "route.status.stopped": "0"
+      }
+    },
+    {
+      "name": "camel-consumers",
+      "status": "UP",
+      "data": {
+        "consumer.count": "11"
+      }
+    },
+    {
+      "name": "SmallRye Reactive Messaging - liveness check",
+      "status": "UP",
+      "data": {
+        "camelbee-northbound-topic": "[OK]"
+      }
+    },
+    {
+      "name": "SmallRye Reactive Messaging - readiness check",
+      "status": "UP",
+      "data": {
+        "camelbee-northbound-topic": "[OK]"
+      }
+    },
+    {
+      "name": "Database connections health check",
+      "status": "UP",
+      "data": {
+        "default": "UP"
+      }
+    },
+    {
+      "name": "MongoDB connection health check",
+      "status": "UP",
+      "data": {
+        "mongoClient": "UP",
+        "version": "7.0.4"
+      }
+    },
+    {
+      "name": "Kafka connection health check",
+      "status": "UP",
+      "data": {
+        "bootstrap.servers": "localhost:9092",
+        "connection": "UP"
+      }
+    },
+    {
+      "name": "Artemis JMS health check",
+      "status": "UP",
+      "data": {
+        "provider": "ActiveMQ Artemis",
+        "url": "tcp://localhost:61616"
+      }
+    },
+    {
+      "name": "Disk Space",
+      "status": "UP",
+      "data": {
+        "total": "510249291776",
+        "free": "182029195264",
+        "threshold": "10485760"
+      }
+    }
+  ]
+}
