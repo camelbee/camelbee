@@ -44,10 +44,14 @@ export function extractStaticEndpointsFromOutput(
 
   const lower = desc.toLowerCase();
 
-  // To[X], DynamicTo[X], WireTap[X]
+  // To[X], DynamicTo[X], DynamicTo[toD[X]], WireTap[X]
   for (const prefix of ['To[', 'DynamicTo[', 'WireTap[']) {
     if (lower.startsWith(prefix.toLowerCase())) {
-      const uri = stripWrapper(desc, prefix);
+      let uri = stripWrapper(desc, prefix);
+      // Handle DynamicTo[toD[X]] — strip the inner toD[] wrapper
+      if (uri.toLowerCase().startsWith('tod[') && uri.endsWith(']')) {
+        uri = uri.substring(4, uri.length - 1);
+      }
       return isInternal(uri) ? null : [uri];
     }
   }
@@ -90,11 +94,15 @@ export function outputReferencesInput(
   const descLower = desc.toLowerCase();
   const inputLower = inputTrimmed.toLowerCase();
 
-  // Direct match: To[input], DynamicTo[input], WireTap[input]
+  // Direct match: To[input], DynamicTo[input], DynamicTo[toD[input]], WireTap[input]
   for (const prefix of ['To[', 'DynamicTo[', 'WireTap[']) {
     if (descLower === `${prefix.toLowerCase()}${inputLower}]`) {
       return true;
     }
+  }
+  // Handle DynamicTo[toD[input]]
+  if (descLower === `dynamicto[tod[${inputLower}]]`) {
+    return true;
   }
 
   // Contained match for Enrich, PollEnrich, RecipientList, RoutingSlip

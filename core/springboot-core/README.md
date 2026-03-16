@@ -18,7 +18,7 @@ The easiest way to get started. Simply use `camelbee-springboot-starter` as your
 <parent>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-springboot-starter</artifactId>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
 </parent>
 ```
 
@@ -40,7 +40,7 @@ mvn -f pom-custom.xml clean install    # run in ./camelbee/core/springboot-core
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-springboot-core-custom</artifactId>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
 </dependency>
 ```
 

@@ -113,7 +113,7 @@ The easiest way to get started is to use a CamelBee starter as your project's pa
 <parent>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-quarkus-starter</artifactId>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
 </parent>
 ```
 
@@ -122,7 +122,7 @@ The easiest way to get started is to use a CamelBee starter as your project's pa
 <parent>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-springboot-starter</artifactId>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
 </parent>
 ```
 
@@ -137,7 +137,7 @@ If your project already has a parent POM or you need to customize Java/Camel ver
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-quarkus-core-custom</artifactId>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
 </dependency>
 ```
 
@@ -146,7 +146,7 @@ If your project already has a parent POM or you need to customize Java/Camel ver
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-springboot-core-custom</artifactId>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
 </dependency>
 ```
 

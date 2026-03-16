@@ -10,8 +10,19 @@ import {
   type EdgeTypes,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import type { CamelBeeContext } from '@/types';
-import { buildRouteGraph, type MessageEdge as MEdge, type ActiveFlow } from '@/utils/routeGraph';
+import type { CamelBeeContext, Message } from '@/types';
+import {
+  buildRouteGraph,
+  makeNodeId,
+  makeProducerId,
+  makeEdgeId,
+  sanitize,
+  truncateLabel,
+  type RouteNode as RNode,
+  type MessageEdge as MEdge,
+  type ActiveFlow,
+} from '@/utils/routeGraph';
+import { extractInputUri, extractComponentType } from '@/utils/endpointParser';
 import { matchMessageToEdge } from '@/utils/messageMatching';
 import { useDebuggerStore } from '@/store/debuggerStore';
 import { useIsDark } from '@/hooks/useTheme';
@@ -23,9 +34,10 @@ const edgeTypes: EdgeTypes = { messageEdge: MessageEdge as never };
 
 interface RouteGraphProps {
   context: CamelBeeContext;
+  onDynamicEdgeAdded?: (edge: MEdge) => void;
 }
 
-export function RouteGraph({ context }: RouteGraphProps) {
+export function RouteGraph({ context, onDynamicEdgeAdded }: RouteGraphProps) {
   const graph = useMemo(() => buildRouteGraph(context), [context]);
   const isDark = useIsDark();
 
@@ -66,7 +78,6 @@ export function RouteGraph({ context }: RouteGraphProps) {
   // Subscribe to store for timeline changes
   const filteredMessages = useDebuggerStore((s) => s.filteredMessages);
   const timelineIndex = useDebuggerStore((s) => s.timelineIndex);
-  const prevTimelineIndex = useDebuggerStore((s) => s.prevTimelineIndex);
 
   const updateEdgeData = useCallback(
     (updater: (edges: MEdge[]) => MEdge[]) => {
@@ -77,6 +88,156 @@ export function RouteGraph({ context }: RouteGraphProps) {
 
   // Flow animation counter
   const flowIdRef = useRef(0);
+  // Track last processed timeline index to avoid replaying animations on unrelated re-renders
+  const lastProcessedTimelineRef = useRef(0);
+
+  /**
+   * Create a dynamic edge + node for a message that doesn't match any existing
+   * edge. This handles runtime-resolved patterns like dynamicRouter.
+   */
+  /** Strip double slashes for comparison (tracer uses direct:// but routes use direct:) */
+  const stripSlashes = (s: string) => s.replace(/\/\//g, '');
+
+  const createDynamicEdge = useCallback(
+    (msg: Message): MEdge | null => {
+      if (!msg.routeId || !msg.endpoint || !context) return null;
+
+      const msgRouteId = stripSlashes(msg.routeId);
+      const msgEndpoint = stripSlashes(msg.endpoint);
+
+      // Find the source route node by routeId or input URI
+      let sourceNodeId: string | null = null;
+      let sourceRouteId: string | null = null;
+      for (const route of context.routes) {
+        const inputUri = extractInputUri(route.input);
+        if (route.id === msgRouteId || stripSlashes(inputUri) === msgRouteId) {
+          sourceNodeId = makeNodeId(route.id);
+          sourceRouteId = route.id;
+          break;
+        }
+      }
+      if (!sourceNodeId || !sourceRouteId) return null;
+
+      // Find or create target node
+      let targetNodeId: string | null = null;
+      let targetRouteId: string | undefined;
+      let targetInputUri: string | undefined;
+      let targetUri: string | undefined;
+
+      // Check if target is an existing route (direct/seda)
+      for (const route of context.routes) {
+        const inputUri = extractInputUri(route.input);
+        if (stripSlashes(inputUri) === msgEndpoint || route.id === msgEndpoint) {
+          targetNodeId = makeNodeId(route.id);
+          targetRouteId = route.id;
+          targetInputUri = inputUri;
+          // Ensure the node exists in the rendered graph
+          const existingNode = nodes.find((n) => n.id === targetNodeId);
+          if (!existingNode) {
+            const componentType = extractComponentType(inputUri);
+            const newNode: RNode = {
+              id: targetNodeId,
+              type: 'routeNode',
+              position: { x: 0, y: 0 },
+              data: {
+                label: truncateLabel(route.id),
+                componentType,
+                kind: 'internal',
+                routeId: route.id,
+              },
+            };
+            const sourceNode = nodes.find((n) => n.id === sourceNodeId);
+            if (sourceNode) {
+              newNode.position = {
+                x: sourceNode.position.x + 300,
+                y: sourceNode.position.y + (Math.random() * 200 - 100),
+              };
+            }
+            setNodes((curr) => [...curr, newNode as never]);
+          }
+          break;
+        }
+      }
+
+      // If not an existing route, create/find a producer node (external endpoint)
+      if (!targetNodeId) {
+        const producerUri = msg.endpoint;
+        targetNodeId = makeProducerId(producerUri);
+        targetUri = producerUri;
+        // Ensure the producer node exists
+        const existingNode = nodes.find((n) => n.id === targetNodeId);
+        if (!existingNode) {
+          const componentType = extractComponentType(producerUri);
+          const newNode: RNode = {
+            id: targetNodeId,
+            type: 'routeNode',
+            position: { x: 0, y: 0 },
+            data: {
+              label: truncateLabel(producerUri),
+              componentType,
+              kind: 'producer',
+            },
+          };
+          const sourceNode = nodes.find((n) => n.id === sourceNodeId);
+          if (sourceNode) {
+            newNode.position = {
+              x: sourceNode.position.x + 300,
+              y: sourceNode.position.y + (Math.random() * 200 - 100),
+            };
+          }
+          setNodes((curr) => [...curr, newNode as never]);
+        }
+      }
+
+      const syntheticOutput = {
+        id: `dynamic-${sanitize(msg.routeId)}-${sanitize(msg.endpoint)}`,
+        description: `Dynamic[${msg.endpoint}]`,
+        delimiter: null,
+        type: 'dynamicRouter',
+        outputs: [],
+      };
+
+      const edgeId = makeEdgeId(sourceNodeId, targetNodeId, syntheticOutput.id);
+
+      // Check if edge already exists
+      if (graphEdgesRef.current.some((e) => e.id === edgeId)) {
+        return graphEdgesRef.current.find((e) => e.id === edgeId) ?? null;
+      }
+
+      const sourceRoute = context.routes.find((r) => r.id === sourceRouteId);
+      const sourceInputUriVal = sourceRoute ? extractInputUri(sourceRoute.input) : undefined;
+
+      const newEdge: MEdge = {
+        id: edgeId,
+        source: sourceNodeId,
+        target: targetNodeId,
+        type: 'messageEdge',
+        data: {
+          outputId: syntheticOutput.id,
+          sourceRouteId,
+          sourceInputUri: sourceInputUriVal,
+          targetRouteId,
+          targetInputUri,
+          targetUri: targetUri ?? msg.endpoint,
+          messageCount: 0,
+          hasError: false,
+          animated: false,
+          isErrorHandler: false,
+          activeFlows: [],
+        },
+      };
+
+      // Add to both the ref and the rendered edges
+      graphEdgesRef.current = [...graphEdgesRef.current, newEdge];
+      setEdges((curr) => [...curr, newEdge as never]);
+
+      // Notify parent so MessagePanel can also see this edge
+      onDynamicEdgeAdded?.(newEdge);
+
+      return newEdge;
+    },
+    [context, nodes, setNodes, setEdges, onDynamicEdgeAdded],
+  );
 
   useEffect(() => {
     const sliced = filteredMessages.slice(0, timelineIndex);
@@ -84,7 +245,11 @@ export function RouteGraph({ context }: RouteGraphProps) {
     // Build counts from the full slice
     const counts = new Map<string, { exchanges: Set<string>; hasError: boolean }>();
     for (const msg of sliced) {
-      const matched = matchMessageToEdge(msg, graphEdgesRef.current);
+      let matched = matchMessageToEdge(msg, graphEdgesRef.current);
+      // If no static edge matched, try to create a dynamic one
+      if (!matched) {
+        matched = createDynamicEdge(msg);
+      }
       if (matched) {
         const entry = counts.get(matched.id) ?? { exchanges: new Set(), hasError: false };
         entry.exchanges.add(msg.exchangeId);
@@ -93,12 +258,17 @@ export function RouteGraph({ context }: RouteGraphProps) {
       }
     }
 
-    // Detect new messages for flow animation (only when stepping forward)
+    // Detect new messages for flow animation (only when timeline actually changed)
     const newFlows = new Map<string, ActiveFlow[]>();
-    if (timelineIndex > prevTimelineIndex) {
-      const newMessages = filteredMessages.slice(prevTimelineIndex, timelineIndex);
+    const lastProcessed = lastProcessedTimelineRef.current;
+    lastProcessedTimelineRef.current = timelineIndex;
+    if (timelineIndex > lastProcessed) {
+      const newMessages = filteredMessages.slice(lastProcessed, timelineIndex);
       for (const msg of newMessages) {
-        const matched = matchMessageToEdge(msg, graphEdgesRef.current);
+        let matched = matchMessageToEdge(msg, graphEdgesRef.current);
+        if (!matched) {
+          matched = createDynamicEdge(msg);
+        }
         if (matched) {
           const flows = newFlows.get(matched.id) ?? [];
           flowIdRef.current += 1;
@@ -129,7 +299,7 @@ export function RouteGraph({ context }: RouteGraphProps) {
         };
       }),
     );
-  }, [timelineIndex, prevTimelineIndex, filteredMessages, updateEdgeData]);
+  }, [timelineIndex, filteredMessages, updateEdgeData, createDynamicEdge]);
 
   return (
     <div className="h-full w-full">

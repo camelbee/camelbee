@@ -3,7 +3,7 @@
 	<groupId>io.camelbee</groupId>
 	<artifactId>camelbee-quarkus-core-custom</artifactId>
 	<packaging>jar</packaging>
-	<version>3.0.0</version>
+	<version>3.0.1</version>
 	<properties>
 		<quarkus.platform.version>3.30.6</quarkus.platform.version>
 		<camel-quarkus.platform.version>${quarkus.platform.version}</camel-quarkus.platform.version>

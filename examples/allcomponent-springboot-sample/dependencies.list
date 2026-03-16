@@ -27,8 +27,8 @@ The following files have been resolved:
    commons-collections:commons-collections:jar:3.2.2:compile[36m -- module commons.collections[0;1;33m (auto)[m
    commons-io:commons-io:jar:2.21.0:compile[36m -- module org.apache.commons.io[m
    de.dentrassi.crypto:pem-keystore:jar:3.0.0:compile[36m -- module pem.keystore[0;1;33m (auto)[m
-   io.camelbee:camelbee-springboot-core:jar:3.0.0:compile[36m -- module camelbee.springboot.core[0;1;33m (auto)[m
-   io.camelbee:camelbee-springboot-security:jar:3.0.0:compile[36m -- module camelbee.springboot.security[0;1;33m (auto)[m
+   io.camelbee:camelbee-springboot-core:jar:3.0.1:compile[36m -- module camelbee.springboot.core[0;1;33m (auto)[m
+   io.camelbee:camelbee-springboot-security:jar:3.0.1:compile[36m -- module camelbee.springboot.security[0;1;33m (auto)[m
    io.micrometer:micrometer-commons:jar:1.15.7:compile[36m -- module micrometer.commons[0;1m [auto][m
    io.micrometer:micrometer-core:jar:1.15.7:compile[36m -- module micrometer.core[0;1m [auto][m
    io.micrometer:micrometer-jakarta9:jar:1.15.7:compile[36m -- module micrometer.jakarta9[0;1m [auto][m
