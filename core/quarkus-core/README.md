@@ -117,7 +117,7 @@ quarkus:
 
 Once your application is running, the embedded CamelBee UI is available at:
 
-`http://localhost:8080/camelbee`
+`http://localhost:8080/camelbee/index.html`
 
 This provides route visualization, message tracing, debugging with replay, filtering, endpoint triggering, and metrics directly in your browser.
 
