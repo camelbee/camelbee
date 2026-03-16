@@ -142,9 +142,6 @@ public class JwtValidationRoute extends RouteBuilder {
    * @throws TokenExpiredException    if the token has expired
    */
   private void validateClaims(JWTClaimsSet claims) {
-    long now = System.currentTimeMillis();
-    long skewMillis = securityProperties.getClockSkew() * 1000L;
-
     // Validate issuer
     if (!securityProperties.getIssuer().equals(claims.getIssuer())) {
       log.warn("JWT validation failed: invalid issuer '{}', expected '{}'", claims.getIssuer(), securityProperties.getIssuer());
@@ -159,6 +156,8 @@ public class JwtValidationRoute extends RouteBuilder {
     }
 
     // Validate expiration
+    long now = System.currentTimeMillis();
+    long skewMillis = securityProperties.getClockSkew() * 1000L;
     Date exp = claims.getExpirationTime();
     if (exp == null) {
       log.warn("JWT validation failed: token has no expiration time, subject '{}'", claims.getSubject());
