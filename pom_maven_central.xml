@@ -40,6 +40,7 @@
     <module>common</module>
     <module>parent</module>
     <module>dependencies</module>
+    <module>ui</module>
     <module>core</module>
     <module>security</module>
     <module>starters</module>
