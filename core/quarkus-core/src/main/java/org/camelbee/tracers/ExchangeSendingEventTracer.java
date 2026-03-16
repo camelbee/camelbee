@@ -39,6 +39,7 @@ import org.camelbee.debugger.model.route.CamelRoute;
 import org.camelbee.debugger.service.MessageService;
 import org.camelbee.debugger.service.RouteContextService;
 import org.camelbee.utils.ExchangeUtils;
+import org.camelbee.utils.TracerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,8 +138,11 @@ public class ExchangeSendingEventTracer {
       routeId = currentRouteProperty;
     }
 
+    // if custom error is thrown then we need to handle that one as well.
+    String errorMessage = TracerUtils.handleError(exchange);
+
     return new Message(exchange.getExchangeId(), MessageEventType.SENDING, requestBody, requestHeaders, routeId,
-        currentRoute, endpointId, MessageType.REQUEST, null);
+        currentRoute, endpointId, MessageType.REQUEST, errorMessage);
   }
 
   private Deque<String> adjustStack(Exchange exchange, Deque<String> routeStack) {

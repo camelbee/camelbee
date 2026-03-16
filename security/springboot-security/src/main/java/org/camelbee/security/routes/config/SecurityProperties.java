@@ -19,8 +19,8 @@ import org.springframework.stereotype.Component;
 public class SecurityProperties {
 
   private boolean enabled = true;
-  private String issuer = "test-issuer";
-  private String audience = "test-audience";
+  private String issuer;
+  private String audience;
   private List<String> roleClaims = new ArrayList<>();
   private List<String> scopeClaims = new ArrayList<>();
   private String algorithm = "RS256";

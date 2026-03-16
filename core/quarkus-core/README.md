@@ -2,81 +2,83 @@
 
 ## Introduction
 
-The camelbee-quarkus-core library is an essential component for integrating a Camel Quarkus Microservice with the CamelBee WebGL application (https://www.camelbee.io) or the local Docker version (accessed at http://localhost:8083 by executing 'docker run -d -p 8083:80 camelbee/webgl'). 
-This library provides the necessary functionalities to configure Camel routes with event notifiers, allowing comprehensive tracing of messages exchanged between the routes. 
-Additionally, it includes rest controllers for seamless interaction with the CamelBee WebGL application.
+The camelbee-quarkus-core library is an essential component for integrating a Camel Quarkus Microservice with the CamelBee ecosystem.
+It comes with an **embedded React UI** served directly from your application, providing route visualization, message tracing, debugging, and metrics.
+This library provides the necessary functionalities to configure Camel routes with event notifiers, allowing comprehensive tracing of messages exchanged between the routes.
 
-## Manual Installation
+## Installation
 
-To manually install the core library, follow the steps below:
+There are two ways to integrate CamelBee into your Quarkus project:
 
-### Maven Installation
+### Option 1: Use CamelBee Starter as Parent (Recommended)
 
-run `mvn clean install` command in the topmost parent folder "./camelbee"
-
-Once the maven artifact is created, you can include it in your project by adding the following dependency to your pom.xml as the parent project:
+The easiest way to get started. Simply use `camelbee-quarkus-starter` as your project's parent POM — it is available on Maven Central and automatically includes the core library, embedded UI, and all required dependencies. No local build needed:
 
 ```xml
 <parent>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-quarkus-starter</artifactId>
-  <version>2.0.4</version>
+  <version>3.0.0</version>
 </parent>
 ```
 
-### Custom Maven Installation: Adding Core Library Directly Without CamelBee Starter Parent
+For working examples using the starter, see the [camelbee-examples](https://github.com/camelbee/camelbee-examples) repository.
 
-If you'd rather not use `camelbee-quarkus-starter` as your parent project, you can build and use `camelbee-quarkus-core-custom` independently. This approach uses the provided `pom-custom.xml` file, which allows you to customize Java and Camel Quarkus versions to match your existing project setup.
+### Option 2: Add the Core Library Directly (Custom POM)
 
-1. Build the core library with the custom POM file:
+If your project already has a parent POM or you need to customize Java and Camel Quarkus versions, you can build and use `camelbee-quarkus-core-custom` independently. This approach uses the provided `pom-custom.xml`, which allows you to adjust versions to match your existing project setup.
 
-run `mvn -f pom-custom.xml clean install` command in the "./camelbee/core/quarkus-core" folder
+1. Build the core library with the custom POM:
 
-Once the custom maven artifact is created, you can include it in your project by adding the following dependency to your pom.xml:
-   
+```bash
+mvn -f pom-custom.xml clean install    # run in ./camelbee/core/quarkus-core
+```
+
+2. Add the dependency to your project's `pom.xml`:
+
 ```xml
-  <dependency>
-    <groupId>io.camelbee</groupId>
-    <artifactId>camelbee-quarkus-core-custom</artifactId>
-    <version>2.0.4</version>
-  </dependency>
+<dependency>
+  <groupId>io.camelbee</groupId>
+  <artifactId>camelbee-quarkus-core-custom</artifactId>
+  <version>3.0.0</version>
+</dependency>
 ```
 
 ## Configuration
 
-### Configure your each Camel Route with org.camelbee.config.CamelBeeRouteConfigurer
+### Configure Your Camel Routes with CamelBeeRouteConfigurer
 
-To enable the stream caching in your camel routes like below:
+Regardless of which installation option you chose, you must configure each of your Camel routes with `CamelBeeRouteConfigurer` to enable tracing, stream caching, and the embedded UI. Inject the configurer and call it at the beginning of your `configure()` method:
 
-```
-/**
- * Musician Route.
- *
- * @author ekaraosmanoglu
- */
+```java
 @ApplicationScoped
 public class MusicianRoute extends RouteBuilder {
 
-    ...
-    ...
+    @Inject
+    CamelBeeRouteConfigurer camelBeeRouteConfigurer;
 
     @Override
     public void configure() throws Exception {
 
         camelBeeRouteConfigurer.configureRoute(this);
-        ...
-        ...
+
+        // your route definitions...
+    }
+}
 ```
 
 ### Enable CamelBee Features
 
 To enable specific features of the CamelBee library, add/modify the following properties in your `application.yml` file:
 
-```
+```yaml
 camelbee:
-  # when enabled it allows the CamelBe WebGL application to fetch the topology of the Camel Context.
+  # when enabled registers the CamelBee event notifier to the Camel context
+  notifier-enabled: true
+  # when enabled configures stream caching, MDC logging and CamelBeeUnitOfWork for routes
+  route-configurer-enabled: true
+  # when enabled it allows the CamelBee UI to fetch the topology of the Camel Context.
   context-enabled: true
-  # tracer-enabled SHOULD BE ONLY ENABLED FOR DEVELOPMENT PURPOSES, NOT FOR PRODUCTION.
   # when enabled intercepts/traces request and responses of all camel components and caches messages.
   tracer-enabled: true
   # maximum time the tracer can remain idle before deactivation tracing of messages.
@@ -88,22 +90,14 @@ camelbee:
 ```
 
 
-### Enable Metrics and CORS for https://www.camelbee.io
+### Enable Metrics
 
-To enable metrics and configure CORS for https://www.camelbee.io, adjust the following properties to your `application.yaml` file:
+To enable metrics, adjust the following properties in your `application.yaml` file:
 
 ```
 quarkus:
   http:
     port: 8080
-    cors:
-      ~: true
-      origins: https://www.camelbee.io,http://localhost:8083
-      methods: GET,POST,DELETE
-      headers: "*"
-      exposed-headers: Content-Disposition
-      access-control-allow-credentials: true
-      access-control-max-age: 24H
 ```
 
 ### Enable CamelBee Quarkus Beans
@@ -118,6 +112,14 @@ quarkus:
       artifact-id: camelbee-quarkus-core
 ```
 
+## Accessing the Embedded UI
+
+Once your application is running, the embedded CamelBee UI is available at:
+
+`http://localhost:8080/camelbee/index.html`
+
+This provides route visualization, message tracing, debugging with replay, filtering, endpoint triggering, and metrics directly in your browser.
+
 ## Example Implementation
 
 Discover a practical and functional application of this core library within the 'allcomponent-quarkus-sample' Maven project showcased below as a successful and operational example:
@@ -125,9 +127,9 @@ Discover a practical and functional application of this core library within the 
 ```shell
 camelbee/
 |-- core/
-| |-- quarkus-core/
-| | |-- ...
+|   |-- quarkus-core/
+|   |   |-- ...
 |-- examples/
-| |-- allcomponent-quarkus-sample/
-| | |-- ...
+|   |-- allcomponent-quarkus-sample/
+|   |   |-- ...
 ```

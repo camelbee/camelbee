@@ -22,11 +22,11 @@
     <parent>
         <groupId>io.camelbee</groupId>
         <artifactId>camelbee-springboot-dependencies</artifactId>
-        <version>2.0.8</version>
+        <version>3.0.0</version>
         <relativePath>../../dependencies/springboot/pom.xml</relativePath>
     </parent>
 
-    <name>CamelBee Quarkus Starter</name>
+    <name>CamelBee Spring Boot Starter</name>
     <artifactId>camelbee-springboot-starter</artifactId>
     <packaging>pom</packaging>
 
@@ -36,12 +36,12 @@
         <dependency>
             <groupId>io.camelbee</groupId>
             <artifactId>camelbee-springboot-core</artifactId>
-            <version>2.0.8</version>
+            <version>3.0.0</version>
         </dependency>
         <dependency>
             <groupId>io.camelbee</groupId>
             <artifactId>camelbee-springboot-security</artifactId>
-            <version>2.0.8</version>
+            <version>3.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -108,6 +108,7 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-test-spring-junit5</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.camel.springboot</groupId>

@@ -22,14 +22,13 @@
   <parent>
     <groupId>io.camelbee</groupId>
     <artifactId>camelbee-quarkus-starter</artifactId>
-    <version>2.0.8</version>
+    <version>3.0.0</version>
     <relativePath>../../starters/camelbee-quarkus-starter/pom.xml</relativePath>
   </parent>
 
   <artifactId>allcomponent-quarkus-sample</artifactId>
   <version>1.1-SNAPSHOT</version>
   <packaging>jar</packaging>
-
 
   <name>allcomponent-quarkus-sample</name>
   <description>CamelBee quarkus Example with the most used Camel Components</description>

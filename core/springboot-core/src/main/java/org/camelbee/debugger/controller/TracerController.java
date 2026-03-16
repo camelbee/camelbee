@@ -35,12 +35,12 @@ import org.springframework.web.bind.annotation.RestController;
  * TracerController.
  */
 @RestController
-@CrossOrigin(origins = {"https://www.camelbee.io", "http://localhost:8083"})
-@ConditionalOnExpression("'${camelbee.context-enabled:false}' && '${camelbee.tracer-enabled:false}'")
+@CrossOrigin(origins = {"${camelbee.cors.origins:https://www.camelbee.io,http://localhost:8083}"})
+@ConditionalOnExpression("${camelbee.context-enabled:false} && ${camelbee.tracer-enabled:false}")
 public class TracerController {
 
   private enum TraceStatus {
-    ACTIVE, DEACTIVE
+    ACTIVE, INACTIVE
   }
 
   @Autowired
@@ -61,7 +61,7 @@ public class TracerController {
     if (traceStatus == TraceStatus.ACTIVE) {
       tracerService.activateTracing(true);
       tracerService.keepTracingActive();
-    } else if (traceStatus == TraceStatus.DEACTIVE) {
+    } else if (traceStatus == TraceStatus.INACTIVE) {
       tracerService.activateTracing(false);
     }
 
@@ -79,8 +79,6 @@ public class TracerController {
   public ResponseEntity<MessageListWithInfo> getMessages(@RequestParam("index") int fromIndex, @RequestParam("addVersion") long addVersion,
       @RequestParam("resetVersion") long resetVersion) {
 
-    //when we start polling the messages we need to activate tracing as well
-    tracerService.activateTracing(true);
     tracerService.keepTracingActive();
 
     return ResponseEntity.ok(messageService.getMessagesFrom(fromIndex, addVersion, resetVersion));

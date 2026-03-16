@@ -40,7 +40,7 @@ import org.camelbee.tracers.TracerService;
 public class TracerController {
 
   private enum TraceStatus {
-    ACTIVE, DEACTIVE
+    ACTIVE, INACTIVE
   }
 
   @Inject
@@ -64,7 +64,7 @@ public class TracerController {
     if (traceStatus == TraceStatus.ACTIVE) {
       tracerService.activateTracing(true);
       tracerService.keepTracingActive();
-    } else if (traceStatus == TraceStatus.DEACTIVE) {
+    } else if (traceStatus == TraceStatus.INACTIVE) {
       tracerService.activateTracing(false);
     }
 
@@ -85,8 +85,6 @@ public class TracerController {
   public Response getMessages(@QueryParam("index") int fromIndex, @QueryParam("addVersion") long addVersion,
       @QueryParam("resetVersion") long resetVersion) {
 
-    //when we start polling the messages we need to activate tracing as well
-    tracerService.activateTracing(true);
     tracerService.keepTracingActive();
 
     return Response.ok(messageService.getMessagesFrom(fromIndex, addVersion, resetVersion)).build();

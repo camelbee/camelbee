@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
  * ContextController exposes routes topology and messages with version control.
  */
 @RestController
-@CrossOrigin(origins = {"https://www.camelbee.io", "http://localhost:8083"})
+@CrossOrigin(origins = {"${camelbee.cors.origins:https://www.camelbee.io,http://localhost:8083}"})
 @ConditionalOnProperty(value = "camelbee.context-enabled", havingValue = "true")
 public class ContextController {
 

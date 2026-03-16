@@ -79,7 +79,7 @@ public class ExchangeCompletedEventTracer {
       final String responseCompletedBody = ExchangeUtils.readBodyAsString(exchange, true);
       final var responseHeaders = ExchangeUtils.getHeaders(exchange);
 
-      return addCompletedMessage(exchange, responseCompletedBody, responseHeaders);
+      return processCompletedMessage(exchange, responseCompletedBody, responseHeaders);
 
     } catch (Exception e) {
       LOGGER.warn("Could not trace ExchangeCompletedEvent: {} with exception: {}", exchange, e);
@@ -88,9 +88,14 @@ public class ExchangeCompletedEventTracer {
 
   }
 
-  private Message addCompletedMessage(Exchange exchange, String responseCompletedBody, String requestHeaders) {
+  private Message processCompletedMessage(Exchange exchange, String responseCompletedBody, String requestHeaders) {
 
     Deque<String> routeStack = (Deque<String>) exchange.getProperty(CURRENT_ROUTE_TRACE_STACK);
+
+    if (routeStack == null || routeStack.isEmpty()) {
+      LOGGER.warn("Empty or null route stack in ExchangeCompletedEvent for exchange: {}", exchange.getExchangeId());
+      return null;
+    }
 
     final String currentRoute = routeStack.pop();
     final String callerRoute = routeStack.peek();

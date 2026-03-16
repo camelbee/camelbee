@@ -21,7 +21,7 @@
     <parent>
         <groupId>io.camelbee</groupId>
         <artifactId>camelbee</artifactId>
-        <version>2.0.8</version>
+        <version>3.0.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -86,7 +86,6 @@
         <nimbus-jose-jwt.version>10.7</nimbus-jose-jwt.version>
         <os-maven-plugin.version>1.7.1</os-maven-plugin.version>
         <cxf-xjc-runtime.version>4.1.2</cxf-xjc-runtime.version>
-        <cxf-xjc-ts.version>4.1.0</cxf-xjc-ts.version>
         <cxf-xjc-ts.version>4.1.2</cxf-xjc-ts.version>
         <saaj-impl.version>3.0.4</saaj-impl.version>
         <avro-maven-plugin.version>1.12.0</avro-maven-plugin.version>
@@ -296,7 +295,7 @@
                                 <artifactItem>
                                     <groupId>io.camelbee</groupId>
                                     <artifactId>common</artifactId>
-                                    <version>2.0.8</version>
+                                    <version>3.0.0</version>
                                     <type>jar</type>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
                                     <includes>config/**, formatter/**</includes>

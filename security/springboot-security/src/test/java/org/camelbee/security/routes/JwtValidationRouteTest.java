@@ -305,6 +305,63 @@ class JwtValidationRouteTest {
   }
 
   @Test
+  void testTokenWithoutExpirationShouldBeRejected() throws Exception {
+    resetMockedEndpoints();
+
+    JWSSigner signer = new RSASSASigner(rsaKey);
+    JWTClaimsSet claims = new JWTClaimsSet.Builder()
+        .subject("user123")
+        .issuer(TEST_ISSUER)
+        .audience(TEST_AUDIENCE)
+        .build();
+
+    SignedJWT jwt = new SignedJWT(
+        new JWSHeader.Builder(JWSAlgorithm.RS256).keyID(rsaKey.getKeyID()).build(),
+        claims
+    );
+    jwt.sign(signer);
+
+    headers.put(HttpHeaders.AUTHORIZATION, "Bearer " + jwt.serialize());
+    exchange.getIn().setHeaders(headers);
+    mockFetchJWKS.expectedMessageCount(1);
+
+    Exchange response = producerTemplate.send(exchange);
+    assertThat(response.getException()).hasMessageContaining("Token must have an expiration time");
+    mockFetchJWKS.assertIsSatisfied();
+  }
+
+  @Test
+  void testMultiAudienceTokenWithMatchingAudience() throws Exception {
+    resetMockedEndpoints();
+
+    JWSSigner signer = new RSASSASigner(rsaKey);
+    JWTClaimsSet claims = new JWTClaimsSet.Builder()
+        .subject("user123")
+        .issuer(TEST_ISSUER)
+        .audience(Arrays.asList("other-audience", TEST_AUDIENCE, "another-audience"))
+        .expirationTime(new Date(System.currentTimeMillis() + 60000))
+        .claim("scope", "read")
+        .build();
+
+    SignedJWT jwt = new SignedJWT(
+        new JWSHeader.Builder(JWSAlgorithm.RS256).keyID(rsaKey.getKeyID()).build(),
+        claims
+    );
+    jwt.sign(signer);
+
+    headers.put(HttpHeaders.AUTHORIZATION, "Bearer " + jwt.serialize());
+    exchange.getIn().setHeaders(headers);
+    mockFetchJWKS.expectedMessageCount(1);
+    resultEndpoint.expectedMessageCount(1);
+
+    producerTemplate.send(exchange);
+
+    mockFetchJWKS.assertIsSatisfied();
+    resultEndpoint.assertIsSatisfied();
+    assertThat(exchange.getProperty("jwt.validated", Boolean.class)).isTrue();
+  }
+
+  @Test
   void testNestedRolesClaim() throws Exception {
     resetMockedEndpoints();
 

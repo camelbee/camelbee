@@ -22,17 +22,13 @@
     <parent>
         <groupId>io.camelbee</groupId>
         <artifactId>camelbee-springboot-dependencies</artifactId>
-        <version>2.0.8</version>
+        <version>3.0.0</version>
         <relativePath>../../dependencies/springboot/pom.xml</relativePath>
     </parent>
 
     <name>CamelBee SpringBoot Core</name>
     <artifactId>camelbee-springboot-core</artifactId>
     <packaging>jar</packaging>
-
-    <properties>
-        <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -97,6 +93,30 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.4.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-ui-dist</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}/static/camelbee</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/../../ui/dist</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
 </project>

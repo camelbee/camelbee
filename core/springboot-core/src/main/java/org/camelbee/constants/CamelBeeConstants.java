@@ -39,7 +39,7 @@ public final class CamelBeeConstants {
 
   public static final String SYSTEM_JVM_VERSION = "java.version";
 
-  public static final String CAMEL_FAILED_EVENT_IDENTITIY_HASHCODE = "camelbee-failedevent-identitiy";
+  public static final String CAMEL_FAILED_EVENT_IDENTITY_HASHCODE = "camelbee-failedevent-identity";
 
   public static final String CAMELBEE_PRODUCED_EXCHANGE = "camelbee-produced-exchange";
 

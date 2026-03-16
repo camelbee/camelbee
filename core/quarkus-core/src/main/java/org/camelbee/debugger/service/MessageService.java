@@ -100,7 +100,7 @@ public class MessageService {
       List<Message> allMessages = getMessageList();
 
       if (fromIndex >= 0 && fromIndex < allMessages.size()) {
-        messages = allMessages.subList(fromIndex, allMessages.size());
+        messages = new ArrayList<>(allMessages.subList(fromIndex, allMessages.size()));
       }
     }
 
