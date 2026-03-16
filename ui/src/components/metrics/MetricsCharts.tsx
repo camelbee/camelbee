@@ -10,6 +10,7 @@ import {
   Legend,
 } from 'recharts';
 import { useMetricsStore, type TimeSeriesPoint } from '@/store/metricsStore';
+import { useIsDark } from '@/hooks/useTheme';
 
 function formatTime(ts: number): string {
   const d = new Date(ts);
@@ -23,9 +24,9 @@ interface ChartPanelProps {
 
 function ChartPanel({ title, children }: ChartPanelProps) {
   return (
-    <div className="rounded border border-gray-700 bg-gray-900/80">
-      <div className="border-b border-gray-700 px-3 py-1.5">
-        <h3 className="text-xs font-semibold uppercase text-gray-300">{title}</h3>
+    <div className="rounded border border-gray-300 bg-white/80 dark:border-gray-700 dark:bg-gray-900/80">
+      <div className="border-b border-gray-300 px-3 py-1.5 dark:border-gray-700">
+        <h3 className="text-xs font-semibold uppercase text-gray-700 dark:text-gray-300">{title}</h3>
       </div>
       <div className="p-2" style={{ height: 200 }}>
         {children}
@@ -40,6 +41,8 @@ interface SimpleChartProps {
 }
 
 function SimpleChart({ series, unit }: SimpleChartProps) {
+  const isDark = useIsDark();
+
   const chartData = useMemo(() => {
     if (series.length === 0 || series[0]!.data.length === 0) return [];
     // Merge all series by timestamp index
@@ -55,30 +58,36 @@ function SimpleChart({ series, unit }: SimpleChartProps) {
 
   if (chartData.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center text-xs text-gray-500">
+      <div className="flex h-full items-center justify-center text-xs text-gray-400 dark:text-gray-500">
         Waiting for data...
       </div>
     );
   }
 
+  const gridStroke = isDark ? '#374151' : '#e5e7eb';
+  const tickFill = isDark ? '#9ca3af' : '#6b7280';
+  const axisStroke = isDark ? '#4b5563' : '#d1d5db';
+  const tooltipBg = isDark ? '#1f2937' : '#ffffff';
+  const tooltipBorder = isDark ? '1px solid #374151' : '1px solid #d1d5db';
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <LineChart data={chartData}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+        <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
         <XAxis
           dataKey="timestamp"
           tickFormatter={formatTime}
-          tick={{ fontSize: 10, fill: '#9ca3af' }}
-          stroke="#4b5563"
+          tick={{ fontSize: 10, fill: tickFill }}
+          stroke={axisStroke}
         />
         <YAxis
-          tick={{ fontSize: 10, fill: '#9ca3af' }}
-          stroke="#4b5563"
+          tick={{ fontSize: 10, fill: tickFill }}
+          stroke={axisStroke}
           width={45}
           tickFormatter={(v: number) => unit === '%' ? `${v.toFixed(0)}%` : v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v.toFixed(0)}
         />
         <Tooltip
-          contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', fontSize: 11 }}
+          contentStyle={{ backgroundColor: tooltipBg, border: tooltipBorder, fontSize: 11 }}
           labelFormatter={formatTime}
           formatter={(value: number) =>
             unit === '%' ? `${value.toFixed(1)}%` : unit === 'MB' ? `${value.toFixed(1)} MB` : unit === 'ms' ? `${value.toFixed(1)} ms` : value.toFixed(1)

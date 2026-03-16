@@ -1,49 +1,54 @@
-# CamelBee - Apache Camel Library for Microservices Monitoring and Debugging in the CamelBee WebGL Application
+# CamelBee - Apache Camel Library for Microservices Monitoring and Debugging
 
 CamelBee java core libraries are engineered to extract the architecture of Camel Routes, pinpoint endpoints, and map out the interconnections among them
-to visualize the topology within either the CamelBee WebGL application (https://www.camelbee.io) or through the local Docker version (accessed at http://localhost:8083 by executing 'docker run -d -p 8083:80 camelbee/webgl').
+to visualize the topology within the **embedded CamelBee UI** served directly from your application.
 
-[![ Watch the Video](images/startscene.png)](https://www.youtube.com/watch?v=W29ilyAsXlM)
+![Debugger Page](images/debugger_page.png)
 
 ## Features
 
 ### Route Visualization
-- Effortlessly visualize complex Camel routes and their interconnections for a better understanding of your microservice architecture.
-- Gain a clear overview of message routing and flow paths within your application.
+- Effortlessly visualize complex Camel routes and their interconnections as an interactive topology graph for a better understanding of your microservice architecture.
+- Gain a clear overview of message routing and flow paths within your application, with color-coded routes and animated dashed lines showing message traversal.
+- Trigger consumer endpoints directly from the UI to start tracing sessions and observe route behavior in real time.
 
-[![ Watch the Video](images/debuggerscene.png)](https://www.youtube.com/watch?v=W29ilyAsXlM)
-
-### Message Tracing
+### Message Tracing & Debugging
 - Trace messages as they traverse through Camel routes, enabling real-time debugging and issue identification.
+- Inspect full request and response message contents including headers and body in the side panel.
 - Detect bottlenecks, errors, or unexpected behavior in your message processing.
+- Navigate through the debugging session's timeline using the timeline bar at the bottom, moving back and forth to thoroughly analyze the process flow.
+- Filter traced messages to focus on specific routes or endpoints.
 
-[![ Watch the Video](images/messages.png)](https://www.youtube.com/watch?v=W29ilyAsXlM)
- 
-### Debugging and Replay
-- Debug Camel routes interactively by inspecting message contents, and analyzing route behavior.
-- Replay debug sessions to reproduce and investigate issues.
-- Navigate through the debugging session's timeline, moving back and forth, to thoroughly analyze the process flow.
+![Message Tracing](images/debugger_messages.png)
 
-[![ Watch the Video](images/replay.png)](https://www.youtube.com/watch?v=W29ilyAsXlM)
+### Health Monitoring
+- View the health status of your microservice at a glance with the built-in health panel, showing context name, framework version, Camel version, JVM, and garbage collector information.
+- Inspect detailed health check results in a modal dialog displaying the full health JSON response including camel-context, camel-routes, and camel-consumers status.
 
-### Filtering
-- Seamlessly filter messages to display only the relevant ones.
+![Health Panel](images/debugger_health.png)
 
-[![ Watch the Video](images/filter.png)](https://www.youtube.com/watch?v=W29ilyAsXlM)
-
-### Trigger Consumer Endpoints
-- Initiate any kind of consumer endpoints direclty from the 3D environment and track message traffic.
-
-[![ Watch the Video](images/routecaller.png)](https://www.youtube.com/watch?v=W29ilyAsXlM)
-
-### Real-time Monitoring
+### Real-time Metrics
 - Monitor Camel microservices with essential metrics and variables, ensuring the health and performance of your application.
-- Retrieve comprehensive metrics data to keep your microservices running smoothly.
+- Browse all available metrics in a detailed modal view, or filter metrics by keyword to quickly find the data you need.
+- Visualize route exchange counts and traffic flow across your topology.
 - Concurrently invoke consumer endpoints to conduct a stress test.
 
-[![ Watch the Video](images/metrics.png)](https://www.youtube.com/watch?v=W29ilyAsXlM)
+![All Metrics](images/metrics_all_metrics.png)
 
-  
+![Filtered Metrics](images/metrics_filtered_metrics.png)
+
+### Metrics Charts
+- Track CPU usage, GC average pauses, JVM memory usage (heap used vs heap max), and thread counts (live, daemon, peak) over time with real-time charts.
+- Toggle between the topology view and charts view on the metrics page.
+
+![Metrics Charts](images/metrics_charts.png)
+
+### Settings
+- Configure health and metrics URLs, refresh rates, metrics history duration, max characters in a text field, and theme (light/dark).
+
+![Settings](images/settings_page.png)
+
+
 ---
 
 ## Project Structure
@@ -52,33 +57,48 @@ The project is structured as follows:
 
 ```shell
 camelbee/
+|-- common/                              # Shared utilities and common code
 |-- core/
-| |-- quarkus-core/
-| | |-- README.md
-| | |-- ...
-| |-- springboot-core/
-| | |-- README.md
-| | |-- ...
+|   |-- quarkus-core/                    # Quarkus-specific core module
+|   |   |-- README.md
+|   |-- springboot-core/                 # Spring Boot-specific core module
+|   |   |-- README.md
+|-- dependencies/
+|   |-- quarkus/                         # Quarkus BOM/dependency management
+|   |-- springboot/                      # Spring Boot BOM/dependency management
 |-- examples/
-| |-- allcomponent-quarkus-sample/
-| | |-- README.md
-| | |-- ...
-| |-- allcomponent-springboot-sample/
-| | |-- README.md
-| | |-- ...
+|   |-- allcomponent-quarkus-sample/     # Quarkus example project
+|   |   |-- README.md
+|   |-- allcomponent-springboot-sample/  # Spring Boot example project
+|   |   |-- README.md
+|-- parent/                              # Parent POM with shared build config
+|-- security/
+|   |-- quarkus-security/               # Quarkus security module
+|   |-- springboot-security/            # Spring Boot security module
+|-- starters/
+|   |-- camelbee-quarkus-starter/       # Quarkus starter (use as parent)
+|   |-- camelbee-springboot-starter/    # Spring Boot starter (use as parent)
+|-- ui/                                  # Embedded React UI (route visualization, tracing, metrics)
 |-- README.md
 ```
 
-- `camelbee`:
-  - `core`: Contains the core modules for CamelBee.to integrate with either the CamelBee WebGL application (https://www.camelbee.io) or through the local Docker version (accessed at http://localhost:8083 by executing 'docker run -d -p 8083:80 camelbee/webgl').
-    - `quarkus-core`: Quarkus-specific core module.
-    - `springboot-core`: Spring Boot-specific core module.
-    - 
-  - `examples`: Contains example projects demonstrating the usage of CamelBee.
-    - `allcomponent-quarkus-sample`:  Quarkus example project which uses camelbee-quarkus-starter library.
-    - `allcomponent-springboot-sample`: Spring Boot example project which uses camelbee-springboot-starter library.
+- `common`: Shared utilities used across core modules.
+- `core`: Contains the core modules for CamelBee that provide route tracing, event notification, and REST endpoints.
+  - `quarkus-core`: Quarkus-specific core module.
+  - `springboot-core`: Spring Boot-specific core module.
+- `dependencies`: BOM (Bill of Materials) modules for dependency version management.
+- `security`: Security modules for CORS and endpoint protection.
+  - `quarkus-security`: Quarkus security configuration.
+  - `springboot-security`: Spring Boot security configuration.
+- `starters`: Starter modules to use as parent projects for quick integration.
+  - `camelbee-quarkus-starter`: Quarkus starter parent project.
+  - `camelbee-springboot-starter`: Spring Boot starter parent project.
+- `ui`: Embedded React-based UI that is bundled into the core libraries and served directly from your application at the `/camelbee` path. Provides route visualization, message tracing, debugging, replay, filtering, endpoint triggering, and metrics.
+- `examples`: Contains example projects demonstrating the usage of CamelBee.
+  - `allcomponent-quarkus-sample`: Quarkus example project which uses `camelbee-quarkus-starter` as parent.
+  - `allcomponent-springboot-sample`: Spring Boot example project which uses `camelbee-springboot-starter` as parent.
 
-Each subproject have its own README file for detailed information specific to that project.
+Each subproject has its own README file for detailed information specific to that project.
 
 ## Getting Started For Quarkus Projects:
 
@@ -87,12 +107,6 @@ For more details, please refer to the [CamelBee Quarkus Core README](https://git
 ## Getting Started For SpringBoot Projects:
 
 For more details, please refer to the [CamelBee SpringBoot Core README](https://github.com/egekaraosmanoglu/camelbee/blob/main/core/springboot-core/README.md).
-
-## Getting Started Using CamelBee WebGL Application:
-
-For more details, please refer to the user guid [CamelBee WebGL Application User Guide](https://github.com/egekaraosmanoglu/camelbee/blob/main/docs/camelbee_userguide.pdf).
-
-
 
 ## License
 

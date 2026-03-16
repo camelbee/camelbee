@@ -50,7 +50,7 @@ export type MessageEdge = Edge<MessageEdgeData>;
 /* ------------------------------------------------------------------ */
 
 const NODE_WIDTH = 220;
-const NODE_HEIGHT = 60;
+const NODE_HEIGHT = 80;
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                           */
@@ -353,7 +353,7 @@ export function buildRouteGraph(context: CamelBeeContext): {
   /* -- Dagre layout -- */
 
   const g = new dagre.graphlib.Graph();
-  g.setGraph({ rankdir: 'LR', ranksep: 300, nodesep: 100 });
+  g.setGraph({ rankdir: 'LR', ranksep: 180, nodesep: 80 });
   g.setDefaultEdgeLabel(() => ({}));
 
   for (const node of nodes) {

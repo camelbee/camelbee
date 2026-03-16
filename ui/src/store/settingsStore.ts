@@ -9,7 +9,6 @@ export interface SettingsState {
   metricsHistory: number; // seconds [300..600]
   metricsRefreshRate: number; // seconds [2..10]
   maxTextFieldChars: number; // [1000..30000]
-  pauseOnFocusLost: boolean;
 
   setTheme: (theme: 'light' | 'dark') => void;
   setHealthUrl: (url: string) => void;
@@ -18,20 +17,18 @@ export interface SettingsState {
   setMetricsHistory: (history: number) => void;
   setMetricsRefreshRate: (rate: number) => void;
   setMaxTextFieldChars: (chars: number) => void;
-  setPauseOnFocusLost: (pause: boolean) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
-      theme: 'dark',
+      theme: 'light',
       healthUrl: '/health',
       healthRefreshRate: 5,
       metricsUrl: '/metrics',
       metricsHistory: 300,
       metricsRefreshRate: 5,
       maxTextFieldChars: 10000,
-      pauseOnFocusLost: true,
 
       setTheme: (theme) => set({ theme }),
       setHealthUrl: (healthUrl) => set({ healthUrl }),
@@ -44,7 +41,6 @@ export const useSettingsStore = create<SettingsState>()(
         set({ metricsRefreshRate: Math.min(10, Math.max(2, metricsRefreshRate)) }),
       setMaxTextFieldChars: (maxTextFieldChars) =>
         set({ maxTextFieldChars: Math.min(30000, Math.max(1000, maxTextFieldChars)) }),
-      setPauseOnFocusLost: (pauseOnFocusLost) => set({ pauseOnFocusLost }),
     }),
     {
       name: 'camelbee-settings',

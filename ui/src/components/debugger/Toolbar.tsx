@@ -1,13 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import type { CamelBeeContext } from '@/types';
+import type { HealthResponse } from '@/api';
 import { useTraceStatus, useDeleteMessages } from '@/api';
 import { useDebuggerStore } from '@/store/debuggerStore';
+import { HealthPanel } from '@/components/HealthPanel';
 
 interface ToolbarProps {
   context: CamelBeeContext | undefined;
+  health?: HealthResponse;
 }
 
-export function Toolbar({ context }: ToolbarProps) {
+export function Toolbar({ context, health }: ToolbarProps) {
   const isTracing = useDebuggerStore((s) => s.isTracing);
   const setTracing = useDebuggerStore((s) => s.setTracing);
   const setFilterText = useDebuggerStore((s) => s.setFilterText);
@@ -22,6 +26,7 @@ export function Toolbar({ context }: ToolbarProps) {
     return () => clearTimeout(debounceRef.current);
   }, [localFilter, setFilterText]);
 
+  const queryClient = useQueryClient();
   const traceStatus = useTraceStatus();
   const deleteMessages = useDeleteMessages();
 
@@ -32,6 +37,7 @@ export function Toolbar({ context }: ToolbarProps) {
       deleteMessages.mutate(undefined, {
         onSuccess: () => {
           clearMessages();
+          queryClient.removeQueries({ queryKey: ['messages'] });
           traceStatus.mutate('ACTIVE', {
             onSuccess: () => setTracing(true),
           });
@@ -45,17 +51,22 @@ export function Toolbar({ context }: ToolbarProps) {
   };
 
   const handleDelete = () => {
-    clearMessages();
-    deleteMessages.mutate();
+    deleteMessages.mutate(undefined, {
+      onSuccess: () => {
+        clearMessages();
+        queryClient.removeQueries({ queryKey: ['messages'] });
+      },
+    });
   };
 
   return (
-    <div className="flex items-center gap-4 border-b border-gray-700 bg-gray-900 px-4 py-2">
-      {/* Context info */}
-      <div className="flex items-center gap-3 text-xs text-gray-400">
+    <div className="flex items-center gap-4 border-b border-gray-300 bg-white px-4 py-2 dark:border-gray-700 dark:bg-gray-900">
+      {/* Health + Context info */}
+      <HealthPanel context={context} health={health} />
+      <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
         {context && (
           <>
-            <span className="font-semibold text-gray-200">{context.name}</span>
+            <span className="font-semibold text-gray-800 dark:text-gray-200">{context.name}</span>
             <span>{context.framework}</span>
             <span>Camel {context.camelVersion}</span>
           </>
@@ -71,7 +82,7 @@ export function Toolbar({ context }: ToolbarProps) {
         placeholder="Filter messages…"
         value={localFilter}
         onChange={(e) => setLocalFilter(e.target.value)}
-        className="w-48 rounded border border-gray-600 bg-gray-800 px-2 py-1 text-xs text-gray-200 placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+        className="w-48 rounded border border-gray-300 bg-gray-50 px-2 py-1 text-xs text-gray-800 placeholder-gray-400 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:placeholder-gray-500"
       />
 
       {/* Trace toggle */}
@@ -91,7 +102,7 @@ export function Toolbar({ context }: ToolbarProps) {
       <button
         onClick={handleDelete}
         disabled={deleteMessages.isPending}
-        className="rounded bg-gray-700 px-3 py-1 text-xs font-medium text-gray-200 transition hover:bg-gray-600 disabled:opacity-50"
+        className="rounded bg-gray-200 px-3 py-1 text-xs font-medium text-gray-800 transition hover:bg-gray-300 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
       >
         Clear
       </button>

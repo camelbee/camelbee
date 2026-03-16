@@ -12,6 +12,7 @@ import '@xyflow/react/dist/style.css';
 import type { CamelBeeContext } from '@/types';
 import { buildRouteGraph } from '@/utils/routeGraph';
 import { useMetricsStore, type RouteMetrics } from '@/store/metricsStore';
+import { useIsDark } from '@/hooks/useTheme';
 import { MetricsRouteNode, type MetricsRouteNodeData } from './MetricsRouteNode';
 
 const nodeTypes: NodeTypes = { routeNode: MetricsRouteNode as never };
@@ -42,6 +43,7 @@ function applyRouteMetrics(
 export function MetricsRouteGraph({ context }: MetricsRouteGraphProps) {
   const graph = useMemo(() => buildRouteGraph(context), [context]);
   const routeMetrics = useMetricsStore((s) => s.routeMetrics);
+  const isDark = useIsDark();
 
   const nodesWithMetrics = useMemo(
     () => applyRouteMetrics(graph.nodes, routeMetrics),
@@ -67,17 +69,17 @@ export function MetricsRouteGraph({ context }: MetricsRouteGraphProps) {
         minZoom={0.1}
         maxZoom={2}
         proOptions={{ hideAttribution: true }}
-        colorMode="dark"
+        colorMode={isDark ? 'dark' : 'light'}
         nodesDraggable={false}
         nodesConnectable={false}
         edgesFocusable={false}
       >
-        <Background color="#374151" gap={20} />
+        <Background color={isDark ? '#374151' : '#d1d5db'} gap={20} />
         <Controls showInteractive={false} />
         <MiniMap
-          nodeColor="#4b5563"
-          maskColor="rgba(0,0,0,0.6)"
-          className="!bg-gray-900"
+          nodeColor={isDark ? '#4b5563' : '#d1d5db'}
+          maskColor={isDark ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.6)'}
+          className={isDark ? '!bg-gray-900' : '!bg-gray-100'}
         />
       </ReactFlow>
     </div>

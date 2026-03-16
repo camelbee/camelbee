@@ -6,7 +6,6 @@ import { Toolbar } from '@/components/debugger/Toolbar';
 import { RouteGraph } from '@/components/debugger/RouteGraph';
 import { TimelineBar } from '@/components/debugger/TimelineBar';
 import { MessagePanel } from '@/components/debugger/MessagePanel';
-import { HealthPanel } from '@/components/HealthPanel';
 import { buildRouteGraph } from '@/utils/routeGraph';
 
 export function DebuggerPage() {
@@ -45,7 +44,7 @@ export function DebuggerPage() {
   if (isLoading) {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <span className="text-sm text-gray-400">Loading routes…</span>
+        <span className="text-sm text-gray-500 dark:text-gray-400">Loading routes…</span>
       </div>
     );
   }
@@ -53,7 +52,7 @@ export function DebuggerPage() {
   if (error) {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <span className="text-sm text-red-400">
+        <span className="text-sm text-red-600 dark:text-red-400">
           Failed to load routes: {(error as Error).message}
         </span>
       </div>
@@ -62,8 +61,7 @@ export function DebuggerPage() {
 
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden">
-      <HealthPanel context={context} health={health ?? undefined} />
-      <Toolbar context={context} />
+      <Toolbar context={context} health={health ?? undefined} />
 
       <div className="flex flex-1 overflow-hidden">
         <div className="flex-1">

@@ -2,9 +2,9 @@
 
 ## Introduction
 
-The camelbee-springboot-core library is an essential component for integrating a Camel SpringBoot Microservice with the CamelBee WebGL application (https://www.camelbee.io) or the local Docker version (accessed at http://localhost:8083 by executing 'docker run -d -p 8083:80 camelbee/webgl'). 
-This library provides the necessary functionalities to configure Camel routes with event notifiers, allowing comprehensive tracing of messages exchanged between the routes. 
-Additionally, it includes rest controllers for seamless interaction with the CamelBee WebGL application.
+The camelbee-springboot-core library is an essential component for integrating a Camel SpringBoot Microservice with the CamelBee ecosystem.
+It comes with an **embedded React UI** served directly from your application, providing route visualization, message tracing, debugging, and metrics.
+This library provides the necessary functionalities to configure Camel routes with event notifiers, allowing comprehensive tracing of messages exchanged between the routes.
 
 ## Manual Installation
 
@@ -20,7 +20,7 @@ Once the maven artifact is created, you can include it in your project by adding
   <parent>
     <groupId>io.camelbee</groupId>
     <artifactId>camelbee-springboot-starter</artifactId>
-    <version>2.0.4</version>
+    <version>3.0.0</version>
   </parent>
 ```
 
@@ -33,12 +33,12 @@ If you'd rather not use `camelbee-springboot-starter` as your parent project, yo
 run `mvn -f pom-custom.xml clean install` command in the "./camelbee/core/springboot-core" folder
 
 Once the custom maven artifact is created, you can include it in your project by adding the following dependency to your pom.xml:
-   
+
 ```xml
   <dependency>
     <groupId>io.camelbee</groupId>
     <artifactId>camelbee-springboot-core-custom</artifactId>
-    <version>2.0.4</version>
+    <version>3.0.0</version>
   </dependency>
 ```
 
@@ -64,7 +64,7 @@ public class MusicianRoute extends RouteBuilder {
     public void configure() throws Exception {
 
         camelBeeRouteConfigurer.configureRoute(this);
-    
+
     ...
     ...
 ```
@@ -73,11 +73,14 @@ public class MusicianRoute extends RouteBuilder {
 
 To enable specific features of the CamelBee library, add/modify the following properties in your `application.yaml` file:
 
-```
+```yaml
 camelbee:
-  # when enabled it allows the CamelBe WebGL application to fetch the topology of the Camel Context.
+  # when enabled registers the CamelBee event notifier to the Camel context
+  notifier-enabled: true
+  # when enabled configures stream caching, MDC logging and CamelBeeUnitOfWork for routes
+  route-configurer-enabled: true
+  # when enabled it allows the CamelBee UI to fetch the topology of the Camel Context.
   context-enabled: true
-  # tracer-enabled SHOULD BE ONLY ENABLED FOR DEVELOPMENT PURPOSES, NOT FOR PRODUCTION.
   # when enabled intercepts/traces request and responses of all camel components and caches messages.
   tracer-enabled: true
   # maximum time the tracer can remain idle before deactivation tracing of messages.
@@ -89,9 +92,9 @@ camelbee:
 ```
 
 
-### Enable Metrics and CORS for https://www.camelbee.io
+### Enable Metrics
 
-To enable metrics and configure CORS for https://www.camelbee.io, adjust the following properties to your `application.yaml` file:
+To enable metrics, adjust the following properties in your `application.yaml` file:
 
 ```
 management:
@@ -108,12 +111,6 @@ management:
       path-mapping:
         prometheus: metrics
         metrics: metrics-default
-      cors:
-        allowed-origins: "https://www.camelbee.io,http://localhost:8083" # Comma-separated list of origins you want to allow
-        allowed-methods: GET  # Allowed HTTP methods. Default to GET.
-        allowed-headers: "*"  # Allowed HTTP headers. Default to "*".
-        allow-credentials: true  # Set to true if you want to allow cookies, authorization headers, etc.
-        max-age: 1800  # Maximum age (in seconds) of the cache duration for CORS preflight responses.
 ```
 
 ### Enable CamelBee Spring Beans
@@ -138,6 +135,15 @@ public class CamelBeeApplication {
 
 }
 ```
+
+## Accessing the Embedded UI
+
+Once your application is running, the embedded CamelBee UI is available at:
+
+`http://localhost:8080/camelbee`
+
+This provides route visualization, message tracing, debugging with replay, filtering, endpoint triggering, and metrics directly in your browser.
+
 ## Example Implementation
 
 Discover a practical and functional application of this core library within the 'allcomponent-springboot-sample' Maven project showcased below as a successful and operational example:
@@ -145,9 +151,9 @@ Discover a practical and functional application of this core library within the 
 ```shell
 camelbee/
 |-- core/
-| |-- springboot-core/
-| | |-- ...
+|   |-- springboot-core/
+|   |   |-- ...
 |-- examples/
-| |-- allcomponent-springboot-sample/
-| | |-- ...
+|   |-- allcomponent-springboot-sample/
+|   |   |-- ...
 ```

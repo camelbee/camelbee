@@ -34,7 +34,7 @@ export function MetricsPage() {
   if (isLoading) {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <span className="text-sm text-gray-400">Loading routes…</span>
+        <span className="text-sm text-gray-500 dark:text-gray-400">Loading routes…</span>
       </div>
     );
   }
@@ -42,7 +42,7 @@ export function MetricsPage() {
   if (error) {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <span className="text-sm text-red-400">
+        <span className="text-sm text-red-600 dark:text-red-400">
           Failed to load routes: {(error as Error).message}
         </span>
       </div>
@@ -51,15 +51,13 @@ export function MetricsPage() {
 
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden">
-      {/* Health panel overlay */}
-      <HealthPanel context={context} health={health ?? undefined} />
-
       {/* Top bar */}
-      <div className="flex items-center justify-between border-b border-gray-700 bg-gray-900 px-4 py-2">
-        <div className="flex items-center gap-3 text-xs text-gray-400">
+      <div className="flex items-center justify-between border-b border-gray-300 bg-white px-4 py-2 dark:border-gray-700 dark:bg-gray-900">
+        <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+          <HealthPanel context={context} health={health ?? undefined} />
           {context && (
             <>
-              <span className="font-semibold text-gray-200">{context.name}</span>
+              <span className="font-semibold text-gray-800 dark:text-gray-200">{context.name}</span>
               <span>{context.framework}</span>
               <span>Camel {context.camelVersion}</span>
             </>
@@ -68,13 +66,13 @@ export function MetricsPage() {
 
         <div className="flex items-center gap-3">
           {/* View toggle */}
-          <div className="flex rounded border border-gray-600">
+          <div className="flex rounded border border-gray-300 dark:border-gray-600">
             <button
               onClick={() => setView('topology')}
               className={`px-3 py-1 text-xs font-medium transition ${
                 view === 'topology'
-                  ? 'bg-gray-700 text-white'
-                  : 'text-gray-400 hover:text-gray-200'
+                  ? 'bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white'
+                  : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'
               }`}
             >
               Topology
@@ -83,8 +81,8 @@ export function MetricsPage() {
               onClick={() => setView('charts')}
               className={`px-3 py-1 text-xs font-medium transition ${
                 view === 'charts'
-                  ? 'bg-gray-700 text-white'
-                  : 'text-gray-400 hover:text-gray-200'
+                  ? 'bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white'
+                  : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'
               }`}
             >
               Charts

@@ -29,16 +29,16 @@ export class ErrorBoundary extends Component<Props, State> {
       if (this.props.fallback) return this.props.fallback;
       return (
         <div className="flex flex-1 items-center justify-center p-8">
-          <div className="max-w-md rounded border border-red-800 bg-red-950/50 p-4 text-center">
-            <h2 className="mb-2 text-sm font-semibold text-red-400">
+          <div className="max-w-md rounded border border-red-300 bg-red-50 p-4 text-center dark:border-red-800 dark:bg-red-950/50">
+            <h2 className="mb-2 text-sm font-semibold text-red-600 dark:text-red-400">
               Something went wrong
             </h2>
-            <p className="mb-3 text-xs text-gray-400">
+            <p className="mb-3 text-xs text-gray-500 dark:text-gray-400">
               {this.state.error?.message ?? 'An unexpected error occurred.'}
             </p>
             <button
               onClick={() => this.setState({ hasError: false, error: null })}
-              className="rounded bg-gray-700 px-3 py-1 text-xs text-gray-200 hover:bg-gray-600"
+              className="rounded bg-gray-200 px-3 py-1 text-xs text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
             >
               Try again
             </button>

@@ -2,23 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
-/* React Flow dark theme overrides */
+/* React Flow theme overrides — light (default) */
 .react-flow__background {
-  background-color: #030712; /* gray-950 */
+  background-color: #f9fafb; /* gray-50 */
 }
 
 .react-flow__controls button {
+  background-color: #ffffff;
+  border-color: #d1d5db; /* gray-300 */
+  color: #374151; /* gray-700 */
+  fill: #374151;
+}
+
+.react-flow__controls button:hover {
+  background-color: #f3f4f6; /* gray-100 */
+}
+
+.react-flow__minimap {
+  background-color: #f3f4f6 !important; /* gray-100 */
+}
+
+/* React Flow theme overrides — dark */
+.dark .react-flow__background {
+  background-color: #030712; /* gray-950 */
+}
+
+.dark .react-flow__controls button {
   background-color: #1f2937; /* gray-800 */
   border-color: #374151; /* gray-700 */
   color: #d1d5db; /* gray-300 */
   fill: #d1d5db;
 }
 
-.react-flow__controls button:hover {
+.dark .react-flow__controls button:hover {
   background-color: #374151;
 }
 
-.react-flow__minimap {
+.dark .react-flow__minimap {
   background-color: #111827 !important; /* gray-900 */
 }
 

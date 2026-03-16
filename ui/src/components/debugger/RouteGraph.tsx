@@ -14,6 +14,7 @@ import type { CamelBeeContext } from '@/types';
 import { buildRouteGraph, type MessageEdge as MEdge, type ActiveFlow } from '@/utils/routeGraph';
 import { matchMessageToEdge } from '@/utils/messageMatching';
 import { useDebuggerStore } from '@/store/debuggerStore';
+import { useIsDark } from '@/hooks/useTheme';
 import { RouteNode } from './RouteNode';
 import { MessageEdge } from './MessageEdge';
 
@@ -26,6 +27,7 @@ interface RouteGraphProps {
 
 export function RouteGraph({ context }: RouteGraphProps) {
   const graph = useMemo(() => buildRouteGraph(context), [context]);
+  const isDark = useIsDark();
 
   const [nodes, setNodes, onNodesChange] = useNodesState(graph.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(graph.edges);
@@ -143,14 +145,14 @@ export function RouteGraph({ context }: RouteGraphProps) {
         minZoom={0.1}
         maxZoom={2}
         proOptions={{ hideAttribution: true }}
-        colorMode="dark"
+        colorMode={isDark ? 'dark' : 'light'}
       >
-        <Background color="#374151" gap={20} />
+        <Background color={isDark ? '#374151' : '#d1d5db'} gap={20} />
         <Controls showInteractive={false} />
         <MiniMap
-          nodeColor="#4b5563"
-          maskColor="rgba(0,0,0,0.6)"
-          className="!bg-gray-900"
+          nodeColor={isDark ? '#4b5563' : '#d1d5db'}
+          maskColor={isDark ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.6)'}
+          className={isDark ? '!bg-gray-900' : '!bg-gray-100'}
         />
       </ReactFlow>
     </div>

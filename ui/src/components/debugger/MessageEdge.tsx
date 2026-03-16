@@ -5,6 +5,7 @@ import {
   type EdgeProps,
 } from '@xyflow/react';
 import type { MessageEdgeData, ActiveFlow } from '@/utils/routeGraph';
+import { useIsDark } from '@/hooks/useTheme';
 
 type Props = EdgeProps & { data: MessageEdgeData | undefined };
 
@@ -43,10 +44,12 @@ function FlowDot({
   flow,
   pathData,
   onDone,
+  textStroke,
 }: {
   flow: ActiveFlow;
   pathData: string;
   onDone: (id: number) => void;
+  textStroke: string;
 }) {
   const isResponse = flow.type === 'RESPONSE' || flow.type === 'ERROR_RESPONSE';
   const isError = flow.type === 'ERROR_RESPONSE';
@@ -102,7 +105,7 @@ function FlowDot({
         y={-16}
         className="text-[9px] font-bold"
         fill={color}
-        stroke="#030712"
+        stroke={textStroke}
         strokeWidth={2}
         paintOrder="stroke"
       >
@@ -125,6 +128,10 @@ function MessageEdgeInner(props: Props) {
     selected,
   } = props;
 
+  const isDark = useIsDark();
+  const defaultStroke = isDark ? '#6b7280' : '#9ca3af'; // gray-500 / gray-400
+  const textStroke = isDark ? '#030712' : '#f9fafb'; // gray-950 / gray-50
+
   const isSelected = selected ?? false;
 
   const [edgePath, labelX, labelY] = getBezierPath({
@@ -140,7 +147,7 @@ function MessageEdgeInner(props: Props) {
   const hasMessages = (data?.messageCount ?? 0) > 0;
   const hasError = data?.hasError ?? false;
 
-  let strokeColor = '#6b7280'; // gray-500
+  let strokeColor = defaultStroke;
   if (isErrorHandler) strokeColor = '#ef4444'; // red-500
   else if (hasError) strokeColor = '#ef4444';
   else if (hasMessages) strokeColor = '#22c55e'; // green-500
@@ -210,6 +217,7 @@ function MessageEdgeInner(props: Props) {
           flow={flow}
           pathData={edgePath}
           onDone={handleFlowDone}
+          textStroke={textStroke}
         />
       ))}
     </>

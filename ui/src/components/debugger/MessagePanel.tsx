@@ -51,16 +51,16 @@ export function MessagePanel({ edges }: MessagePanelProps) {
   };
 
   return (
-    <div className="flex h-full w-[400px] flex-col border-l border-gray-700 bg-gray-900 transition-all">
+    <div className="flex h-full w-[400px] flex-col border-l border-gray-300 bg-gray-50 transition-all dark:border-gray-700 dark:bg-gray-900">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-gray-700 px-3 py-2">
-        <span className="text-xs font-semibold text-gray-200">
+      <div className="flex items-center justify-between border-b border-gray-300 px-3 py-2 dark:border-gray-700">
+        <span className="text-xs font-semibold text-gray-800 dark:text-gray-200">
           Messages ({interactions.length})
         </span>
         <button
           onClick={() => selectEdge(null)}
           aria-label="Close message panel"
-          className="text-gray-400 hover:text-gray-200"
+          className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
         >
           ✕
         </button>
@@ -68,15 +68,15 @@ export function MessagePanel({ edges }: MessagePanelProps) {
 
       {/* Navigation */}
       {interactions.length > 1 && (
-        <div className="flex items-center justify-between border-b border-gray-700 px-3 py-1">
+        <div className="flex items-center justify-between border-b border-gray-300 px-3 py-1 dark:border-gray-700">
           <button
             onClick={() => setInteractionIdx(Math.max(0, interactionIdx - 1))}
             disabled={interactionIdx === 0}
-            className="text-xs text-gray-400 hover:text-gray-200 disabled:opacity-40"
+            className="text-xs text-gray-500 hover:text-gray-800 disabled:opacity-40 dark:text-gray-400 dark:hover:text-gray-200"
           >
             ◀ Prev
           </button>
-          <span className="text-xs tabular-nums text-gray-400">
+          <span className="text-xs tabular-nums text-gray-500 dark:text-gray-400">
             {interactionIdx + 1} / {interactions.length}
           </span>
           <button
@@ -86,7 +86,7 @@ export function MessagePanel({ edges }: MessagePanelProps) {
               )
             }
             disabled={interactionIdx >= interactions.length - 1}
-            className="text-xs text-gray-400 hover:text-gray-200 disabled:opacity-40"
+            className="text-xs text-gray-500 hover:text-gray-800 disabled:opacity-40 dark:text-gray-400 dark:hover:text-gray-200"
           >
             Next ▶
           </button>
@@ -96,7 +96,7 @@ export function MessagePanel({ edges }: MessagePanelProps) {
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-3 py-2">
         {!current ? (
-          <p className="text-xs text-gray-500">No messages for this edge at current timeline position.</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500">No messages for this edge at current timeline position.</p>
         ) : (
           <div className="space-y-3">
             {/* Status badge */}
@@ -104,13 +104,13 @@ export function MessagePanel({ edges }: MessagePanelProps) {
               <span
                 className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase ${
                   current.isError
-                    ? 'bg-red-500/20 text-red-400'
-                    : 'bg-green-500/20 text-green-400'
+                    ? 'bg-red-500/20 text-red-600 dark:text-red-400'
+                    : 'bg-green-500/20 text-green-600 dark:text-green-400'
                 }`}
               >
                 {current.isError ? 'Error' : 'Success'}
               </span>
-              <span className="truncate text-[10px] text-gray-500">
+              <span className="truncate text-[10px] text-gray-400 dark:text-gray-500">
                 {current.exchangeId}
               </span>
             </div>
@@ -128,10 +128,10 @@ export function MessagePanel({ edges }: MessagePanelProps) {
             {/* Exception */}
             {current.response?.exception && (
               <div>
-                <h4 className="mb-1 text-[10px] font-semibold uppercase text-red-400">
+                <h4 className="mb-1 text-[10px] font-semibold uppercase text-red-600 dark:text-red-400">
                   Exception
                 </h4>
-                <pre className="whitespace-pre-wrap rounded bg-red-500/10 p-2 text-[11px] text-red-300">
+                <pre className="whitespace-pre-wrap rounded bg-red-500/10 p-2 text-[11px] text-red-700 dark:text-red-300">
                   {current.response.exception}
                 </pre>
               </div>
@@ -140,7 +140,7 @@ export function MessagePanel({ edges }: MessagePanelProps) {
             {/* Go to timeline */}
             <button
               onClick={handleGoToTimeline}
-              className="w-full rounded bg-gray-700 py-1 text-xs text-gray-300 hover:bg-gray-600"
+              className="w-full rounded bg-gray-200 py-1 text-xs text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
             >
               Go to timeline position
             </button>
@@ -154,21 +154,21 @@ export function MessagePanel({ edges }: MessagePanelProps) {
 function MessageBlock({ label, message }: { label: string; message: Message }) {
   return (
     <div>
-      <h4 className="mb-1 text-[10px] font-semibold uppercase text-gray-400">
+      <h4 className="mb-1 text-[10px] font-semibold uppercase text-gray-500 dark:text-gray-400">
         {label}
       </h4>
       {message.headers && (
         <details className="mb-1">
-          <summary className="cursor-pointer text-[10px] text-gray-500">
+          <summary className="cursor-pointer text-[10px] text-gray-400 dark:text-gray-500">
             Headers
           </summary>
-          <pre className="mt-0.5 max-h-32 overflow-auto whitespace-pre-wrap rounded bg-gray-800 p-1.5 text-[11px] text-gray-300">
+          <pre className="mt-0.5 max-h-32 overflow-auto whitespace-pre-wrap rounded bg-gray-200 p-1.5 text-[11px] text-gray-700 dark:bg-gray-800 dark:text-gray-300">
             {message.headers}
           </pre>
         </details>
       )}
       {message.messageBody && (
-        <pre className="max-h-48 overflow-auto whitespace-pre-wrap rounded bg-gray-800 p-2 text-[11px] text-gray-300">
+        <pre className="max-h-48 overflow-auto whitespace-pre-wrap rounded bg-gray-200 p-2 text-[11px] text-gray-700 dark:bg-gray-800 dark:text-gray-300">
           {message.messageBody}
         </pre>
       )}

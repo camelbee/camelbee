@@ -21,7 +21,7 @@
     <parent>
         <groupId>io.camelbee</groupId>
         <artifactId>camelbee</artifactId>
-        <version>2.0.8</version>
+        <version>3.0.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -32,7 +32,6 @@
     <description>CamelBee Root Pom</description>
 
     <properties>
-        <camelbee.version>2.0.8</camelbee.version>
         <argLine>-Duser.language=en</argLine>
         <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
         <camel-maven-plugin.version>4.16.0</camel-maven-plugin.version>
@@ -296,7 +295,7 @@
                                 <artifactItem>
                                     <groupId>io.camelbee</groupId>
                                     <artifactId>common</artifactId>
-                                    <version>2.0.8</version>
+                                    <version>3.0.0</version>
                                     <type>jar</type>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
                                     <includes>config/**, formatter/**</includes>

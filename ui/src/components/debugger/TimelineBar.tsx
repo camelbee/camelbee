@@ -8,12 +8,12 @@ export function TimelineBar() {
   const stepForward = useDebuggerStore((s) => s.stepForward);
 
   return (
-    <div className="flex items-center gap-3 border-t border-gray-700 bg-gray-900 px-4 py-2">
+    <div className="flex items-center gap-3 border-t border-gray-300 bg-white px-4 py-2 dark:border-gray-700 dark:bg-gray-900">
       <button
         onClick={stepBack}
         disabled={timelineIndex <= 0}
         aria-label="Step back"
-        className="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 hover:bg-gray-600 disabled:opacity-40"
+        className="rounded bg-gray-200 px-2 py-1 text-xs text-gray-700 hover:bg-gray-300 disabled:opacity-40 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
       >
         ◀
       </button>
@@ -25,19 +25,19 @@ export function TimelineBar() {
         value={timelineIndex}
         onChange={(e) => setTimelineIndex(Number(e.target.value))}
         aria-label="Timeline position"
-        className="h-1.5 flex-1 cursor-pointer appearance-none rounded-full bg-gray-700 accent-blue-500"
+        className="h-1.5 flex-1 cursor-pointer appearance-none rounded-full bg-gray-300 accent-blue-500 dark:bg-gray-700"
       />
 
       <button
         onClick={stepForward}
         disabled={timelineIndex >= total}
         aria-label="Step forward"
-        className="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 hover:bg-gray-600 disabled:opacity-40"
+        className="rounded bg-gray-200 px-2 py-1 text-xs text-gray-700 hover:bg-gray-300 disabled:opacity-40 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
       >
         ▶
       </button>
 
-      <span className="min-w-[80px] text-right text-xs tabular-nums text-gray-400">
+      <span className="min-w-[80px] text-right text-xs tabular-nums text-gray-500 dark:text-gray-400">
         {timelineIndex} / {total}
       </span>
     </div>
