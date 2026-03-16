@@ -173,6 +173,7 @@ Once your application is running, the CamelBee UI is available at: `http://local
 
 ### Detailed Documentation
 
+- **User Guide:** [CamelBee User Guide](https://github.com/egekaraosmanoglu/camelbee/blob/main/docs/camelbee_userguide.md)
 - **Quarkus:** [CamelBee Quarkus Core README](https://github.com/egekaraosmanoglu/camelbee/blob/main/core/quarkus-core/README.md)
 - **Spring Boot:** [CamelBee SpringBoot Core README](https://github.com/egekaraosmanoglu/camelbee/blob/main/core/springboot-core/README.md)
 
