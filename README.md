@@ -102,7 +102,7 @@ Each subproject has its own README file for detailed information specific to tha
 
 ## Getting Started
 
-There are two ways to integrate CamelBee into your project:
+There are three ways to integrate CamelBee into your project:
 
 ### Option 1: Use a CamelBee Starter as Parent (Recommended)
 
@@ -113,7 +113,7 @@ The easiest way to get started is to use a CamelBee starter as your project's pa
 <parent>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-quarkus-starter</artifactId>
-  <version>3.0.1</version>
+  <version>3.0.2</version>
 </parent>
 ```
 
@@ -122,22 +122,109 @@ The easiest way to get started is to use a CamelBee starter as your project's pa
 <parent>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-springboot-starter</artifactId>
-  <version>3.0.1</version>
+  <version>3.0.2</version>
 </parent>
 ```
 
 For working examples using the starters, see the [camelbee-examples](https://github.com/camelbee/camelbee-examples) repository.
 
-### Option 2: Add the Core Library Directly (Custom POM)
+### Option 2: Add the Core Library as a Dependency from Maven Central
 
-If your project already has a parent POM or you need to customize Java/Camel versions, you can build the core library independently using the provided `pom-custom.xml` and add it as a dependency.
+If your project already has a parent POM, you can add the CamelBee core library directly as a dependency from Maven Central. No local build needed.
+
+> **Note:** Since you are not using the CamelBee starter as parent, you must manage your own dependency versions and compiler settings. Make sure to set the Java version and import the appropriate platform BOMs in your project.
+
+**For Quarkus:**
+
+Set the Java version and import the Quarkus and Camel Quarkus BOMs (adjust versions to match your project):
+```xml
+<properties>
+  <quarkus.platform.version>3.30.6</quarkus.platform.version>
+  <maven.compiler.source>21</maven.compiler.source>
+  <maven.compiler.target>21</maven.compiler.target>
+</properties>
+```
+```xml
+<dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>io.quarkus.platform</groupId>
+      <artifactId>quarkus-bom</artifactId>
+      <version>${quarkus.platform.version}</version>
+      <type>pom</type>
+      <scope>import</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus.platform</groupId>
+      <artifactId>quarkus-camel-bom</artifactId>
+      <version>${quarkus.platform.version}</version>
+      <type>pom</type>
+      <scope>import</scope>
+    </dependency>
+  </dependencies>
+</dependencyManagement>
+```
+
+Then add the CamelBee core dependency:
+```xml
+<dependency>
+  <groupId>io.camelbee</groupId>
+  <artifactId>camelbee-quarkus-core</artifactId>
+  <version>3.0.2</version>
+</dependency>
+```
+
+**For Spring Boot:**
+
+Set the Java version and import the Spring Boot and Camel Spring Boot BOMs (adjust versions to match your project):
+```xml
+<properties>
+  <spring-boot.version>3.5.9</spring-boot.version>
+  <camel.version>4.16.0</camel.version>
+  <maven.compiler.source>21</maven.compiler.source>
+  <maven.compiler.target>21</maven.compiler.target>
+</properties>
+```
+```xml
+<dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-dependencies</artifactId>
+      <version>${spring-boot.version}</version>
+      <type>pom</type>
+      <scope>import</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel.springboot</groupId>
+      <artifactId>camel-spring-boot-bom</artifactId>
+      <version>${camel.version}</version>
+      <type>pom</type>
+      <scope>import</scope>
+    </dependency>
+  </dependencies>
+</dependencyManagement>
+```
+
+Then add the CamelBee core dependency:
+```xml
+<dependency>
+  <groupId>io.camelbee</groupId>
+  <artifactId>camelbee-springboot-core</artifactId>
+  <version>3.0.2</version>
+</dependency>
+```
+
+### Option 3: Build a Custom Core Library (Custom Java/Camel Versions)
+
+If you need to customize Java or Camel versions, you can build the core library independently using the provided `pom-custom.xml` and add it as a dependency.
 
 **For Quarkus:** build with `mvn -f pom-custom.xml clean install` in `core/quarkus-core/`, then add:
 ```xml
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-quarkus-core-custom</artifactId>
-  <version>3.0.1</version>
+  <version>3.0.2</version>
 </dependency>
 ```
 
@@ -146,7 +233,7 @@ If your project already has a parent POM or you need to customize Java/Camel ver
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-springboot-core-custom</artifactId>
-  <version>3.0.1</version>
+  <version>3.0.2</version>
 </dependency>
 ```
 

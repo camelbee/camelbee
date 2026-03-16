@@ -19,7 +19,7 @@
   <parent>
     <groupId>io.camelbee</groupId>
     <artifactId>parent</artifactId>
-    <version>3.0.1</version>
+    <version>3.0.2</version>
     <relativePath>../parent/pom.xml</relativePath>
   </parent>
 
@@ -27,7 +27,7 @@
   <groupId>io.camelbee</groupId>
   <artifactId>core</artifactId>
   <packaging>pom</packaging>
-  <version>3.0.1</version>
+  <version>3.0.2</version>
 
 
   <name>CamelBee</name>
