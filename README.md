@@ -100,13 +100,81 @@ camelbee/
 
 Each subproject has its own README file for detailed information specific to that project.
 
-## Getting Started For Quarkus Projects:
+## Getting Started
 
-For more details, please refer to the [CamelBee Quarkus Core README](https://github.com/egekaraosmanoglu/camelbee/blob/main/core/quarkus-core/README.md).
+There are two ways to integrate CamelBee into your project:
 
-## Getting Started For SpringBoot Projects:
+### Option 1: Use a CamelBee Starter as Parent (Recommended)
 
-For more details, please refer to the [CamelBee SpringBoot Core README](https://github.com/egekaraosmanoglu/camelbee/blob/main/core/springboot-core/README.md).
+The easiest way to get started is to use a CamelBee starter as your project's parent POM. The starters are available on Maven Central and automatically include the core library, embedded UI, and all required dependencies. No local build needed.
+
+**For Quarkus:**
+```xml
+<parent>
+  <groupId>io.camelbee</groupId>
+  <artifactId>camelbee-quarkus-starter</artifactId>
+  <version>3.0.0</version>
+</parent>
+```
+
+**For Spring Boot:**
+```xml
+<parent>
+  <groupId>io.camelbee</groupId>
+  <artifactId>camelbee-springboot-starter</artifactId>
+  <version>3.0.0</version>
+</parent>
+```
+
+For working examples using the starters, see the [camelbee-examples](https://github.com/camelbee/camelbee-examples) repository.
+
+### Option 2: Add the Core Library Directly (Custom POM)
+
+If your project already has a parent POM or you need to customize Java/Camel versions, you can build the core library independently using the provided `pom-custom.xml` and add it as a dependency.
+
+**For Quarkus:** build with `mvn -f pom-custom.xml clean install` in `core/quarkus-core/`, then add:
+```xml
+<dependency>
+  <groupId>io.camelbee</groupId>
+  <artifactId>camelbee-quarkus-core-custom</artifactId>
+  <version>3.0.0</version>
+</dependency>
+```
+
+**For Spring Boot:** build with `mvn -f pom-custom.xml clean install` in `core/springboot-core/`, then add:
+```xml
+<dependency>
+  <groupId>io.camelbee</groupId>
+  <artifactId>camelbee-springboot-core-custom</artifactId>
+  <version>3.0.0</version>
+</dependency>
+```
+
+### Configure Your Camel Routes
+
+Regardless of which option you choose, you need to configure each of your Camel routes with `CamelBeeRouteConfigurer` to enable tracing and the embedded UI. Simply inject the configurer and call it at the beginning of your `configure()` method:
+
+```java
+public class MyRoute extends RouteBuilder {
+
+    @Inject // or @Autowired for Spring Boot
+    CamelBeeRouteConfigurer camelBeeRouteConfigurer;
+
+    @Override
+    public void configure() throws Exception {
+        camelBeeRouteConfigurer.configureRoute(this);
+
+        // your route definitions...
+    }
+}
+```
+
+Once your application is running, the CamelBee UI is available at: `http://localhost:8080/camelbee/index.html`
+
+### Detailed Documentation
+
+- **Quarkus:** [CamelBee Quarkus Core README](https://github.com/egekaraosmanoglu/camelbee/blob/main/core/quarkus-core/README.md)
+- **Spring Boot:** [CamelBee SpringBoot Core README](https://github.com/egekaraosmanoglu/camelbee/blob/main/core/springboot-core/README.md)
 
 ## License
 

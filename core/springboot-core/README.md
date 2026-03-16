@@ -6,67 +6,65 @@ The camelbee-springboot-core library is an essential component for integrating a
 It comes with an **embedded React UI** served directly from your application, providing route visualization, message tracing, debugging, and metrics.
 This library provides the necessary functionalities to configure Camel routes with event notifiers, allowing comprehensive tracing of messages exchanged between the routes.
 
-## Manual Installation
+## Installation
 
-To manually install the core library, follow the steps below:
+There are two ways to integrate CamelBee into your Spring Boot project:
 
-### Maven Installation
+### Option 1: Use CamelBee Starter as Parent (Recommended)
 
-run `mvn clean install` command in the topmost parent folder "./camelbee"
-
-Once the maven artifact is created, you can include it in your project by adding the following dependency to your pom.xml as the parent project:
+The easiest way to get started. Simply use `camelbee-springboot-starter` as your project's parent POM — it is available on Maven Central and automatically includes the core library, embedded UI, and all required dependencies. No local build needed:
 
 ```xml
-  <parent>
-    <groupId>io.camelbee</groupId>
-    <artifactId>camelbee-springboot-starter</artifactId>
-    <version>3.0.0</version>
-  </parent>
+<parent>
+  <groupId>io.camelbee</groupId>
+  <artifactId>camelbee-springboot-starter</artifactId>
+  <version>3.0.0</version>
+</parent>
 ```
 
-### Custom Maven Installation: Adding Core Library Directly Without CamelBee Starter Parent
+For working examples using the starter, see the [camelbee-examples](https://github.com/camelbee/camelbee-examples) repository.
 
-If you'd rather not use `camelbee-springboot-starter` as your parent project, you can build and use `camelbee-springboot-core-custom` independently. This approach uses the provided `pom-custom.xml` file, which allows you to customize Java and Camel Spring Boot versions to match your existing project setup.
+### Option 2: Add the Core Library Directly (Custom POM)
 
-1. Build the core library with the custom POM file:
+If your project already has a parent POM or you need to customize Java and Camel Spring Boot versions, you can build and use `camelbee-springboot-core-custom` independently. This approach uses the provided `pom-custom.xml`, which allows you to adjust versions to match your existing project setup.
 
-run `mvn -f pom-custom.xml clean install` command in the "./camelbee/core/springboot-core" folder
+1. Build the core library with the custom POM:
 
-Once the custom maven artifact is created, you can include it in your project by adding the following dependency to your pom.xml:
+```bash
+mvn -f pom-custom.xml clean install    # run in ./camelbee/core/springboot-core
+```
+
+2. Add the dependency to your project's `pom.xml`:
 
 ```xml
-  <dependency>
-    <groupId>io.camelbee</groupId>
-    <artifactId>camelbee-springboot-core-custom</artifactId>
-    <version>3.0.0</version>
-  </dependency>
+<dependency>
+  <groupId>io.camelbee</groupId>
+  <artifactId>camelbee-springboot-core-custom</artifactId>
+  <version>3.0.0</version>
+</dependency>
 ```
 
 ## Configuration
 
-### Configure your each Camel Route with org.camelbee.config.CamelBeeRouteConfigurer
+### Configure Your Camel Routes with CamelBeeRouteConfigurer
 
-To enable the stream caching in your camel routes like below:
+Regardless of which installation option you chose, you must configure each of your Camel routes with `CamelBeeRouteConfigurer` to enable tracing, stream caching, and the embedded UI. Inject the configurer and call it at the beginning of your `configure()` method:
 
-```
-/**
- * Musician Route.
- *
- * @author ekaraosmanoglu
- */
+```java
 @Component
 public class MusicianRoute extends RouteBuilder {
 
-    ...
-    ...
+    @Autowired
+    CamelBeeRouteConfigurer camelBeeRouteConfigurer;
 
     @Override
     public void configure() throws Exception {
 
         camelBeeRouteConfigurer.configureRoute(this);
 
-    ...
-    ...
+        // your route definitions...
+    }
+}
 ```
 
 ### Enable CamelBee Features
