@@ -49,7 +49,7 @@ export function NavBar() {
 
       {/* Right: Version */}
       <div className="flex w-40 justify-end">
-        <span className="text-xs text-gray-400 dark:text-gray-500">V 3.0.1</span>
+        <span className="text-xs text-gray-400 dark:text-gray-500">V 3.0.2</span>
       </div>
     </nav>
   );
