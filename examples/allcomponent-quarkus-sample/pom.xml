@@ -22,7 +22,7 @@
   <parent>
     <groupId>io.camelbee</groupId>
     <artifactId>camelbee-quarkus-starter</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
     <relativePath>../../starters/camelbee-quarkus-starter/pom.xml</relativePath>
   </parent>
 

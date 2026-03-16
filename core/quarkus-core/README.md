@@ -18,7 +18,7 @@ The easiest way to get started. Simply use `camelbee-quarkus-starter` as your pr
 <parent>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-quarkus-starter</artifactId>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
 </parent>
 ```
 
@@ -40,7 +40,7 @@ mvn -f pom-custom.xml clean install    # run in ./camelbee/core/quarkus-core
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-quarkus-core-custom</artifactId>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
 </dependency>
 ```
 

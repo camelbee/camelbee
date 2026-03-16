@@ -35,10 +35,18 @@ interface DebuggerState {
   clearMessages: () => void;
 }
 
+/**
+ * Filter messages for the timeline. Only SENDING and SENT events are included
+ * because CREATED and COMPLETED events have no endpoint information and cannot
+ * be matched to edges in the topology graph.
+ */
 function applyFilter(messages: Message[], text: string): Message[] {
-  if (!text) return messages;
+  const edgeMessages = messages.filter(
+    (m) => m.exchangeEventType === 'SENDING' || m.exchangeEventType === 'SENT',
+  );
+  if (!text) return edgeMessages;
   const lower = text.toLowerCase();
-  return messages.filter(
+  return edgeMessages.filter(
     (m) =>
       m.messageBody?.toLowerCase().includes(lower) ||
       m.headers?.toLowerCase().includes(lower),

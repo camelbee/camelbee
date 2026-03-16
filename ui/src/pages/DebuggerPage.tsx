@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo } from 'react';
+import { useCallback, useEffect, useRef, useMemo, useState } from 'react';
 import { useRoutes, useMessages, useHealth } from '@/api';
 import { useDebuggerStore } from '@/store/debuggerStore';
 import { useSettingsStore } from '@/store/settingsStore';
@@ -6,7 +6,7 @@ import { Toolbar } from '@/components/debugger/Toolbar';
 import { RouteGraph } from '@/components/debugger/RouteGraph';
 import { TimelineBar } from '@/components/debugger/TimelineBar';
 import { MessagePanel } from '@/components/debugger/MessagePanel';
-import { buildRouteGraph } from '@/utils/routeGraph';
+import { buildRouteGraph, type MessageEdge } from '@/utils/routeGraph';
 
 export function DebuggerPage() {
   const { data: context, isLoading, error } = useRoutes();
@@ -35,11 +35,32 @@ export function DebuggerPage() {
     }
   }, [messagesQuery.data, addVersion, resetVersion, appendMessages]);
 
-  // Build edges for the message panel
-  const graphEdges = useMemo(() => {
+  // Build static edges for the message panel
+  const staticEdges = useMemo(() => {
     if (!context) return [];
     return buildRouteGraph(context).edges;
   }, [context]);
+
+  // Track dynamic edges added by RouteGraph at runtime
+  const [dynamicEdges, setDynamicEdges] = useState<MessageEdge[]>([]);
+
+  const onDynamicEdgeAdded = useCallback((edge: MessageEdge) => {
+    setDynamicEdges((prev) => {
+      if (prev.some((e) => e.id === edge.id)) return prev;
+      return [...prev, edge];
+    });
+  }, []);
+
+  // Reset dynamic edges when context changes
+  useEffect(() => {
+    setDynamicEdges([]);
+  }, [context]);
+
+  // Merge static + dynamic edges for MessagePanel
+  const allEdges = useMemo(
+    () => [...staticEdges, ...dynamicEdges],
+    [staticEdges, dynamicEdges],
+  );
 
   if (isLoading) {
     return (
@@ -65,9 +86,11 @@ export function DebuggerPage() {
 
       <div className="flex flex-1 overflow-hidden">
         <div className="flex-1">
-          {context && <RouteGraph context={context} />}
+          {context && (
+            <RouteGraph context={context} onDynamicEdgeAdded={onDynamicEdgeAdded} />
+          )}
         </div>
-        <MessagePanel edges={graphEdges} />
+        <MessagePanel edges={allEdges} />
       </div>
 
       <TimelineBar />

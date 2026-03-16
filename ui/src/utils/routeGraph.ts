@@ -53,6 +53,12 @@ const NODE_WIDTH = 220;
 const NODE_HEIGHT = 80;
 
 /* ------------------------------------------------------------------ */
+/*  Public helpers                                                    */
+/* ------------------------------------------------------------------ */
+
+export { sanitize, makeNodeId, makeProducerId, makeEdgeId, truncateLabel };
+
+/* ------------------------------------------------------------------ */
 /*  Helpers                                                           */
 /* ------------------------------------------------------------------ */
 
@@ -381,6 +387,17 @@ export function buildRouteGraph(context: CamelBeeContext): {
     const minX = Math.min(...consumerNodes.map((n) => n.position.x));
     for (const node of consumerNodes) {
       node.position.x = minX;
+    }
+
+    // After aligning X, fix Y overlaps caused by collapsing different ranks
+    consumerNodes.sort((a, b) => a.position.y - b.position.y);
+    const minGap = NODE_HEIGHT + 20;
+    for (let i = 1; i < consumerNodes.length; i++) {
+      const prev = consumerNodes[i - 1]!;
+      const curr = consumerNodes[i]!;
+      if (curr.position.y - prev.position.y < minGap) {
+        curr.position.y = prev.position.y + minGap;
+      }
     }
   }
 
