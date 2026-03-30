@@ -12,7 +12,7 @@ There are three ways to integrate CamelBee into your Quarkus project:
 
 ### Option 1: Use CamelBee Starter as Parent (Recommended)
 
-The easiest way to get started. Simply use `camelbee-quarkus-starter` as your project's parent POM — it is available on Maven Central and automatically includes the core library, embedded UI, and all required dependencies. No local build needed:
+The easiest way to get started. Simply use `camelbee-quarkus-starter` as your project's parent POM — it is available on Maven Central and automatically includes the core library, embedded UI, and all required dependencies — including all dependency version management. No local build needed:
 
 ```xml
 <parent>
@@ -22,50 +22,61 @@ The easiest way to get started. Simply use `camelbee-quarkus-starter` as your pr
 </parent>
 ```
 
+Then add the following to your `application.yaml`:
+```yaml
+camelbee:
+  notifier-enabled: true
+  route-configurer-enabled: true
+  context-enabled: true
+  tracer-enabled: true
+  tracer-max-idle-time: 60000
+  tracer-max-messages-count: 10000
+  logging-enabled: true
+
+quarkus:
+  http:
+    port: 8080
+  index-dependency:
+    camelbeecore:
+      group-id: io.camelbee
+      artifact-id: camelbee-quarkus-core
+```
+
 For working examples using the starter, see the [camelbee-examples](https://github.com/camelbee/camelbee-examples) repository.
 
 ### Option 2: Add the Core Library as a Dependency from Maven Central
 
 If your project already has a parent POM, you can add the CamelBee core library directly as a dependency from Maven Central. No local build needed.
 
-> **Note:** Since you are not using the CamelBee starter as parent, you must manage your own dependency versions and compiler settings. Make sure to set the Java version and import the Quarkus and Camel Quarkus platform BOMs (adjust versions to match your project):
+> **Note:** This library requires Quarkus 3.x+ and Camel Quarkus 3.x+. Your existing BOMs should satisfy this — no changes needed if your project already targets these versions.
 
-```xml
-<properties>
-  <quarkus.platform.version>3.30.6</quarkus.platform.version>
-  <maven.compiler.source>21</maven.compiler.source>
-  <maven.compiler.target>21</maven.compiler.target>
-</properties>
-```
-
-```xml
-<dependencyManagement>
-  <dependencies>
-    <dependency>
-      <groupId>io.quarkus.platform</groupId>
-      <artifactId>quarkus-bom</artifactId>
-      <version>${quarkus.platform.version}</version>
-      <type>pom</type>
-      <scope>import</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.quarkus.platform</groupId>
-      <artifactId>quarkus-camel-bom</artifactId>
-      <version>${quarkus.platform.version}</version>
-      <type>pom</type>
-      <scope>import</scope>
-    </dependency>
-  </dependencies>
-</dependencyManagement>
-```
-
-Then add the CamelBee core dependency:
+Add the CamelBee core dependency:
 ```xml
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-quarkus-core</artifactId>
   <version>3.0.2</version>
 </dependency>
+```
+
+Then add the following to your `application.yaml`:
+```yaml
+camelbee:
+  notifier-enabled: true
+  route-configurer-enabled: true
+  context-enabled: true
+  tracer-enabled: true
+  tracer-max-idle-time: 60000
+  tracer-max-messages-count: 10000
+  logging-enabled: true
+
+quarkus:
+  http:
+    port: 8080
+  index-dependency:
+    camelbeecore:
+      group-id: io.camelbee
+      artifact-id: camelbee-quarkus-core
 ```
 
 ### Option 3: Build a Custom Core Library (Custom Java/Camel Versions)
@@ -88,28 +99,27 @@ mvn -f pom-custom.xml clean install    # run in ./camelbee/core/quarkus-core
 </dependency>
 ```
 
-## Configuration
+3. Add the following to your `application.yaml`:
+```yaml
+camelbee:
+  notifier-enabled: true
+  route-configurer-enabled: true
+  context-enabled: true
+  tracer-enabled: true
+  tracer-max-idle-time: 60000
+  tracer-max-messages-count: 10000
+  logging-enabled: true
 
-### Configure Your Camel Routes with CamelBeeRouteConfigurer
-
-Regardless of which installation option you chose, you must configure each of your Camel routes with `CamelBeeRouteConfigurer` to enable tracing, stream caching, and the embedded UI. Inject the configurer and call it at the beginning of your `configure()` method:
-
-```java
-@ApplicationScoped
-public class MusicianRoute extends RouteBuilder {
-
-    @Inject
-    CamelBeeRouteConfigurer camelBeeRouteConfigurer;
-
-    @Override
-    public void configure() throws Exception {
-
-        camelBeeRouteConfigurer.configureRoute(this);
-
-        // your route definitions...
-    }
-}
+quarkus:
+  http:
+    port: 8080
+  index-dependency:
+    camelbeecore:
+      group-id: io.camelbee
+      artifact-id: camelbee-quarkus-core-custom
 ```
+
+## Configuration
 
 ### Enable CamelBee Features
 
@@ -138,22 +148,14 @@ camelbee:
 
 To enable metrics, adjust the following properties in your `application.yaml` file:
 
-```
+```yaml
 quarkus:
   http:
     port: 8080
-```
-
-### Enable CamelBee Quarkus Beans
-
-Add "camelbee-quarkus-core" dependency to your application.yaml of your Quarkus project, so they will be available.
-
-```
-quarkus:
-  index-dependency:
-    camelbeecore:
-      group-id: io.camelbee
-      artifact-id: camelbee-quarkus-core
+  micrometer:
+    export:
+      prometheus:
+        path: /metrics
 ```
 
 ## Accessing the Embedded UI
