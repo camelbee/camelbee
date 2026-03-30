@@ -10,43 +10,9 @@ This library provides the necessary functionalities to configure Camel routes wi
 
 There are three ways to integrate CamelBee into your Quarkus project:
 
-### Option 1: Use CamelBee Starter as Parent (Recommended)
+### Option 1: Add the Core Library as a Dependency (Recommended)
 
-The easiest way to get started. Simply use `camelbee-quarkus-starter` as your project's parent POM — it is available on Maven Central and automatically includes the core library, embedded UI, and all required dependencies — including all dependency version management. No local build needed:
-
-```xml
-<parent>
-  <groupId>io.camelbee</groupId>
-  <artifactId>camelbee-quarkus-starter</artifactId>
-  <version>3.0.2</version>
-</parent>
-```
-
-Then add the following to your `application.yaml`:
-```yaml
-camelbee:
-  notifier-enabled: true
-  route-configurer-enabled: true
-  context-enabled: true
-  tracer-enabled: true
-  tracer-max-idle-time: 60000
-  tracer-max-messages-count: 10000
-  logging-enabled: true
-
-quarkus:
-  http:
-    port: 8080
-  index-dependency:
-    camelbeecore:
-      group-id: io.camelbee
-      artifact-id: camelbee-quarkus-core
-```
-
-For working examples using the starter, see the [camelbee-examples](https://github.com/camelbee/camelbee-examples) repository.
-
-### Option 2: Add the Core Library as a Dependency from Maven Central
-
-If your project already has a parent POM, you can add the CamelBee core library directly as a dependency from Maven Central. No local build needed.
+The recommended way for existing microservices. Add the CamelBee core library directly as a dependency from Maven Central — no local build needed, and it works alongside your existing parent POM.
 
 > **Note:** This library requires Quarkus 3.x+ and Camel Quarkus 3.x+. Your existing BOMs should satisfy this — no changes needed if your project already targets these versions.
 
@@ -73,11 +39,53 @@ camelbee:
 quarkus:
   http:
     port: 8080
+  micrometer:
+    export:
+      prometheus:
+        path: /metrics
   index-dependency:
     camelbeecore:
       group-id: io.camelbee
       artifact-id: camelbee-quarkus-core
 ```
+
+### Option 2: Use CamelBee Starter as Parent (New projects only)
+
+Only suitable for new projects without an existing parent POM. Simply use `camelbee-quarkus-starter` as your project's parent POM — it is available on Maven Central and automatically includes the core library, embedded UI, and all required dependencies — including all dependency version management. No local build needed:
+
+```xml
+<parent>
+  <groupId>io.camelbee</groupId>
+  <artifactId>camelbee-quarkus-starter</artifactId>
+  <version>3.0.2</version>
+</parent>
+```
+
+Then add the following to your `application.yaml`:
+```yaml
+camelbee:
+  notifier-enabled: true
+  route-configurer-enabled: true
+  context-enabled: true
+  tracer-enabled: true
+  tracer-max-idle-time: 60000
+  tracer-max-messages-count: 10000
+  logging-enabled: true
+
+quarkus:
+  http:
+    port: 8080
+  micrometer:
+    export:
+      prometheus:
+        path: /metrics
+  index-dependency:
+    camelbeecore:
+      group-id: io.camelbee
+      artifact-id: camelbee-quarkus-core
+```
+
+For working examples using the starter, see the [camelbee-examples](https://github.com/camelbee/camelbee-examples) repository.
 
 ### Option 3: Build a Custom Core Library (Custom Java/Camel Versions)
 
@@ -113,6 +121,10 @@ camelbee:
 quarkus:
   http:
     port: 8080
+  micrometer:
+    export:
+      prometheus:
+        path: /metrics
   index-dependency:
     camelbeecore:
       group-id: io.camelbee
