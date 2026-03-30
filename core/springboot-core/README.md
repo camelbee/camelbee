@@ -12,7 +12,7 @@ There are three ways to integrate CamelBee into your Spring Boot project:
 
 ### Option 1: Use CamelBee Starter as Parent (Recommended)
 
-The easiest way to get started. Simply use `camelbee-springboot-starter` as your project's parent POM — it is available on Maven Central and automatically includes the core library, embedded UI, and all required dependencies. No local build needed:
+The easiest way to get started. Simply use `camelbee-springboot-starter` as your project's parent POM — it is available on Maven Central and automatically includes the core library, embedded UI, and all required dependencies — including all dependency version management. No local build needed:
 
 ```xml
 <parent>
@@ -22,51 +22,95 @@ The easiest way to get started. Simply use `camelbee-springboot-starter` as your
 </parent>
 ```
 
+Then add the following to your `application.yaml`:
+```yaml
+camelbee:
+  notifier-enabled: true
+  route-configurer-enabled: true
+  context-enabled: true
+  tracer-enabled: true
+  tracer-max-idle-time: 60000
+  tracer-max-messages-count: 10000
+  logging-enabled: true
+
+management:
+  server:
+    port: 8080
+  security:
+    enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+      base-path: /
+      path-mapping:
+        prometheus: metrics
+        metrics: metrics-default
+```
+
+Also add `org.camelbee` to your `@ComponentScan` to pick up CamelBee beans:
+```java
+@SpringBootApplication
+@ComponentScan(basePackages = {"org.camelbee", "your.application.package"})
+public class YourApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(YourApplication.class, args);
+    }
+}
+```
+
 For working examples using the starter, see the [camelbee-examples](https://github.com/camelbee/camelbee-examples) repository.
 
 ### Option 2: Add the Core Library as a Dependency from Maven Central
 
 If your project already has a parent POM, you can add the CamelBee core library directly as a dependency from Maven Central. No local build needed.
 
-> **Note:** Since you are not using the CamelBee starter as parent, you must manage your own dependency versions and compiler settings. Make sure to set the Java version and import the Spring Boot and Camel Spring Boot BOMs (adjust versions to match your project):
+> **Note:** This library requires Spring Boot 3.x+ and Camel Spring Boot 4.x+. Your existing BOMs should satisfy this — no changes needed if your project already targets these versions.
 
-```xml
-<properties>
-  <spring-boot.version>3.5.9</spring-boot.version>
-  <camel.version>4.16.0</camel.version>
-  <maven.compiler.source>21</maven.compiler.source>
-  <maven.compiler.target>21</maven.compiler.target>
-</properties>
-```
-
-```xml
-<dependencyManagement>
-  <dependencies>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-dependencies</artifactId>
-      <version>${spring-boot.version}</version>
-      <type>pom</type>
-      <scope>import</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.camel.springboot</groupId>
-      <artifactId>camel-spring-boot-bom</artifactId>
-      <version>${camel.version}</version>
-      <type>pom</type>
-      <scope>import</scope>
-    </dependency>
-  </dependencies>
-</dependencyManagement>
-```
-
-Then add the CamelBee core dependency:
+Add the CamelBee core dependency:
 ```xml
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-springboot-core</artifactId>
   <version>3.0.2</version>
 </dependency>
+```
+
+Then add the following to your `application.yaml`:
+```yaml
+camelbee:
+  notifier-enabled: true
+  route-configurer-enabled: true
+  context-enabled: true
+  tracer-enabled: true
+  tracer-max-idle-time: 60000
+  tracer-max-messages-count: 10000
+  logging-enabled: true
+
+management:
+  server:
+    port: 8080
+  security:
+    enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+      base-path: /
+      path-mapping:
+        prometheus: metrics
+        metrics: metrics-default
+```
+
+Also add `org.camelbee` to your `@ComponentScan` to pick up CamelBee beans:
+```java
+@SpringBootApplication
+@ComponentScan(basePackages = {"org.camelbee", "your.application.package"})
+public class YourApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(YourApplication.class, args);
+    }
+}
 ```
 
 ### Option 3: Build a Custom Core Library (Custom Java/Camel Versions)
@@ -89,28 +133,44 @@ mvn -f pom-custom.xml clean install    # run in ./camelbee/core/springboot-core
 </dependency>
 ```
 
-## Configuration
+3. Add the following to your `application.yaml`:
+```yaml
+camelbee:
+  notifier-enabled: true
+  route-configurer-enabled: true
+  context-enabled: true
+  tracer-enabled: true
+  tracer-max-idle-time: 60000
+  tracer-max-messages-count: 10000
+  logging-enabled: true
 
-### Configure Your Camel Routes with CamelBeeRouteConfigurer
+management:
+  server:
+    port: 8080
+  security:
+    enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+      base-path: /
+      path-mapping:
+        prometheus: metrics
+        metrics: metrics-default
+```
 
-Regardless of which installation option you chose, you must configure each of your Camel routes with `CamelBeeRouteConfigurer` to enable tracing, stream caching, and the embedded UI. Inject the configurer and call it at the beginning of your `configure()` method:
-
+Also add `org.camelbee` to your `@ComponentScan` to pick up CamelBee beans:
 ```java
-@Component
-public class MusicianRoute extends RouteBuilder {
-
-    @Autowired
-    CamelBeeRouteConfigurer camelBeeRouteConfigurer;
-
-    @Override
-    public void configure() throws Exception {
-
-        camelBeeRouteConfigurer.configureRoute(this);
-
-        // your route definitions...
+@SpringBootApplication
+@ComponentScan(basePackages = {"org.camelbee", "your.application.package"})
+public class YourApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(YourApplication.class, args);
     }
 }
 ```
+
+## Configuration
 
 ### Enable CamelBee Features
 
@@ -154,29 +214,6 @@ management:
       path-mapping:
         prometheus: metrics
         metrics: metrics-default
-```
-
-### Enable CamelBee Spring Beans
-
-Add "org.camelbee" package to your ComponentScan folder of Spring like in the example project below:
-```
-/**
- * CamelBee Rest microservice example.
- */
-@SpringBootApplication
-@EnableAutoConfiguration
-@ComponentScan(
-    basePackages = {"org.camelbee", "io.camelbee.springboot.example"})
-public class CamelBeeApplication {
-
-  /**
-   * A main method to start this application.
-   */
-  public static void main(String[] args) {
-    SpringApplication.run(CamelBeeApplication.class, args);
-  }
-
-}
 ```
 
 ## Accessing the Embedded UI
