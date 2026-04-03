@@ -26,9 +26,10 @@ The following files have been resolved:
    commons-codec:commons-codec:jar:1.18.0:compile[36m -- module org.apache.commons.codec[m
    commons-collections:commons-collections:jar:3.2.2:compile[36m -- module commons.collections[0;1;33m (auto)[m
    commons-io:commons-io:jar:2.21.0:compile[36m -- module org.apache.commons.io[m
+   commons-logging:commons-logging:jar:1.2:test[36m -- module commons.logging[0;1;33m (auto)[m
    de.dentrassi.crypto:pem-keystore:jar:3.0.0:compile[36m -- module pem.keystore[0;1;33m (auto)[m
-   io.camelbee:camelbee-springboot-core:jar:3.0.2:compile[36m -- module camelbee.springboot.core[0;1;33m (auto)[m
-   io.camelbee:camelbee-springboot-security:jar:3.0.2:compile[36m -- module camelbee.springboot.security[0;1;33m (auto)[m
+   io.camelbee:camelbee-springboot-core:jar:3.1.0:compile[36m -- module camelbee.springboot.core[0;1;33m (auto)[m
+   io.camelbee:camelbee-springboot-security:jar:3.1.0:compile[36m -- module camelbee.springboot.security[0;1;33m (auto)[m
    io.micrometer:micrometer-commons:jar:1.15.7:compile[36m -- module micrometer.commons[0;1m [auto][m
    io.micrometer:micrometer-core:jar:1.15.7:compile[36m -- module micrometer.core[0;1m [auto][m
    io.micrometer:micrometer-jakarta9:jar:1.15.7:compile[36m -- module micrometer.jakarta9[0;1m [auto][m
@@ -54,6 +55,10 @@ The following files have been resolved:
    io.prometheus:prometheus-metrics-exposition-textformats:jar:1.3.10:runtime[36m -- module io.prometheus.writer.text[0;1m [auto][m
    io.prometheus:prometheus-metrics-model:jar:1.3.10:compile[36m -- module io.prometheus.metrics.model[0;1m [auto][m
    io.prometheus:prometheus-metrics-tracer-common:jar:1.3.10:compile[36m -- module io.prometheus.metrics.tracer.common[0;1m [auto][m
+   io.rest-assured:json-path:jar:5.5.6:test[36m -- module json.path[0;1;33m (auto)[m
+   io.rest-assured:rest-assured-common:jar:5.5.6:test[36m -- module rest.assured.common[0;1;33m (auto)[m
+   io.rest-assured:rest-assured:jar:5.5.6:test[36m -- module rest.assured[0;1;33m (auto)[m
+   io.rest-assured:xml-path:jar:5.5.6:test[36m -- module xml.path[0;1;33m (auto)[m
    io.smallrye:jandex:jar:3.2.0:runtime[36m -- module org.jboss.jandex[0;1m [auto][m
    jakarta.activation:jakarta.activation-api:jar:2.1.4:compile[36m -- module jakarta.activation[m
    jakarta.annotation:jakarta.annotation-api:jar:2.1.1:compile[36m -- module jakarta.annotation[m
@@ -185,9 +190,15 @@ The following files have been resolved:
    org.apache.commons:commons-compress:jar:1.24.0:test[36m -- module org.apache.commons.compress[m
    org.apache.commons:commons-lang3:jar:3.20.0:compile[36m -- module org.apache.commons.lang3[m
    org.apache.cxf:cxf-core:jar:4.1.4:compile[36m -- module org.apache.cxf.core[0;1m [auto][m
+   org.apache.groovy:groovy-json:jar:4.0.29:test[36m -- module org.apache.groovy.json[0;1m [auto][m
+   org.apache.groovy:groovy-xml:jar:4.0.29:test[36m -- module org.apache.groovy.xml[0;1m [auto][m
+   org.apache.groovy:groovy:jar:4.0.29:test[36m -- module org.apache.groovy[0;1m [auto][m
    org.apache.httpcomponents.client5:httpclient5:jar:5.5.1:compile[36m -- module org.apache.httpcomponents.client5.httpclient5[0;1m [auto][m
    org.apache.httpcomponents.core5:httpcore5-h2:jar:5.3.6:compile[36m -- module org.apache.httpcomponents.core5.httpcore5.h2[0;1m [auto][m
    org.apache.httpcomponents.core5:httpcore5:jar:5.3.6:compile[36m -- module org.apache.httpcomponents.core5.httpcore5[0;1m [auto][m
+   org.apache.httpcomponents:httpclient:jar:4.5.13:test[36m -- module org.apache.httpcomponents.httpclient[0;1m [auto][m
+   org.apache.httpcomponents:httpcore:jar:4.4.16:test[36m -- module org.apache.httpcomponents.httpcore[0;1m [auto][m
+   org.apache.httpcomponents:httpmime:jar:4.5.13:test[36m -- module org.apache.httpcomponents.httpmime[0;1m [auto][m
    org.apache.kafka:kafka-clients:jar:3.9.1:compile[36m -- module kafka.clients[0;1;33m (auto)[m
    org.apache.logging.log4j:log4j-api:jar:2.24.3:compile[36m -- module org.apache.logging.log4j[m
    org.apache.logging.log4j:log4j-to-slf4j:jar:2.24.3:compile[36m -- module org.apache.logging.log4j.to.slf4j[m
@@ -197,6 +208,7 @@ The following files have been resolved:
    org.aspectj:aspectjweaver:jar:1.9.25.1:compile[36m -- module org.aspectj.weaver[0;1m [auto][m
    org.assertj:assertj-core:jar:3.27.6:test[36m -- module org.assertj.core[m
    org.awaitility:awaitility:jar:4.2.2:test[36m -- module awaitility[0;1;33m (auto)[m
+   org.ccil.cowan.tagsoup:tagsoup:jar:1.2.1:test[36m -- module tagsoup[0;1;33m (auto)[m
    org.codehaus.woodstox:stax2-api:jar:4.2.2:compile[36m -- module org.codehaus.stax2[m
    org.eclipse.angus:angus-activation:jar:2.0.3:compile[36m -- module org.eclipse.angus.activation[m
    org.eclipse.jetty.ee10.websocket:jetty-ee10-websocket-jakarta-client:jar:12.0.31:compile[36m -- module org.eclipse.jetty.ee10.websocket.jakarta.client[m

@@ -22,7 +22,7 @@
 	<parent>
 		<groupId>io.camelbee</groupId>
 		<artifactId>camelbee-quarkus-dependencies</artifactId>
-		<version>3.0.2</version>
+		<version>3.1.0</version>
 		<relativePath>../../dependencies/quarkus/pom.xml</relativePath>
 	</parent>
 
@@ -36,12 +36,12 @@
 		<dependency>
 			<groupId>io.camelbee</groupId>
 			<artifactId>camelbee-quarkus-core</artifactId>
-			<version>3.0.2</version>
+			<version>3.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>io.camelbee</groupId>
 			<artifactId>camelbee-quarkus-security</artifactId>
-			<version>3.0.2</version>
+			<version>3.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.camel.quarkus</groupId>
@@ -125,6 +125,7 @@
 					<argLine>-Duser.language=en</argLine>
 					<excludes>
 						<exclude>**/*IntegrationTest.java</exclude>
+						<exclude>**/*BlackBoxTest.java</exclude>
 					</excludes>
 					<systemPropertyVariables>
 						<CamelTestRouteCoverage>true</CamelTestRouteCoverage>
