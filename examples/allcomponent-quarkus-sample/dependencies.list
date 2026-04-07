@@ -44,8 +44,8 @@ The following files have been resolved:
    io.agroal:agroal-api:jar:2.8:compile[36m -- module agroal.api[0;1;33m (auto)[m
    io.agroal:agroal-narayana:jar:2.8:compile[36m -- module agroal.narayana[0;1;33m (auto)[m
    io.agroal:agroal-pool:jar:2.8:compile[36m -- module agroal.pool[0;1;33m (auto)[m
-   io.camelbee:camelbee-quarkus-core:jar:3.1.0:compile[36m -- module camelbee.quarkus.core[0;1;33m (auto)[m
-   io.camelbee:camelbee-quarkus-security:jar:3.1.0:compile[36m -- module camelbee.quarkus.security[0;1;33m (auto)[m
+   io.camelbee:camelbee-quarkus-core:jar:3.1.1:compile[36m -- module camelbee.quarkus.core[0;1;33m (auto)[m
+   io.camelbee:camelbee-quarkus-security:jar:3.1.1:compile[36m -- module camelbee.quarkus.security[0;1;33m (auto)[m
    io.github.dmlloyd:jdk-classfile-backport:jar:25.1:test[36m -- module io.github.dmlloyd.classfile[m
    io.micrometer:micrometer-commons:jar:1.14.7:compile[36m -- module micrometer.commons[0;1m [auto][m
    io.micrometer:micrometer-core:jar:1.14.7:compile[36m -- module micrometer.core[0;1m [auto][m
@@ -109,6 +109,7 @@ The following files have been resolved:
    io.quarkus:quarkus-hibernate-validator:jar:3.30.6:compile[36m -- module quarkus.hibernate.validator[0;1;33m (auto)[m
    io.quarkus:quarkus-ide-launcher:jar:3.30.6:compile[36m -- module quarkus.ide.launcher[0;1;33m (auto)[m
    io.quarkus:quarkus-jackson:jar:3.30.6:compile[36m -- module quarkus.jackson[0;1;33m (auto)[m
+   io.quarkus:quarkus-jacoco:jar:3.30.6:test[36m -- module quarkus.jacoco[0;1;33m (auto)[m
    io.quarkus:quarkus-jaxp:jar:3.30.6:compile[36m -- module quarkus.jaxp[0;1;33m (auto)[m
    io.quarkus:quarkus-jdbc-mariadb:jar:3.30.6:compile[36m -- module quarkus.jdbc.mariadb[0;1;33m (auto)[m
    io.quarkus:quarkus-jsonp:jar:3.30.6:compile[36m -- module quarkus.jsonp[0;1;33m (auto)[m
@@ -395,6 +396,10 @@ The following files have been resolved:
    org.hibernate.orm:hibernate-graalvm:jar:7.1.11.Final:compile[36m -- module org.hibernate.orm.graalvm[0;1m [auto][m
    org.hibernate.validator:hibernate-validator:jar:9.1.0.Final:compile[36m -- module org.hibernate.validator[m
    org.hibernate:quarkus-local-cache:jar:0.3.1:compile[36m -- module quarkus.local.cache[0;1;33m (auto)[m
+   org.jacoco:org.jacoco.agent:jar:0.8.14:test[36m -- module org.jacoco.agent[0;1m [auto][m
+   org.jacoco:org.jacoco.agent:jar:runtime:0.8.14:test[36m -- module org.jacoco.agent.rt[0;1m [auto][m
+   org.jacoco:org.jacoco.core:jar:0.8.14:test[36m -- module org.jacoco.core[0;1m [auto][m
+   org.jacoco:org.jacoco.report:jar:0.8.14:test[36m -- module org.jacoco.report[0;1m [auto][m
    org.jboss.invocation:jboss-invocation:jar:2.0.0.Final:compile[36m -- module jboss.invocation[0;1;33m (auto)[m
    org.jboss.logging:commons-logging-jboss-logging:jar:1.0.0.Final:compile[36m -- module commons.logging.jboss.logging[0;1;33m (auto)[m
    org.jboss.logging:jboss-logging:jar:3.6.1.Final:compile[36m -- module org.jboss.logging[m

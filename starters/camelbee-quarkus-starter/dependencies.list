@@ -25,8 +25,8 @@ The following files have been resolved:
    commons-cli:commons-cli:jar:1.8.0:test[36m -- module org.apache.commons.cli[m
    commons-codec:commons-codec:jar:1.20.0:compile[36m -- module org.apache.commons.codec[m
    commons-io:commons-io:jar:2.21.0:compile[36m -- module org.apache.commons.io[m
-   io.camelbee:camelbee-quarkus-core:jar:3.1.0:compile[36m -- module camelbee.quarkus.core[0;1;33m (auto)[m
-   io.camelbee:camelbee-quarkus-security:jar:3.1.0:compile[36m -- module camelbee.quarkus.security[0;1;33m (auto)[m
+   io.camelbee:camelbee-quarkus-core:jar:3.1.1:compile[36m -- module camelbee.quarkus.core[0;1;33m (auto)[m
+   io.camelbee:camelbee-quarkus-security:jar:3.1.1:compile[36m -- module camelbee.quarkus.security[0;1;33m (auto)[m
    io.github.dmlloyd:jdk-classfile-backport:jar:25.1:test[36m -- module io.github.dmlloyd.classfile[m
    io.micrometer:micrometer-commons:jar:1.14.7:compile[36m -- module micrometer.commons[0;1m [auto][m
    io.micrometer:micrometer-core:jar:1.14.7:compile[36m -- module micrometer.core[0;1m [auto][m
@@ -76,6 +76,7 @@ The following files have been resolved:
    io.quarkus:quarkus-hibernate-validator:jar:3.30.6:compile[36m -- module quarkus.hibernate.validator[0;1;33m (auto)[m
    io.quarkus:quarkus-ide-launcher:jar:3.30.6:compile[36m -- module quarkus.ide.launcher[0;1;33m (auto)[m
    io.quarkus:quarkus-jackson:jar:3.30.6:compile[36m -- module quarkus.jackson[0;1;33m (auto)[m
+   io.quarkus:quarkus-jacoco:jar:3.30.6:test[36m -- module quarkus.jacoco[0;1;33m (auto)[m
    io.quarkus:quarkus-jaxp:jar:3.30.6:compile[36m -- module quarkus.jaxp[0;1;33m (auto)[m
    io.quarkus:quarkus-jsonp:jar:3.30.6:compile[36m -- module quarkus.jsonp[0;1;33m (auto)[m
    io.quarkus:quarkus-junit5-config:jar:3.30.6:test[36m -- module quarkus.junit5.config[0;1;33m (auto)[m
@@ -303,6 +304,10 @@ The following files have been resolved:
    org.hamcrest:hamcrest:jar:2.2:test[36m -- module org.hamcrest[0;1m [auto][m
    org.hdrhistogram:HdrHistogram:jar:2.2.2:runtime[36m -- module HdrHistogram[0;1;33m (auto)[m
    org.hibernate.validator:hibernate-validator:jar:9.1.0.Final:compile[36m -- module org.hibernate.validator[m
+   org.jacoco:org.jacoco.agent:jar:0.8.14:test[36m -- module org.jacoco.agent[0;1m [auto][m
+   org.jacoco:org.jacoco.agent:jar:runtime:0.8.14:test[36m -- module org.jacoco.agent.rt[0;1m [auto][m
+   org.jacoco:org.jacoco.core:jar:0.8.14:test[36m -- module org.jacoco.core[0;1m [auto][m
+   org.jacoco:org.jacoco.report:jar:0.8.14:test[36m -- module org.jacoco.report[0;1m [auto][m
    org.jboss.logging:commons-logging-jboss-logging:jar:1.0.0.Final:test[36m -- module commons.logging.jboss.logging[0;1;33m (auto)[m
    org.jboss.logging:jboss-logging:jar:3.6.1.Final:compile[36m -- module org.jboss.logging[m
    org.jboss.logmanager:jboss-logmanager:jar:3.1.2.Final:compile[36m -- module org.jboss.logmanager[m
