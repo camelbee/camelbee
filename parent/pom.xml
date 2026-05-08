@@ -21,7 +21,7 @@
     <parent>
         <groupId>io.camelbee</groupId>
         <artifactId>camelbee</artifactId>
-        <version>3.1.0</version>
+        <version>3.1.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -295,7 +295,7 @@
                                 <artifactItem>
                                     <groupId>io.camelbee</groupId>
                                     <artifactId>common</artifactId>
-                                    <version>3.1.0</version>
+                                    <version>3.1.1</version>
                                     <type>jar</type>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
                                     <includes>config/**, formatter/**</includes>
@@ -521,6 +521,21 @@
                         <exclude>**/exception/*</exclude>
                         <exclude>**/*Config.*</exclude>
                         <exclude>**/*Test.*</exclude>
+                        <!-- Exclude OpenAPI/Protobuf/Avro/JAXB generated models -->
+                        <exclude>**/model/api/mcp/**</exclude>
+                        <exclude>**/model/api/json/**</exclude>
+                        <exclude>**/model/api/xml/**</exclude>
+                        <exclude>**/model/api/soap/**</exclude>
+                        <exclude>**/model/api/proto/**</exclude>
+                        <exclude>**/model/api/avro/**</exclude>
+                        <exclude>**/model/infra/json/**</exclude>
+                        <exclude>**/model/infra/xml/**</exclude>
+                        <exclude>**/model/infra/soap/**</exclude>
+                        <exclude>**/model/infra/proto/**</exclude>
+                        <exclude>**/model/infra/avro/**</exclude>
+                        <exclude>**/RestResourceRoot*</exclude>
+                        <!-- Exclude MapStruct generated implementations -->
+                        <exclude>**/mapper/**/*Impl*</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -529,6 +544,9 @@
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
+                        <configuration>
+                            <propertyName>jacocoArgLine</propertyName>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>jacoco-site</id>
