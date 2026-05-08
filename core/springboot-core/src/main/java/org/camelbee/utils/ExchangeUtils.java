@@ -18,8 +18,9 @@ package org.camelbee.utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.util.List;
 import org.apache.camel.Exchange;
 import org.apache.camel.StreamCache;
 import org.apache.commons.lang3.StringUtils;
@@ -47,12 +48,13 @@ public class ExchangeUtils {
    * @return String The headers.
    */
   public static String getHeaders(Exchange exchange) {
+    var headerMap = exchange.getIn().getHeaders();
+    if (headerMap == null || headerMap.isEmpty()) {
+      return StringUtils.EMPTY;
+    }
 
     var headers = new StringBuilder();
-
-    exchange.getIn().getHeaders()
-        .forEach((p, q) -> headers.append(p).append(":").append(q).append("\n"));
-
+    headerMap.forEach((p, q) -> headers.append(p).append(":").append(q).append("\n"));
     return headers.toString();
   }
 
@@ -61,40 +63,81 @@ public class ExchangeUtils {
    *
    * @param exchange The Exchange.
    * @return String body.
-   * @throws IOException The exception.
    */
   @SuppressWarnings("java:S3740")
   public static String readBodyAsString(Exchange exchange, boolean resetBefore) {
     try {
-      // Determine whether to use getMessage() or getIn()
       boolean useMessage = exchange.getMessage() != null && exchange.getMessage().getBody() != null;
 
-      // Extract body object using the determined approach
       Object bodyObject = useMessage
           ? exchange.getMessage().getBody()
           : exchange.getIn().getBody();
 
-      // Return null if body is null
       if (bodyObject == null) {
         return null;
       }
 
-      // Handle different body types
       if (bodyObject instanceof StreamCache streamCache) {
         return processStreamCache(streamCache, resetBefore);
-      } else if (bodyObject instanceof ArrayList) {
-        // Specifically for cxf MessageContentsList
-        return bodyObject.toString();
-      } else {
-        // Use the same message source as we determined earlier
-        return useMessage
-            ? exchange.getMessage().getBody(String.class)
-            : exchange.getIn().getBody(String.class);
       }
+      if (bodyObject instanceof List<?> list) {
+        return buildListString(list);
+      }
+      String converted = itemToString(bodyObject);
+      if (converted != null) {
+        return converted;
+      }
+      // Fallback: Camel's type converter handles JAXB, XML Document, etc.
+      return useMessage
+          ? exchange.getMessage().getBody(String.class)
+          : exchange.getIn().getBody(String.class);
+
     } catch (Exception e) {
-      LOGGER.warn("Could not read Exchange body: {} with exception: {}", exchange, e);
+      LOGGER.warn("Could not read Exchange body: {}", exchange, e);
       return StringUtils.EMPTY;
     }
+  }
+
+  private static String buildListString(List<?> list) {
+    StringBuilder sb = new StringBuilder("[");
+    for (int i = 0; i < list.size(); i++) {
+      if (i > 0) {
+        sb.append(", ");
+      }
+      Object item = list.get(i);
+      if (item instanceof StreamCache sc) {
+        try {
+          sb.append(processStreamCache(sc, false));
+        } catch (IOException e) {
+          sb.append(item);
+        }
+      } else {
+        String converted = itemToString(item);
+        sb.append(converted != null ? converted : item);
+      }
+    }
+    sb.append("]");
+    return sb.toString();
+  }
+
+  /**
+   * Converts known scalar body types to String without side effects.
+   * Returns null for unknown types so callers can apply their own fallback.
+   */
+  private static String itemToString(Object item) {
+    return switch (item) {
+      case String str -> str;
+      case byte[] bytes -> new String(bytes, StandardCharsets.UTF_8);
+      case ByteBuffer bb -> readByteBuffer(bb);
+      default -> null;
+    };
+  }
+
+  private static String readByteBuffer(ByteBuffer buffer) {
+    ByteBuffer dup = buffer.duplicate();
+    byte[] bytes = new byte[dup.remaining()];
+    dup.get(bytes);
+    return new String(bytes, StandardCharsets.UTF_8);
   }
 
   private static String processStreamCache(StreamCache streamCache, boolean resetBefore) throws IOException {
