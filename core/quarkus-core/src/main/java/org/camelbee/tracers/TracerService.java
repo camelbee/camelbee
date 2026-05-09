@@ -16,6 +16,8 @@
 
 package org.camelbee.tracers;
 
+import static org.camelbee.constants.CamelBeeConstants.DIRECT;
+
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -80,12 +82,24 @@ public class TracerService {
     this.loggingService = loggingService;
   }
 
+  private boolean isActive() {
+    return loggingEnabled || (tracerEnabled && isTracingActivated());
+  }
+
+  private boolean isDirectEndpointWithoutTracing(String endpointUri) {
+    return !(tracerEnabled && isTracingActivated()) && endpointUri.startsWith(DIRECT);
+  }
+
   /**
    * traceExchangeCreateEvent.
    *
    * @param exchangeCreatedEvent The exchange.
    */
   public void traceExchangeCreateEvent(ExchangeCreatedEvent exchangeCreatedEvent) {
+
+    if (!isActive()) {
+      return;
+    }
 
     Message message = exchangeCreatedEventTracer.traceEvent(exchangeCreatedEvent);
 
@@ -106,6 +120,14 @@ public class TracerService {
    */
   public void traceExchangeSendingEvent(ExchangeSendingEvent exchangeSendingEvent) {
 
+    if (!isActive()) {
+      return;
+    }
+
+    if (isDirectEndpointWithoutTracing(exchangeSendingEvent.getEndpoint().getEndpointUri())) {
+      return;
+    }
+
     Message message = exchangeSendingEventTracer.traceEvent(exchangeSendingEvent);
 
     if (loggingEnabled) {
@@ -125,6 +147,14 @@ public class TracerService {
    */
   public void traceExchangeSentEvent(ExchangeSentEvent exchangeSentEvent) {
 
+    if (!isActive()) {
+      return;
+    }
+
+    if (isDirectEndpointWithoutTracing(exchangeSentEvent.getEndpoint().getEndpointUri())) {
+      return;
+    }
+
     Message message = exchangeSentEventTracer.traceEvent(exchangeSentEvent);
 
     if (loggingEnabled) {
@@ -143,6 +173,10 @@ public class TracerService {
    * @param exchangeCompletedEvent The exchange.
    */
   public void traceExchangeCompletedEvent(ExchangeCompletedEvent exchangeCompletedEvent) {
+
+    if (!isActive()) {
+      return;
+    }
 
     Message message = exchangeCompletedEventTracer.traceEvent(exchangeCompletedEvent);
 
