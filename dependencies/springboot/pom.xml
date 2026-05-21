@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.camelbee</groupId>
         <artifactId>dependencies</artifactId>
-        <version>3.1.2</version>
+        <version>3.2.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -21,6 +21,7 @@
         <jakarta-inject.version>2.0.1.MR</jakarta-inject.version>
         <cxf-rt-transports-http-jetty.version>4.1.4</cxf-rt-transports-http-jetty.version>
         <logstash-logback-encoder.version>9.0</logstash-logback-encoder.version>
+        <rest-assured.version>5.5.7</rest-assured.version>
     </properties>
 
     <dependencyManagement>
@@ -60,6 +61,14 @@
                 <groupId>net.logstash.logback</groupId>
                 <artifactId>logstash-logback-encoder</artifactId>
                 <version>${logstash-logback-encoder.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.rest-assured</groupId>
+                <artifactId>rest-assured-bom</artifactId>
+                <version>${rest-assured.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
         </dependencies>

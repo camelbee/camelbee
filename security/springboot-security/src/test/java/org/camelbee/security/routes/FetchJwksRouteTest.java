@@ -13,8 +13,8 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.AdviceWith;
 import org.apache.camel.builder.ExchangeBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
-import org.apache.camel.test.spring.junit5.UseAdviceWith;
+import org.apache.camel.test.spring.junit6.CamelSpringBootTest;
+import org.apache.camel.test.spring.junit6.UseAdviceWith;
 import org.camelbee.security.routes.cache.JwksCache;
 import org.camelbee.security.routes.config.SecurityProperties;
 import org.camelbee.security.routes.routes.FetchJwksRoute;
@@ -24,11 +24,10 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @CamelSpringBootTest
-@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
+@EnableAutoConfiguration
 @SpringBootTest(
     properties = {
         "camelbee.security.enabled=true",
