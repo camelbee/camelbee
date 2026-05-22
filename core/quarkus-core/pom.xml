@@ -101,6 +101,22 @@
 
 	<build>
 		<plugins>
+			<!-- Build a Jandex index so Quarkus/Arc auto-discovers CamelBee's CDI beans when this
+			     jar is used as a dependency (e.g. in a Camel K integration) WITHOUT requiring the
+			     consumer to add quarkus.index-dependency configuration. -->
+			<plugin>
+				<groupId>io.smallrye</groupId>
+				<artifactId>jandex-maven-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>make-index</id>
+						<goals>
+							<goal>jandex</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>3.5.0</version>

@@ -36,6 +36,7 @@
   <modules>
       <module>quarkus-core</module>
       <module>springboot-core</module>
+      <module>standalone-core</module>
   </modules>
 
 </project>

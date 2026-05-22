@@ -1,0 +1,136 @@
+The following files have been resolved:
+   com.fasterxml.jackson.core:jackson-annotations:jar:2.21:compile -- module com.fasterxml.jackson.annotation
+   com.fasterxml.jackson.core:jackson-core:jar:2.21.2:compile -- module com.fasterxml.jackson.core
+   com.fasterxml.jackson.core:jackson-databind:jar:2.21.2:compile -- module com.fasterxml.jackson.databind
+   com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:jar:2.21.2:compile -- module com.fasterxml.jackson.dataformat.yaml
+   com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar:2.21.2:compile -- module com.fasterxml.jackson.datatype.jsr310
+   com.fasterxml.woodstox:woodstox-core:jar:7.1.1:compile -- module com.ctc.wstx
+   com.github.docker-java:docker-java-api:jar:3.7.1:test -- module com.github.dockerjava.api [auto]
+   com.github.docker-java:docker-java-transport-zerodep:jar:3.7.1:test -- module com.github.dockerjava.transport.zerodep [auto]
+   com.github.docker-java:docker-java-transport:jar:3.7.1:test -- module com.github.dockerjava.transport [auto]
+   com.github.spotbugs:spotbugs-annotations:jar:4.9.8:compile -- module com.github.spotbugs.annotations [auto]
+   com.google.code.findbugs:jsr305:jar:3.0.2:compile -- module jsr305 (auto)
+   com.sun.istack:istack-commons-runtime:jar:4.1.2:compile -- module com.sun.istack.runtime
+   commons-codec:commons-codec:jar:1.19.0:test -- module org.apache.commons.codec
+   commons-io:commons-io:jar:2.22.0:compile -- module org.apache.commons.io
+   io.micrometer:micrometer-commons:jar:1.16.5:compile (optional) -- module micrometer.commons [auto]
+   io.micrometer:micrometer-core:jar:1.16.5:compile (optional) -- module micrometer.core [auto]
+   io.micrometer:micrometer-observation:jar:1.16.5:compile (optional) -- module micrometer.observation [auto]
+   io.micrometer:micrometer-registry-prometheus:jar:1.16.5:compile (optional) -- module micrometer.registry.prometheus [auto]
+   io.netty:netty-buffer:jar:4.1.132.Final:provided -- module io.netty.buffer [auto]
+   io.netty:netty-codec-dns:jar:4.1.132.Final:provided -- module io.netty.codec.dns [auto]
+   io.netty:netty-codec-http2:jar:4.1.132.Final:provided -- module io.netty.codec.http2 [auto]
+   io.netty:netty-codec-http:jar:4.1.132.Final:provided -- module io.netty.codec.http [auto]
+   io.netty:netty-codec-socks:jar:4.1.132.Final:provided -- module io.netty.codec.socks [auto]
+   io.netty:netty-codec:jar:4.1.132.Final:provided -- module io.netty.codec [auto]
+   io.netty:netty-common:jar:4.1.132.Final:provided -- module io.netty.common [auto]
+   io.netty:netty-handler-proxy:jar:4.1.132.Final:provided -- module io.netty.handler.proxy [auto]
+   io.netty:netty-handler:jar:4.1.132.Final:provided -- module io.netty.handler [auto]
+   io.netty:netty-resolver-dns:jar:4.1.132.Final:provided -- module io.netty.resolver.dns [auto]
+   io.netty:netty-resolver:jar:4.1.132.Final:provided -- module io.netty.resolver [auto]
+   io.netty:netty-transport-native-unix-common:jar:4.1.132.Final:provided -- module io.netty.transport.unix.common [auto]
+   io.netty:netty-transport:jar:4.1.132.Final:provided -- module io.netty.transport [auto]
+   io.prometheus:prometheus-metrics-config:jar:1.4.3:compile (optional) -- module io.prometheus.metrics.config [auto]
+   io.prometheus:prometheus-metrics-core:jar:1.4.3:compile (optional) -- module io.prometheus.metrics.core [auto]
+   io.prometheus:prometheus-metrics-exposition-formats:jar:1.4.3:runtime (optional) -- module io.prometheus.metrics.expositionformats [auto]
+   io.prometheus:prometheus-metrics-exposition-textformats:jar:1.4.3:runtime (optional) -- module io.prometheus.writer.text [auto]
+   io.prometheus:prometheus-metrics-model:jar:1.4.3:compile (optional) -- module io.prometheus.metrics.model [auto]
+   io.prometheus:prometheus-metrics-tracer-common:jar:1.4.3:compile (optional) -- module io.prometheus.metrics.tracer.common [auto]
+   io.vertx:vertx-auth-common:jar:4.5.26:provided -- module io.vertx.auth.common [auto]
+   io.vertx:vertx-auth-jwt:jar:4.5.26:provided -- module io.vertx.auth.jwt [auto]
+   io.vertx:vertx-auth-properties:jar:4.5.26:provided -- module io.vertx.auth.properties [auto]
+   io.vertx:vertx-bridge-common:jar:4.5.26:provided -- module io.vertx.eventbusbridge.common [auto]
+   io.vertx:vertx-core:jar:4.5.26:provided -- module io.vertx.core [auto]
+   io.vertx:vertx-web-common:jar:4.5.26:provided -- module io.vertx.web.common [auto]
+   io.vertx:vertx-web:jar:4.5.26:provided -- module io.vertx.web [auto]
+   jakarta.activation:jakarta.activation-api:jar:2.1.4:compile -- module jakarta.activation
+   jakarta.annotation:jakarta.annotation-api:jar:3.0.0:compile -- module jakarta.annotation
+   jakarta.xml.bind:jakarta.xml.bind-api:jar:4.0.5:compile -- module jakarta.xml.bind
+   net.bytebuddy:byte-buddy-agent:jar:1.17.7:test -- module net.bytebuddy.agent
+   net.bytebuddy:byte-buddy:jar:1.17.7:test -- module net.bytebuddy
+   net.java.dev.jna:jna:jar:5.18.1:test -- module com.sun.jna [auto]
+   org.apache.camel:camel-api:jar:4.20.0:compile -- module camel.api (auto)
+   org.apache.camel:camel-attachments:jar:4.20.0:provided -- module camel.attachments (auto)
+   org.apache.camel:camel-base-engine:jar:4.20.0:compile -- module camel.base.engine (auto)
+   org.apache.camel:camel-base:jar:4.20.0:compile -- module camel.base (auto)
+   org.apache.camel:camel-bean:jar:4.20.0:compile -- module camel.bean (auto)
+   org.apache.camel:camel-browse:jar:4.20.0:compile -- module camel.browse (auto)
+   org.apache.camel:camel-cluster:jar:4.20.0:compile -- module camel.cluster (auto)
+   org.apache.camel:camel-controlbus:jar:4.20.0:compile -- module camel.controlbus (auto)
+   org.apache.camel:camel-core-catalog:jar:4.20.0:compile -- module camel.core.catalog (auto)
+   org.apache.camel:camel-core-engine:jar:4.20.0:compile -- module camel.core.engine (auto)
+   org.apache.camel:camel-core-languages:jar:4.20.0:compile -- module camel.core.languages (auto)
+   org.apache.camel:camel-core-model:jar:4.20.0:compile -- module camel.core.model (auto)
+   org.apache.camel:camel-core-processor:jar:4.20.0:compile -- module camel.core.processor (auto)
+   org.apache.camel:camel-core-reifier:jar:4.20.0:compile -- module camel.core.reifier (auto)
+   org.apache.camel:camel-core:jar:4.20.0:compile -- module camel.core (auto)
+   org.apache.camel:camel-dataformat:jar:4.20.0:compile -- module camel.dataformat (auto)
+   org.apache.camel:camel-dataset:jar:4.20.0:compile -- module camel.dataset (auto)
+   org.apache.camel:camel-direct:jar:4.20.0:compile -- module camel.direct (auto)
+   org.apache.camel:camel-file:jar:4.20.0:compile -- module camel.file (auto)
+   org.apache.camel:camel-health:jar:4.20.0:compile -- module camel.health (auto)
+   org.apache.camel:camel-http-base:jar:4.20.0:compile -- module camel.http.base (auto)
+   org.apache.camel:camel-jackson:jar:4.20.0:compile -- module camel.jackson (auto)
+   org.apache.camel:camel-language:jar:4.20.0:compile -- module camel.language (auto)
+   org.apache.camel:camel-log:jar:4.20.0:compile -- module camel.log (auto)
+   org.apache.camel:camel-main:jar:4.20.0:compile -- module camel.main (auto)
+   org.apache.camel:camel-management-api:jar:4.20.0:compile -- module camel.management.api (auto)
+   org.apache.camel:camel-micrometer:jar:4.20.0:compile (optional) -- module camel.micrometer (auto)
+   org.apache.camel:camel-mock:jar:4.20.0:compile -- module camel.mock (auto)
+   org.apache.camel:camel-platform-http-main:jar:4.20.0:provided -- module camel.platform.http.main (auto)
+   org.apache.camel:camel-platform-http-vertx:jar:4.20.0:provided -- module camel.platform.http.vertx (auto)
+   org.apache.camel:camel-platform-http:jar:4.20.0:compile -- module camel.platform.http (auto)
+   org.apache.camel:camel-ref:jar:4.20.0:compile -- module camel.ref (auto)
+   org.apache.camel:camel-rest:jar:4.20.0:compile -- module camel.rest (auto)
+   org.apache.camel:camel-saga:jar:4.20.0:compile -- module camel.saga (auto)
+   org.apache.camel:camel-scheduler:jar:4.20.0:compile -- module camel.scheduler (auto)
+   org.apache.camel:camel-seda:jar:4.20.0:compile -- module camel.seda (auto)
+   org.apache.camel:camel-stub:jar:4.20.0:compile -- module camel.stub (auto)
+   org.apache.camel:camel-support:jar:4.20.0:compile -- module camel.support (auto)
+   org.apache.camel:camel-test-junit5:jar:4.20.0:test -- module camel.test.junit5 (auto)
+   org.apache.camel:camel-timer:jar:4.20.0:compile -- module camel.timer (auto)
+   org.apache.camel:camel-tooling-model:jar:4.20.0:compile -- module camel.tooling.model (auto)
+   org.apache.camel:camel-util-json:jar:4.20.0:compile -- module camel.util.json (auto)
+   org.apache.camel:camel-util:jar:4.20.0:compile -- module camel.util (auto)
+   org.apache.camel:camel-validator:jar:4.20.0:compile -- module camel.validator (auto)
+   org.apache.camel:camel-vertx-common:jar:4.20.0:provided -- module camel.vertx.common (auto)
+   org.apache.camel:camel-xml-io-util:jar:4.20.0:compile -- module camel.xml.io.util (auto)
+   org.apache.camel:camel-xml-io:jar:4.20.0:compile -- module camel.xml.io (auto)
+   org.apache.camel:camel-xml-jaxb:jar:4.20.0:compile -- module camel.xml.jaxb (auto)
+   org.apache.camel:camel-xml-jaxp-util:jar:4.20.0:compile -- module camel.xml.jaxp.util (auto)
+   org.apache.camel:camel-xml-jaxp:jar:4.20.0:compile -- module camel.xml.jaxp (auto)
+   org.apache.camel:camel-xpath:jar:4.20.0:compile -- module camel.xpath (auto)
+   org.apache.camel:camel-xslt:jar:4.20.0:compile -- module camel.xslt (auto)
+   org.apache.camel:camel-yaml-io:jar:4.20.0:compile -- module camel.yaml.io (auto)
+   org.apache.commons:commons-compress:jar:1.28.0:test -- module org.apache.commons.compress
+   org.apache.commons:commons-lang3:jar:3.20.0:compile -- module org.apache.commons.lang3
+   org.apache.cxf:cxf-core:jar:4.2.1:compile -- module org.apache.cxf.core [auto]
+   org.apache.ws.xmlschema:xmlschema-core:jar:2.3.2:compile -- module xmlschema.core (auto)
+   org.apiguardian:apiguardian-api:jar:1.1.2:test -- module org.apiguardian.api
+   org.codehaus.woodstox:stax2-api:jar:4.2.2:compile -- module org.codehaus.stax2
+   org.eclipse.angus:angus-activation:jar:2.0.3:compile -- module org.eclipse.angus.activation
+   org.glassfish.jaxb:jaxb-core:jar:4.0.8:compile -- module org.glassfish.jaxb.core
+   org.glassfish.jaxb:jaxb-runtime:jar:4.0.8:compile -- module org.glassfish.jaxb.runtime
+   org.glassfish.jaxb:txw2:jar:4.0.8:compile -- module com.sun.xml.txw2
+   org.hdrhistogram:HdrHistogram:jar:2.2.2:runtime (optional) -- module HdrHistogram (auto)
+   org.jetbrains:annotations:jar:17.0.0:test -- module org.jetbrains.annotations [auto]
+   org.jspecify:jspecify:jar:1.0.0:compile (optional) -- module org.jspecify
+   org.junit.jupiter:junit-jupiter-api:jar:5.13.4:test -- module org.junit.jupiter.api
+   org.junit.jupiter:junit-jupiter-engine:jar:5.13.4:test -- module org.junit.jupiter.engine
+   org.junit.jupiter:junit-jupiter-params:jar:5.13.4:test -- module org.junit.jupiter.params
+   org.junit.platform:junit-platform-commons:jar:1.13.4:test -- module org.junit.platform.commons
+   org.junit.platform:junit-platform-engine:jar:1.13.4:test -- module org.junit.platform.engine
+   org.latencyutils:LatencyUtils:jar:2.0.3:runtime (optional) -- module LatencyUtils (auto)
+   org.mapstruct:mapstruct:jar:1.6.3:compile -- module org.mapstruct [auto]
+   org.mockito:mockito-core:jar:5.23.0:test -- module org.mockito
+   org.mockito:mockito-junit-jupiter:jar:5.23.0:test -- module org.mockito.junit.jupiter
+   org.objenesis:objenesis:jar:3.3:test -- module org.objenesis [auto]
+   org.openapitools:jackson-databind-nullable:jar:0.2.10:compile -- module org.openapitools.jackson.nullable
+   org.opentest4j:opentest4j:jar:1.3.0:test -- module org.opentest4j
+   org.projectlombok:lombok:jar:1.18.46:provided -- module lombok
+   org.rnorth.duct-tape:duct-tape:jar:1.0.8:test -- module duct.tape (auto)
+   org.slf4j:slf4j-api:jar:2.0.17:compile -- module org.slf4j
+   org.testcontainers:junit-jupiter:jar:1.21.4:test -- module junit.jupiter (auto)
+   org.testcontainers:testcontainers:jar:2.0.5:test -- module testcontainers (auto)
+   org.yaml:snakeyaml:jar:2.6:compile -- module org.yaml.snakeyaml
+

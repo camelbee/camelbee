@@ -33,6 +33,7 @@
   <modules>
       <module>camelbee-quarkus-starter</module>
       <module>camelbee-springboot-starter</module>
+      <module>camelbee-standalone-starter</module>
   </modules>
 
 </project>

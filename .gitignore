@@ -3,6 +3,7 @@ maven_central_deployment.txt
 pom.xml.versionsBackup
 pom_maven_central.xml
 
+_reference
 target/
 !**/src/main/**/target/
 !**/src/test/**/target/

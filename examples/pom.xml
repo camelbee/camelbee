@@ -33,6 +33,7 @@
   <modules>
       <module>allcomponent-quarkus-sample</module>
       <module>allcomponent-springboot-sample</module>
+      <module>allcomponent-standalone-sample</module>
   </modules>
 
 </project>

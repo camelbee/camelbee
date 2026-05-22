@@ -33,6 +33,7 @@
   <modules>
       <module>quarkus</module>
       <module>springboot</module>
+      <module>standalone</module>
   </modules>
 
 </project>

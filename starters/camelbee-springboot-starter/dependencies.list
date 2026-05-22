@@ -1,260 +1,260 @@
 The following files have been resolved:
-   ch.qos.logback:logback-classic:jar:1.5.32:compile[36m -- module ch.qos.logback.classic[m
-   ch.qos.logback:logback-core:jar:1.5.32:compile[36m -- module ch.qos.logback.core[m
-   com.fasterxml.jackson.core:jackson-annotations:jar:2.21:compile[36m -- module com.fasterxml.jackson.annotation[m
-   com.fasterxml.jackson.core:jackson-core:jar:2.21.2:compile[36m -- module com.fasterxml.jackson.core[m
-   com.fasterxml.jackson.core:jackson-databind:jar:2.21.2:compile[36m -- module com.fasterxml.jackson.databind[m
-   com.fasterxml.woodstox:woodstox-core:jar:7.1.1:compile[36m -- module com.ctc.wstx[m
-   com.fasterxml:classmate:jar:1.7.3:compile[36m -- module com.fasterxml.classmate[m
-   com.github.docker-java:docker-java-api:jar:3.7.1:test[36m -- module com.github.dockerjava.api[0;1m [auto][m
-   com.github.docker-java:docker-java-transport-zerodep:jar:3.7.1:test[36m -- module com.github.dockerjava.transport.zerodep[0;1m [auto][m
-   com.github.docker-java:docker-java-transport:jar:3.7.1:test[36m -- module com.github.dockerjava.transport[0;1m [auto][m
-   com.github.spotbugs:spotbugs-annotations:jar:4.9.8:compile[36m -- module com.github.spotbugs.annotations[0;1m [auto][m
-   com.google.code.findbugs:jsr305:jar:3.0.2:compile[36m -- module jsr305[0;1;33m (auto)[m
-   com.jayway.jsonpath:json-path:jar:2.10.0:test[36m -- module json.path[0;1m [auto][m
-   com.nimbusds:nimbus-jose-jwt:jar:10.7:compile[36m -- module com.nimbusds.jose.jwt[m
-   com.sun.istack:istack-commons-runtime:jar:4.1.2:compile[36m -- module com.sun.istack.runtime[m
-   com.vaadin.external.google:android-json:jar:0.0.20131108.vaadin1:test[36m -- module android.json[0;1;33m (auto)[m
-   commons-codec:commons-codec:jar:1.19.0:test[36m -- module org.apache.commons.codec[m
-   commons-io:commons-io:jar:2.21.0:compile[36m -- module org.apache.commons.io[m
-   commons-logging:commons-logging:jar:1.3.6:compile[36m -- module org.apache.commons.logging[m
-   io.camelbee:camelbee-springboot-core:jar:3.2.1:compile[36m -- module camelbee.springboot.core[0;1;33m (auto)[m
-   io.camelbee:camelbee-springboot-security:jar:3.2.1:compile[36m -- module camelbee.springboot.security[0;1;33m (auto)[m
-   io.micrometer:micrometer-commons:jar:1.16.5:compile[36m -- module micrometer.commons[0;1m [auto][m
-   io.micrometer:micrometer-core:jar:1.16.5:compile[36m -- module micrometer.core[0;1m [auto][m
-   io.micrometer:micrometer-jakarta9:jar:1.16.5:compile[36m -- module micrometer.jakarta9[0;1m [auto][m
-   io.micrometer:micrometer-observation:jar:1.16.5:compile[36m -- module micrometer.observation[0;1m [auto][m
-   io.micrometer:micrometer-registry-prometheus:jar:1.16.5:compile[36m -- module micrometer.registry.prometheus[0;1m [auto][m
-   io.prometheus:prometheus-metrics-config:jar:1.4.3:compile[36m -- module io.prometheus.metrics.config[0;1m [auto][m
-   io.prometheus:prometheus-metrics-core:jar:1.4.3:compile[36m -- module io.prometheus.metrics.core[0;1m [auto][m
-   io.prometheus:prometheus-metrics-exposition-formats:jar:1.4.3:runtime[36m -- module io.prometheus.metrics.expositionformats[0;1m [auto][m
-   io.prometheus:prometheus-metrics-exposition-textformats:jar:1.4.3:runtime[36m -- module io.prometheus.writer.text[0;1m [auto][m
-   io.prometheus:prometheus-metrics-model:jar:1.4.3:compile[36m -- module io.prometheus.metrics.model[0;1m [auto][m
-   io.prometheus:prometheus-metrics-tracer-common:jar:1.4.3:compile[36m -- module io.prometheus.metrics.tracer.common[0;1m [auto][m
-   io.rest-assured:json-path:jar:5.5.7:test[36m -- module json.path[0;1;33m (auto)[m
-   io.rest-assured:rest-assured-common:jar:5.5.7:test[36m -- module rest.assured.common[0;1;33m (auto)[m
-   io.rest-assured:rest-assured:jar:5.5.7:test[36m -- module rest.assured[0;1;33m (auto)[m
-   io.rest-assured:xml-path:jar:5.5.7:test[36m -- module xml.path[0;1;33m (auto)[m
-   jakarta.activation:jakarta.activation-api:jar:2.1.4:compile[36m -- module jakarta.activation[m
-   jakarta.annotation:jakarta.annotation-api:jar:3.0.0:compile[36m -- module jakarta.annotation[m
-   jakarta.el:jakarta.el-api:jar:6.0.1:compile[36m -- module jakarta.el[m
-   jakarta.enterprise:jakarta.enterprise.cdi-api:jar:4.1.0:compile[36m -- module jakarta.cdi[m
-   jakarta.enterprise:jakarta.enterprise.lang-model:jar:4.1.0:compile[36m -- module jakarta.cdi.lang.model[m
-   jakarta.inject:jakarta.inject-api:jar:2.0.1.MR:compile[36m -- module jakarta.inject[m
-   jakarta.interceptor:jakarta.interceptor-api:jar:2.2.0:compile[36m -- module jakarta.interceptor[m
-   jakarta.servlet:jakarta.servlet-api:jar:6.1.0:compile[36m -- module jakarta.servlet[m
-   jakarta.transaction:jakarta.transaction-api:jar:2.0.1:compile[36m -- module jakarta.transaction[m
-   jakarta.validation:jakarta.validation-api:jar:3.1.1:compile[36m -- module jakarta.validation[m
-   jakarta.websocket:jakarta.websocket-api:jar:2.2.0:compile[36m -- module jakarta.websocket[m
-   jakarta.websocket:jakarta.websocket-client-api:jar:2.2.0:compile[36m -- module jakarta.websocket.client[m
-   jakarta.xml.bind:jakarta.xml.bind-api:jar:4.0.4:compile[36m -- module jakarta.xml.bind[m
-   net.bytebuddy:byte-buddy-agent:jar:1.17.8:test[36m -- module net.bytebuddy.agent[m
-   net.bytebuddy:byte-buddy:jar:1.17.8:test[36m -- module net.bytebuddy[m
-   net.java.dev.jna:jna:jar:5.18.1:test[36m -- module com.sun.jna[0;1m [auto][m
-   net.minidev:accessors-smart:jar:2.6.0:test[36m -- module accessors.smart[0;1;33m (auto)[m
-   net.minidev:json-smart:jar:2.6.0:test[36m -- module json.smart[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-bean-starter:jar:4.20.0:compile[36m -- module camel.bean.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-bean-validator-starter:jar:4.20.0:compile[36m -- module camel.bean.validator.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-browse-starter:jar:4.20.0:compile[36m -- module camel.browse.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-controlbus-starter:jar:4.20.0:compile[36m -- module camel.controlbus.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-core-starter:jar:4.20.0:compile[36m -- module camel.core.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-dataformat-starter:jar:4.20.0:compile[36m -- module camel.dataformat.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-dataset-starter:jar:4.20.0:compile[36m -- module camel.dataset.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-direct-starter:jar:4.20.0:compile[36m -- module camel.direct.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-file-starter:jar:4.20.0:compile[36m -- module camel.file.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-jackson-starter:jar:4.20.0:compile[36m -- module camel.jackson.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-language-starter:jar:4.20.0:compile[36m -- module camel.language.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-log-starter:jar:4.20.0:compile[36m -- module camel.log.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-management-starter:jar:4.20.0:compile[36m -- module camel.management.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-micrometer-starter:jar:4.20.0:compile[36m -- module camel.micrometer.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-mock-starter:jar:4.20.0:compile[36m -- module camel.mock.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-ref-starter:jar:4.20.0:compile[36m -- module camel.ref.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-rest-starter:jar:4.20.0:compile[36m -- module camel.rest.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-saga-starter:jar:4.20.0:compile[36m -- module camel.saga.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-scheduler-starter:jar:4.20.0:compile[36m -- module camel.scheduler.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-seda-starter:jar:4.20.0:compile[36m -- module camel.seda.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-spring-boot-starter:jar:4.20.0:compile[36m -- module camel.spring.boot.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-spring-boot:jar:4.20.0:compile[36m -- module camel.spring.boot[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-stub-starter:jar:4.20.0:compile[36m -- module camel.stub.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-timer-starter:jar:4.20.0:compile[36m -- module camel.timer.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-validator-starter:jar:4.20.0:compile[36m -- module camel.validator.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-xml-jaxp-starter:jar:4.20.0:compile[36m -- module camel.xml.jaxp.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-xpath-starter:jar:4.20.0:compile[36m -- module camel.xpath.starter[0;1;33m (auto)[m
-   org.apache.camel.springboot:camel-xslt-starter:jar:4.20.0:compile[36m -- module camel.xslt.starter[0;1;33m (auto)[m
-   org.apache.camel:camel-api:jar:4.20.0:compile[36m -- module camel.api[0;1;33m (auto)[m
-   org.apache.camel:camel-attachments:jar:4.20.0:compile[36m -- module camel.attachments[0;1;33m (auto)[m
-   org.apache.camel:camel-base-engine:jar:4.20.0:compile[36m -- module camel.base.engine[0;1;33m (auto)[m
-   org.apache.camel:camel-base:jar:4.20.0:compile[36m -- module camel.base[0;1;33m (auto)[m
-   org.apache.camel:camel-bean-validator:jar:4.20.0:compile[36m -- module camel.bean.validator[0;1;33m (auto)[m
-   org.apache.camel:camel-bean:jar:4.20.0:compile[36m -- module camel.bean[0;1;33m (auto)[m
-   org.apache.camel:camel-browse:jar:4.20.0:compile[36m -- module camel.browse[0;1;33m (auto)[m
-   org.apache.camel:camel-cluster:jar:4.20.0:compile[36m -- module camel.cluster[0;1;33m (auto)[m
-   org.apache.camel:camel-controlbus:jar:4.20.0:compile[36m -- module camel.controlbus[0;1;33m (auto)[m
-   org.apache.camel:camel-core-engine:jar:4.20.0:compile[36m -- module camel.core.engine[0;1;33m (auto)[m
-   org.apache.camel:camel-core-languages:jar:4.20.0:compile[36m -- module camel.core.languages[0;1;33m (auto)[m
-   org.apache.camel:camel-core-model:jar:4.20.0:compile[36m -- module camel.core.model[0;1;33m (auto)[m
-   org.apache.camel:camel-core-processor:jar:4.20.0:compile[36m -- module camel.core.processor[0;1;33m (auto)[m
-   org.apache.camel:camel-core-reifier:jar:4.20.0:compile[36m -- module camel.core.reifier[0;1;33m (auto)[m
-   org.apache.camel:camel-core-xml:jar:4.20.0:test[36m -- module camel.core.xml[0;1;33m (auto)[m
-   org.apache.camel:camel-dataformat:jar:4.20.0:compile[36m -- module camel.dataformat[0;1;33m (auto)[m
-   org.apache.camel:camel-dataset:jar:4.20.0:compile[36m -- module camel.dataset[0;1;33m (auto)[m
-   org.apache.camel:camel-direct:jar:4.20.0:compile[36m -- module camel.direct[0;1;33m (auto)[m
-   org.apache.camel:camel-file:jar:4.20.0:compile[36m -- module camel.file[0;1;33m (auto)[m
-   org.apache.camel:camel-health:jar:4.20.0:compile[36m -- module camel.health[0;1;33m (auto)[m
-   org.apache.camel:camel-http-base:jar:4.20.0:compile[36m -- module camel.http.base[0;1;33m (auto)[m
-   org.apache.camel:camel-http-common:jar:4.20.0:compile[36m -- module camel.http.common[0;1;33m (auto)[m
-   org.apache.camel:camel-jackson:jar:4.20.0:compile[36m -- module camel.jackson[0;1;33m (auto)[m
-   org.apache.camel:camel-language:jar:4.20.0:compile[36m -- module camel.language[0;1;33m (auto)[m
-   org.apache.camel:camel-log:jar:4.20.0:compile[36m -- module camel.log[0;1;33m (auto)[m
-   org.apache.camel:camel-main:jar:4.20.0:compile[36m -- module camel.main[0;1;33m (auto)[m
-   org.apache.camel:camel-management-api:jar:4.20.0:compile[36m -- module camel.management.api[0;1;33m (auto)[m
-   org.apache.camel:camel-management:jar:4.20.0:compile[36m -- module camel.management[0;1;33m (auto)[m
-   org.apache.camel:camel-micrometer:jar:4.20.0:compile[36m -- module camel.micrometer[0;1;33m (auto)[m
-   org.apache.camel:camel-mock:jar:4.20.0:compile[36m -- module camel.mock[0;1;33m (auto)[m
-   org.apache.camel:camel-ref:jar:4.20.0:compile[36m -- module camel.ref[0;1;33m (auto)[m
-   org.apache.camel:camel-rest:jar:4.20.0:compile[36m -- module camel.rest[0;1;33m (auto)[m
-   org.apache.camel:camel-saga:jar:4.20.0:compile[36m -- module camel.saga[0;1;33m (auto)[m
-   org.apache.camel:camel-scheduler:jar:4.20.0:compile[36m -- module camel.scheduler[0;1;33m (auto)[m
-   org.apache.camel:camel-seda:jar:4.20.0:compile[36m -- module camel.seda[0;1;33m (auto)[m
-   org.apache.camel:camel-spring-main:jar:4.20.0:compile[36m -- module camel.spring.main[0;1;33m (auto)[m
-   org.apache.camel:camel-spring-xml:jar:4.20.0:test[36m -- module camel.spring.xml[0;1;33m (auto)[m
-   org.apache.camel:camel-spring:jar:4.20.0:compile[36m -- module camel.spring[0;1;33m (auto)[m
-   org.apache.camel:camel-stub:jar:4.20.0:compile[36m -- module camel.stub[0;1;33m (auto)[m
-   org.apache.camel:camel-support:jar:4.20.0:compile[36m -- module camel.support[0;1;33m (auto)[m
-   org.apache.camel:camel-test-junit6:jar:4.20.0:test[36m -- module camel.test.junit6[0;1;33m (auto)[m
-   org.apache.camel:camel-test-spring-junit6:jar:4.20.0:test[36m -- module camel.test.spring.junit6[0;1;33m (auto)[m
-   org.apache.camel:camel-timer:jar:4.20.0:compile[36m -- module camel.timer[0;1;33m (auto)[m
-   org.apache.camel:camel-util-json:jar:4.20.0:compile[36m -- module camel.util.json[0;1;33m (auto)[m
-   org.apache.camel:camel-util:jar:4.20.0:compile[36m -- module camel.util[0;1;33m (auto)[m
-   org.apache.camel:camel-validator:jar:4.20.0:compile[36m -- module camel.validator[0;1;33m (auto)[m
-   org.apache.camel:camel-xml-io-util:jar:4.20.0:compile[36m -- module camel.xml.io.util[0;1;33m (auto)[m
-   org.apache.camel:camel-xml-io:jar:4.20.0:compile[36m -- module camel.xml.io[0;1;33m (auto)[m
-   org.apache.camel:camel-xml-jaxb:jar:4.20.0:test[36m -- module camel.xml.jaxb[0;1;33m (auto)[m
-   org.apache.camel:camel-xml-jaxp-util:jar:4.20.0:compile[36m -- module camel.xml.jaxp.util[0;1;33m (auto)[m
-   org.apache.camel:camel-xml-jaxp:jar:4.20.0:compile[36m -- module camel.xml.jaxp[0;1;33m (auto)[m
-   org.apache.camel:camel-xpath:jar:4.20.0:compile[36m -- module camel.xpath[0;1;33m (auto)[m
-   org.apache.camel:camel-xslt:jar:4.20.0:compile[36m -- module camel.xslt[0;1;33m (auto)[m
-   org.apache.commons:commons-compress:jar:1.28.0:test[36m -- module org.apache.commons.compress[m
-   org.apache.commons:commons-lang3:jar:3.20.0:compile[36m -- module org.apache.commons.lang3[m
-   org.apache.cxf:cxf-core:jar:4.1.4:compile[36m -- module org.apache.cxf.core[0;1m [auto][m
-   org.apache.groovy:groovy-json:jar:5.0.5:test[36m -- module org.apache.groovy.json[0;1m [auto][m
-   org.apache.groovy:groovy-xml:jar:5.0.5:test[36m -- module org.apache.groovy.xml[0;1m [auto][m
-   org.apache.groovy:groovy:jar:5.0.5:test[36m -- module org.apache.groovy[0;1m [auto][m
-   org.apache.httpcomponents:httpclient:jar:4.5.13:test[36m -- module org.apache.httpcomponents.httpclient[0;1m [auto][m
-   org.apache.httpcomponents:httpcore:jar:4.4.16:test[36m -- module org.apache.httpcomponents.httpcore[0;1m [auto][m
-   org.apache.httpcomponents:httpmime:jar:4.5.13:test[36m -- module org.apache.httpcomponents.httpmime[0;1m [auto][m
-   org.apache.logging.log4j:log4j-api:jar:2.25.4:compile[36m -- module org.apache.logging.log4j[m
-   org.apache.logging.log4j:log4j-to-slf4j:jar:2.25.4:compile[36m -- module org.apache.logging.log4j.to.slf4j[m
-   org.apache.tomcat.embed:tomcat-embed-el:jar:11.0.21:compile[36m -- module org.apache.tomcat.embed.el[m
-   org.apache.ws.xmlschema:xmlschema-core:jar:2.3.2:compile[36m -- module xmlschema.core[0;1;33m (auto)[m
-   org.apiguardian:apiguardian-api:jar:1.1.2:test[36m -- module org.apiguardian.api[m
-   org.assertj:assertj-core:jar:3.27.7:test[36m -- module org.assertj.core[m
-   org.awaitility:awaitility:jar:4.3.0:test[36m -- module awaitility[0;1;33m (auto)[m
-   org.ccil.cowan.tagsoup:tagsoup:jar:1.2.1:test[36m -- module tagsoup[0;1;33m (auto)[m
-   org.codehaus.woodstox:stax2-api:jar:4.2.2:compile[36m -- module org.codehaus.stax2[m
-   org.eclipse.angus:angus-activation:jar:2.0.3:compile[36m -- module org.eclipse.angus.activation[m
-   org.eclipse.jetty.compression:jetty-compression-common:jar:12.1.8:compile[36m -- module org.eclipse.jetty.compression[m
-   org.eclipse.jetty.compression:jetty-compression-gzip:jar:12.1.8:compile[36m -- module org.eclipse.jetty.compression.gzip[m
-   org.eclipse.jetty.compression:jetty-compression-server:jar:12.1.8:runtime[36m -- module org.eclipse.jetty.compression.server[m
-   org.eclipse.jetty.ee11.websocket:jetty-ee11-websocket-jakarta-client:jar:12.1.8:compile[36m -- module org.eclipse.jetty.ee11.websocket.jakarta.client[m
-   org.eclipse.jetty.ee11.websocket:jetty-ee11-websocket-jakarta-common:jar:12.1.8:compile[36m -- module org.eclipse.jetty.ee11.websocket.jakarta.common[m
-   org.eclipse.jetty.ee11.websocket:jetty-ee11-websocket-jakarta-server:jar:12.1.8:compile[36m -- module org.eclipse.jetty.ee11.websocket.jakarta.server[m
-   org.eclipse.jetty.ee11.websocket:jetty-ee11-websocket-jetty-server:jar:12.1.8:compile[36m -- module org.eclipse.jetty.ee11.websocket.jetty.server[m
-   org.eclipse.jetty.ee11.websocket:jetty-ee11-websocket-servlet:jar:12.1.8:compile[36m -- module org.eclipse.jetty.ee11.websocket.servlet[m
-   org.eclipse.jetty.ee11:jetty-ee11-annotations:jar:12.1.8:compile[36m -- module org.eclipse.jetty.ee11.annotations[m
-   org.eclipse.jetty.ee11:jetty-ee11-plus:jar:12.1.8:compile[36m -- module org.eclipse.jetty.ee11.plus[m
-   org.eclipse.jetty.ee11:jetty-ee11-servlet:jar:12.1.8:compile[36m -- module org.eclipse.jetty.ee11.servlet[m
-   org.eclipse.jetty.ee11:jetty-ee11-webapp:jar:12.1.8:compile[36m -- module org.eclipse.jetty.ee11.webapp[m
-   org.eclipse.jetty.ee:jetty-ee-webapp:jar:12.1.8:compile[36m -- module org.eclipse.jetty.ee.webapp[m
-   org.eclipse.jetty.websocket:jetty-websocket-core-client:jar:12.1.8:compile[36m -- module org.eclipse.jetty.websocket.core.client[m
-   org.eclipse.jetty.websocket:jetty-websocket-core-common:jar:12.1.8:compile[36m -- module org.eclipse.jetty.websocket.core.common[m
-   org.eclipse.jetty.websocket:jetty-websocket-core-server:jar:12.1.8:compile[36m -- module org.eclipse.jetty.websocket.core.server[m
-   org.eclipse.jetty.websocket:jetty-websocket-jetty-api:jar:12.1.8:compile[36m -- module org.eclipse.jetty.websocket.api[m
-   org.eclipse.jetty.websocket:jetty-websocket-jetty-common:jar:12.1.8:compile[36m -- module org.eclipse.jetty.websocket.common[m
-   org.eclipse.jetty.websocket:jetty-websocket-jetty-server:jar:12.1.8:compile[36m -- module org.eclipse.jetty.websocket.server[m
-   org.eclipse.jetty:jetty-alpn-client:jar:12.1.8:compile[36m -- module org.eclipse.jetty.alpn.client[m
-   org.eclipse.jetty:jetty-annotations:jar:12.1.8:compile[36m -- module org.eclipse.jetty.annotations[m
-   org.eclipse.jetty:jetty-client:jar:12.1.8:compile[36m -- module org.eclipse.jetty.client[m
-   org.eclipse.jetty:jetty-http:jar:12.1.8:compile[36m -- module org.eclipse.jetty.http[m
-   org.eclipse.jetty:jetty-io:jar:12.1.8:compile[36m -- module org.eclipse.jetty.io[m
-   org.eclipse.jetty:jetty-plus:jar:12.1.8:compile[36m -- module org.eclipse.jetty.plus[m
-   org.eclipse.jetty:jetty-security:jar:12.1.8:compile[36m -- module org.eclipse.jetty.security[m
-   org.eclipse.jetty:jetty-server:jar:12.1.8:compile[36m -- module org.eclipse.jetty.server[m
-   org.eclipse.jetty:jetty-session:jar:12.1.8:compile[36m -- module org.eclipse.jetty.session[m
-   org.eclipse.jetty:jetty-util:jar:12.1.8:compile[36m -- module org.eclipse.jetty.util[m
-   org.eclipse.jetty:jetty-xml:jar:12.1.8:compile[36m -- module org.eclipse.jetty.xml[m
-   org.glassfish.expressly:expressly:jar:6.0.0:compile[36m -- module org.glassfish.expressly[0;1m [auto][m
-   org.glassfish.jaxb:jaxb-core:jar:4.0.6:compile[36m -- module org.glassfish.jaxb.core[m
-   org.glassfish.jaxb:jaxb-runtime:jar:4.0.6:compile[36m -- module org.glassfish.jaxb.runtime[m
-   org.glassfish.jaxb:txw2:jar:4.0.6:compile[36m -- module com.sun.xml.txw2[m
-   org.hamcrest:hamcrest:jar:3.0:test[36m -- module org.hamcrest[0;1m [auto][m
-   org.hdrhistogram:HdrHistogram:jar:2.2.2:runtime[36m -- module HdrHistogram[0;1;33m (auto)[m
-   org.hibernate.validator:hibernate-validator:jar:9.0.1.Final:compile[36m -- module org.hibernate.validator[m
-   org.jboss.logging:jboss-logging:jar:3.6.3.Final:compile[36m -- module org.jboss.logging[m
-   org.jetbrains:annotations:jar:17.0.0:test[36m -- module org.jetbrains.annotations[0;1m [auto][m
-   org.jspecify:jspecify:jar:1.0.0:compile[36m -- module org.jspecify[m
-   org.junit.jupiter:junit-jupiter-api:jar:6.0.3:test[36m -- module org.junit.jupiter.api[m
-   org.junit.jupiter:junit-jupiter-engine:jar:6.0.3:test[36m -- module org.junit.jupiter.engine[m
-   org.junit.jupiter:junit-jupiter-params:jar:6.0.3:test[36m -- module org.junit.jupiter.params[m
-   org.junit.jupiter:junit-jupiter:jar:6.0.3:test[36m -- module org.junit.jupiter[m
-   org.junit.platform:junit-platform-commons:jar:6.0.3:test[36m -- module org.junit.platform.commons[m
-   org.junit.platform:junit-platform-engine:jar:6.0.3:test[36m -- module org.junit.platform.engine[m
-   org.junit.platform:junit-platform-launcher:jar:6.0.3:test[36m -- module org.junit.platform.launcher[m
-   org.latencyutils:LatencyUtils:jar:2.0.3:runtime[36m -- module LatencyUtils[0;1;33m (auto)[m
-   org.mapstruct:mapstruct:jar:1.6.3:compile[36m -- module org.mapstruct[0;1m [auto][m
-   org.mockito:mockito-core:jar:5.20.0:test[36m -- module org.mockito[m
-   org.mockito:mockito-junit-jupiter:jar:5.20.0:test[36m -- module org.mockito.junit.jupiter[m
-   org.objenesis:objenesis:jar:3.3:test[36m -- module org.objenesis[0;1m [auto][m
-   org.openapitools:jackson-databind-nullable:jar:0.2.8:compile[36m -- module org.openapitools.jackson.nullable[m
-   org.opentest4j:opentest4j:jar:1.3.0:test[36m -- module org.opentest4j[m
-   org.ow2.asm:asm-commons:jar:9.9.1:compile[36m -- module org.objectweb.asm.commons[m
-   org.ow2.asm:asm-tree:jar:9.9.1:compile[36m -- module org.objectweb.asm.tree[m
-   org.ow2.asm:asm:jar:9.7.1:compile[36m -- module org.objectweb.asm[m
-   org.projectlombok:lombok:jar:1.18.42:provided[36m -- module lombok[m
-   org.rnorth.duct-tape:duct-tape:jar:1.0.8:test[36m -- module duct.tape[0;1;33m (auto)[m
-   org.skyscreamer:jsonassert:jar:1.5.3:test[36m -- module jsonassert[0;1;33m (auto)[m
-   org.slf4j:jul-to-slf4j:jar:2.0.17:compile[36m -- module jul.to.slf4j[m
-   org.slf4j:slf4j-api:jar:2.0.17:compile[36m -- module org.slf4j[m
-   org.springframework.boot:spring-boot-actuator-autoconfigure:jar:4.0.6:compile[36m -- module spring.boot.actuator.autoconfigure[0;1m [auto][m
-   org.springframework.boot:spring-boot-actuator:jar:4.0.6:compile[36m -- module spring.boot.actuator[0;1m [auto][m
-   org.springframework.boot:spring-boot-autoconfigure:jar:4.0.6:compile[36m -- module spring.boot.autoconfigure[0;1m [auto][m
-   org.springframework.boot:spring-boot-configuration-processor:jar:4.0.6:compile (optional)[36m -- module spring.boot.configuration.processor[0;1m [auto][m
-   org.springframework.boot:spring-boot-health:jar:4.0.6:compile[36m -- module spring.boot.health[0;1m [auto][m
-   org.springframework.boot:spring-boot-http-converter:jar:4.0.6:compile[36m -- module spring.boot.http.converter[0;1m [auto][m
-   org.springframework.boot:spring-boot-jackson:jar:4.0.6:compile[36m -- module spring.boot.jackson[0;1m [auto][m
-   org.springframework.boot:spring-boot-jetty:jar:4.0.6:compile[36m -- module spring.boot.jetty[0;1m [auto][m
-   org.springframework.boot:spring-boot-micrometer-metrics:jar:4.0.6:compile[36m -- module spring.boot.micrometer.metrics[0;1m [auto][m
-   org.springframework.boot:spring-boot-micrometer-observation:jar:4.0.6:compile[36m -- module spring.boot.micrometer.observation[0;1m [auto][m
-   org.springframework.boot:spring-boot-servlet:jar:4.0.6:compile[36m -- module spring.boot.servlet[0;1m [auto][m
-   org.springframework.boot:spring-boot-starter-actuator:jar:4.0.6:compile[36m -- module spring.boot.starter.actuator[0;1m [auto][m
-   org.springframework.boot:spring-boot-starter-jackson:jar:4.0.6:compile[36m -- module spring.boot.starter.jackson[0;1m [auto][m
-   org.springframework.boot:spring-boot-starter-jetty-runtime:jar:4.0.6:compile[36m -- module spring.boot.starter.jetty.runtime[0;1m [auto][m
-   org.springframework.boot:spring-boot-starter-jetty:jar:4.0.6:compile[36m -- module spring.boot.starter.jetty[0;1m [auto][m
-   org.springframework.boot:spring-boot-starter-logging:jar:4.0.6:compile[36m -- module spring.boot.starter.logging[0;1m [auto][m
-   org.springframework.boot:spring-boot-starter-micrometer-metrics:jar:4.0.6:compile[36m -- module spring.boot.starter.micrometer.metrics[0;1m [auto][m
-   org.springframework.boot:spring-boot-starter-test:jar:4.0.6:test[36m -- module spring.boot.starter.test[0;1m [auto][m
-   org.springframework.boot:spring-boot-starter-validation:jar:4.0.6:compile[36m -- module spring.boot.starter.validation[0;1m [auto][m
-   org.springframework.boot:spring-boot-starter-web:jar:4.0.6:compile[36m -- module spring.boot.starter.web[0;1m [auto][m
-   org.springframework.boot:spring-boot-starter:jar:4.0.6:compile[36m -- module spring.boot.starter[0;1m [auto][m
-   org.springframework.boot:spring-boot-test-autoconfigure:jar:4.0.6:test[36m -- module spring.boot.test.autoconfigure[0;1m [auto][m
-   org.springframework.boot:spring-boot-test:jar:4.0.6:test[36m -- module spring.boot.test[0;1m [auto][m
-   org.springframework.boot:spring-boot-validation:jar:4.0.6:compile[36m -- module spring.boot.validation[0;1m [auto][m
-   org.springframework.boot:spring-boot-web-server:jar:4.0.6:compile[36m -- module spring.boot.web.server[0;1m [auto][m
-   org.springframework.boot:spring-boot-webmvc:jar:4.0.6:compile[36m -- module spring.boot.webmvc[0;1m [auto][m
-   org.springframework.boot:spring-boot:jar:4.0.6:compile[36m -- module spring.boot[0;1m [auto][m
-   org.springframework:spring-aop:jar:7.0.7:compile[36m -- module spring.aop[0;1m [auto][m
-   org.springframework:spring-beans:jar:7.0.7:compile[36m -- module spring.beans[0;1m [auto][m
-   org.springframework:spring-context:jar:7.0.7:compile[36m -- module spring.context[0;1m [auto][m
-   org.springframework:spring-core:jar:7.0.7:compile[36m -- module spring.core[0;1m [auto][m
-   org.springframework:spring-expression:jar:7.0.7:compile[36m -- module spring.expression[0;1m [auto][m
-   org.springframework:spring-test:jar:7.0.7:test[36m -- module spring.test[0;1m [auto][m
-   org.springframework:spring-tx:jar:7.0.7:compile[36m -- module spring.tx[0;1m [auto][m
-   org.springframework:spring-web:jar:7.0.7:compile[36m -- module spring.web[0;1m [auto][m
-   org.springframework:spring-webmvc:jar:7.0.7:compile[36m -- module spring.webmvc[0;1m [auto][m
-   org.testcontainers:junit-jupiter:jar:1.21.4:test[36m -- module junit.jupiter[0;1;33m (auto)[m
-   org.testcontainers:testcontainers:jar:2.0.5:test[36m -- module testcontainers[0;1;33m (auto)[m
-   org.xmlunit:xmlunit-core:jar:2.10.4:test[36m -- module org.xmlunit[0;1m [auto][m
-   org.yaml:snakeyaml:jar:2.5:compile[36m -- module org.yaml.snakeyaml[m
-   tools.jackson.core:jackson-core:jar:3.1.2:compile[36m -- module tools.jackson.core[m
-   tools.jackson.core:jackson-databind:jar:3.1.2:compile[36m -- module tools.jackson.databind[m
+   ch.qos.logback:logback-classic:jar:1.5.32:compile -- module ch.qos.logback.classic
+   ch.qos.logback:logback-core:jar:1.5.32:compile -- module ch.qos.logback.core
+   com.fasterxml.jackson.core:jackson-annotations:jar:2.21:compile -- module com.fasterxml.jackson.annotation
+   com.fasterxml.jackson.core:jackson-core:jar:2.21.2:compile -- module com.fasterxml.jackson.core
+   com.fasterxml.jackson.core:jackson-databind:jar:2.21.2:compile -- module com.fasterxml.jackson.databind
+   com.fasterxml.woodstox:woodstox-core:jar:7.1.1:compile -- module com.ctc.wstx
+   com.fasterxml:classmate:jar:1.7.3:compile -- module com.fasterxml.classmate
+   com.github.docker-java:docker-java-api:jar:3.7.1:test -- module com.github.dockerjava.api [auto]
+   com.github.docker-java:docker-java-transport-zerodep:jar:3.7.1:test -- module com.github.dockerjava.transport.zerodep [auto]
+   com.github.docker-java:docker-java-transport:jar:3.7.1:test -- module com.github.dockerjava.transport [auto]
+   com.github.spotbugs:spotbugs-annotations:jar:4.9.8:compile -- module com.github.spotbugs.annotations [auto]
+   com.google.code.findbugs:jsr305:jar:3.0.2:compile -- module jsr305 (auto)
+   com.jayway.jsonpath:json-path:jar:2.10.0:test -- module json.path [auto]
+   com.nimbusds:nimbus-jose-jwt:jar:10.9:compile -- module com.nimbusds.jose.jwt
+   com.sun.istack:istack-commons-runtime:jar:4.1.2:compile -- module com.sun.istack.runtime
+   com.vaadin.external.google:android-json:jar:0.0.20131108.vaadin1:test -- module android.json (auto)
+   commons-codec:commons-codec:jar:1.19.0:test -- module org.apache.commons.codec
+   commons-io:commons-io:jar:2.22.0:compile -- module org.apache.commons.io
+   commons-logging:commons-logging:jar:1.3.6:compile -- module org.apache.commons.logging
+   io.camelbee:camelbee-springboot-core:jar:3.2.1:compile -- module camelbee.springboot.core (auto)
+   io.camelbee:camelbee-springboot-security:jar:3.2.1:compile -- module camelbee.springboot.security (auto)
+   io.micrometer:micrometer-commons:jar:1.16.5:compile -- module micrometer.commons [auto]
+   io.micrometer:micrometer-core:jar:1.16.5:compile -- module micrometer.core [auto]
+   io.micrometer:micrometer-jakarta9:jar:1.16.5:compile -- module micrometer.jakarta9 [auto]
+   io.micrometer:micrometer-observation:jar:1.16.5:compile -- module micrometer.observation [auto]
+   io.micrometer:micrometer-registry-prometheus:jar:1.16.5:compile -- module micrometer.registry.prometheus [auto]
+   io.prometheus:prometheus-metrics-config:jar:1.4.3:compile -- module io.prometheus.metrics.config [auto]
+   io.prometheus:prometheus-metrics-core:jar:1.4.3:compile -- module io.prometheus.metrics.core [auto]
+   io.prometheus:prometheus-metrics-exposition-formats:jar:1.4.3:runtime -- module io.prometheus.metrics.expositionformats [auto]
+   io.prometheus:prometheus-metrics-exposition-textformats:jar:1.4.3:runtime -- module io.prometheus.writer.text [auto]
+   io.prometheus:prometheus-metrics-model:jar:1.4.3:compile -- module io.prometheus.metrics.model [auto]
+   io.prometheus:prometheus-metrics-tracer-common:jar:1.4.3:compile -- module io.prometheus.metrics.tracer.common [auto]
+   io.rest-assured:json-path:jar:5.5.7:test -- module json.path (auto)
+   io.rest-assured:rest-assured-common:jar:5.5.7:test -- module rest.assured.common (auto)
+   io.rest-assured:rest-assured:jar:5.5.7:test -- module rest.assured (auto)
+   io.rest-assured:xml-path:jar:5.5.7:test -- module xml.path (auto)
+   jakarta.activation:jakarta.activation-api:jar:2.1.4:compile -- module jakarta.activation
+   jakarta.annotation:jakarta.annotation-api:jar:3.0.0:compile -- module jakarta.annotation
+   jakarta.el:jakarta.el-api:jar:6.0.1:compile -- module jakarta.el
+   jakarta.enterprise:jakarta.enterprise.cdi-api:jar:4.1.0:compile -- module jakarta.cdi
+   jakarta.enterprise:jakarta.enterprise.lang-model:jar:4.1.0:compile -- module jakarta.cdi.lang.model
+   jakarta.inject:jakarta.inject-api:jar:2.0.1.MR:compile -- module jakarta.inject
+   jakarta.interceptor:jakarta.interceptor-api:jar:2.2.0:compile -- module jakarta.interceptor
+   jakarta.servlet:jakarta.servlet-api:jar:6.1.0:compile -- module jakarta.servlet
+   jakarta.transaction:jakarta.transaction-api:jar:2.0.1:compile -- module jakarta.transaction
+   jakarta.validation:jakarta.validation-api:jar:3.1.1:compile -- module jakarta.validation
+   jakarta.websocket:jakarta.websocket-api:jar:2.2.0:compile -- module jakarta.websocket
+   jakarta.websocket:jakarta.websocket-client-api:jar:2.2.0:compile -- module jakarta.websocket.client
+   jakarta.xml.bind:jakarta.xml.bind-api:jar:4.0.4:compile -- module jakarta.xml.bind
+   net.bytebuddy:byte-buddy-agent:jar:1.17.8:test -- module net.bytebuddy.agent
+   net.bytebuddy:byte-buddy:jar:1.17.8:test -- module net.bytebuddy
+   net.java.dev.jna:jna:jar:5.18.1:test -- module com.sun.jna [auto]
+   net.minidev:accessors-smart:jar:2.6.0:test -- module accessors.smart (auto)
+   net.minidev:json-smart:jar:2.6.0:test -- module json.smart (auto)
+   org.apache.camel.springboot:camel-bean-starter:jar:4.20.0:compile -- module camel.bean.starter (auto)
+   org.apache.camel.springboot:camel-bean-validator-starter:jar:4.20.0:compile -- module camel.bean.validator.starter (auto)
+   org.apache.camel.springboot:camel-browse-starter:jar:4.20.0:compile -- module camel.browse.starter (auto)
+   org.apache.camel.springboot:camel-controlbus-starter:jar:4.20.0:compile -- module camel.controlbus.starter (auto)
+   org.apache.camel.springboot:camel-core-starter:jar:4.20.0:compile -- module camel.core.starter (auto)
+   org.apache.camel.springboot:camel-dataformat-starter:jar:4.20.0:compile -- module camel.dataformat.starter (auto)
+   org.apache.camel.springboot:camel-dataset-starter:jar:4.20.0:compile -- module camel.dataset.starter (auto)
+   org.apache.camel.springboot:camel-direct-starter:jar:4.20.0:compile -- module camel.direct.starter (auto)
+   org.apache.camel.springboot:camel-file-starter:jar:4.20.0:compile -- module camel.file.starter (auto)
+   org.apache.camel.springboot:camel-jackson-starter:jar:4.20.0:compile -- module camel.jackson.starter (auto)
+   org.apache.camel.springboot:camel-language-starter:jar:4.20.0:compile -- module camel.language.starter (auto)
+   org.apache.camel.springboot:camel-log-starter:jar:4.20.0:compile -- module camel.log.starter (auto)
+   org.apache.camel.springboot:camel-management-starter:jar:4.20.0:compile -- module camel.management.starter (auto)
+   org.apache.camel.springboot:camel-micrometer-starter:jar:4.20.0:compile -- module camel.micrometer.starter (auto)
+   org.apache.camel.springboot:camel-mock-starter:jar:4.20.0:compile -- module camel.mock.starter (auto)
+   org.apache.camel.springboot:camel-ref-starter:jar:4.20.0:compile -- module camel.ref.starter (auto)
+   org.apache.camel.springboot:camel-rest-starter:jar:4.20.0:compile -- module camel.rest.starter (auto)
+   org.apache.camel.springboot:camel-saga-starter:jar:4.20.0:compile -- module camel.saga.starter (auto)
+   org.apache.camel.springboot:camel-scheduler-starter:jar:4.20.0:compile -- module camel.scheduler.starter (auto)
+   org.apache.camel.springboot:camel-seda-starter:jar:4.20.0:compile -- module camel.seda.starter (auto)
+   org.apache.camel.springboot:camel-spring-boot-starter:jar:4.20.0:compile -- module camel.spring.boot.starter (auto)
+   org.apache.camel.springboot:camel-spring-boot:jar:4.20.0:compile -- module camel.spring.boot (auto)
+   org.apache.camel.springboot:camel-stub-starter:jar:4.20.0:compile -- module camel.stub.starter (auto)
+   org.apache.camel.springboot:camel-timer-starter:jar:4.20.0:compile -- module camel.timer.starter (auto)
+   org.apache.camel.springboot:camel-validator-starter:jar:4.20.0:compile -- module camel.validator.starter (auto)
+   org.apache.camel.springboot:camel-xml-jaxp-starter:jar:4.20.0:compile -- module camel.xml.jaxp.starter (auto)
+   org.apache.camel.springboot:camel-xpath-starter:jar:4.20.0:compile -- module camel.xpath.starter (auto)
+   org.apache.camel.springboot:camel-xslt-starter:jar:4.20.0:compile -- module camel.xslt.starter (auto)
+   org.apache.camel:camel-api:jar:4.20.0:compile -- module camel.api (auto)
+   org.apache.camel:camel-attachments:jar:4.20.0:compile -- module camel.attachments (auto)
+   org.apache.camel:camel-base-engine:jar:4.20.0:compile -- module camel.base.engine (auto)
+   org.apache.camel:camel-base:jar:4.20.0:compile -- module camel.base (auto)
+   org.apache.camel:camel-bean-validator:jar:4.20.0:compile -- module camel.bean.validator (auto)
+   org.apache.camel:camel-bean:jar:4.20.0:compile -- module camel.bean (auto)
+   org.apache.camel:camel-browse:jar:4.20.0:compile -- module camel.browse (auto)
+   org.apache.camel:camel-cluster:jar:4.20.0:compile -- module camel.cluster (auto)
+   org.apache.camel:camel-controlbus:jar:4.20.0:compile -- module camel.controlbus (auto)
+   org.apache.camel:camel-core-engine:jar:4.20.0:compile -- module camel.core.engine (auto)
+   org.apache.camel:camel-core-languages:jar:4.20.0:compile -- module camel.core.languages (auto)
+   org.apache.camel:camel-core-model:jar:4.20.0:compile -- module camel.core.model (auto)
+   org.apache.camel:camel-core-processor:jar:4.20.0:compile -- module camel.core.processor (auto)
+   org.apache.camel:camel-core-reifier:jar:4.20.0:compile -- module camel.core.reifier (auto)
+   org.apache.camel:camel-core-xml:jar:4.20.0:test -- module camel.core.xml (auto)
+   org.apache.camel:camel-dataformat:jar:4.20.0:compile -- module camel.dataformat (auto)
+   org.apache.camel:camel-dataset:jar:4.20.0:compile -- module camel.dataset (auto)
+   org.apache.camel:camel-direct:jar:4.20.0:compile -- module camel.direct (auto)
+   org.apache.camel:camel-file:jar:4.20.0:compile -- module camel.file (auto)
+   org.apache.camel:camel-health:jar:4.20.0:compile -- module camel.health (auto)
+   org.apache.camel:camel-http-base:jar:4.20.0:compile -- module camel.http.base (auto)
+   org.apache.camel:camel-http-common:jar:4.20.0:compile -- module camel.http.common (auto)
+   org.apache.camel:camel-jackson:jar:4.20.0:compile -- module camel.jackson (auto)
+   org.apache.camel:camel-language:jar:4.20.0:compile -- module camel.language (auto)
+   org.apache.camel:camel-log:jar:4.20.0:compile -- module camel.log (auto)
+   org.apache.camel:camel-main:jar:4.20.0:compile -- module camel.main (auto)
+   org.apache.camel:camel-management-api:jar:4.20.0:compile -- module camel.management.api (auto)
+   org.apache.camel:camel-management:jar:4.20.0:compile -- module camel.management (auto)
+   org.apache.camel:camel-micrometer:jar:4.20.0:compile -- module camel.micrometer (auto)
+   org.apache.camel:camel-mock:jar:4.20.0:compile -- module camel.mock (auto)
+   org.apache.camel:camel-ref:jar:4.20.0:compile -- module camel.ref (auto)
+   org.apache.camel:camel-rest:jar:4.20.0:compile -- module camel.rest (auto)
+   org.apache.camel:camel-saga:jar:4.20.0:compile -- module camel.saga (auto)
+   org.apache.camel:camel-scheduler:jar:4.20.0:compile -- module camel.scheduler (auto)
+   org.apache.camel:camel-seda:jar:4.20.0:compile -- module camel.seda (auto)
+   org.apache.camel:camel-spring-main:jar:4.20.0:compile -- module camel.spring.main (auto)
+   org.apache.camel:camel-spring-xml:jar:4.20.0:test -- module camel.spring.xml (auto)
+   org.apache.camel:camel-spring:jar:4.20.0:compile -- module camel.spring (auto)
+   org.apache.camel:camel-stub:jar:4.20.0:compile -- module camel.stub (auto)
+   org.apache.camel:camel-support:jar:4.20.0:compile -- module camel.support (auto)
+   org.apache.camel:camel-test-junit6:jar:4.20.0:test -- module camel.test.junit6 (auto)
+   org.apache.camel:camel-test-spring-junit6:jar:4.20.0:test -- module camel.test.spring.junit6 (auto)
+   org.apache.camel:camel-timer:jar:4.20.0:compile -- module camel.timer (auto)
+   org.apache.camel:camel-util-json:jar:4.20.0:compile -- module camel.util.json (auto)
+   org.apache.camel:camel-util:jar:4.20.0:compile -- module camel.util (auto)
+   org.apache.camel:camel-validator:jar:4.20.0:compile -- module camel.validator (auto)
+   org.apache.camel:camel-xml-io-util:jar:4.20.0:compile -- module camel.xml.io.util (auto)
+   org.apache.camel:camel-xml-io:jar:4.20.0:compile -- module camel.xml.io (auto)
+   org.apache.camel:camel-xml-jaxb:jar:4.20.0:test -- module camel.xml.jaxb (auto)
+   org.apache.camel:camel-xml-jaxp-util:jar:4.20.0:compile -- module camel.xml.jaxp.util (auto)
+   org.apache.camel:camel-xml-jaxp:jar:4.20.0:compile -- module camel.xml.jaxp (auto)
+   org.apache.camel:camel-xpath:jar:4.20.0:compile -- module camel.xpath (auto)
+   org.apache.camel:camel-xslt:jar:4.20.0:compile -- module camel.xslt (auto)
+   org.apache.commons:commons-compress:jar:1.28.0:test -- module org.apache.commons.compress
+   org.apache.commons:commons-lang3:jar:3.20.0:compile -- module org.apache.commons.lang3
+   org.apache.cxf:cxf-core:jar:4.2.1:compile -- module org.apache.cxf.core [auto]
+   org.apache.groovy:groovy-json:jar:5.0.5:test -- module org.apache.groovy.json [auto]
+   org.apache.groovy:groovy-xml:jar:5.0.5:test -- module org.apache.groovy.xml [auto]
+   org.apache.groovy:groovy:jar:5.0.5:test -- module org.apache.groovy [auto]
+   org.apache.httpcomponents:httpclient:jar:4.5.13:test -- module org.apache.httpcomponents.httpclient [auto]
+   org.apache.httpcomponents:httpcore:jar:4.4.16:test -- module org.apache.httpcomponents.httpcore [auto]
+   org.apache.httpcomponents:httpmime:jar:4.5.13:test -- module org.apache.httpcomponents.httpmime [auto]
+   org.apache.logging.log4j:log4j-api:jar:2.25.4:compile -- module org.apache.logging.log4j
+   org.apache.logging.log4j:log4j-to-slf4j:jar:2.25.4:compile -- module org.apache.logging.log4j.to.slf4j
+   org.apache.tomcat.embed:tomcat-embed-el:jar:11.0.21:compile -- module org.apache.tomcat.embed.el
+   org.apache.ws.xmlschema:xmlschema-core:jar:2.3.2:compile -- module xmlschema.core (auto)
+   org.apiguardian:apiguardian-api:jar:1.1.2:test -- module org.apiguardian.api
+   org.assertj:assertj-core:jar:3.27.7:test -- module org.assertj.core
+   org.awaitility:awaitility:jar:4.3.0:test -- module awaitility (auto)
+   org.ccil.cowan.tagsoup:tagsoup:jar:1.2.1:test -- module tagsoup (auto)
+   org.codehaus.woodstox:stax2-api:jar:4.2.2:compile -- module org.codehaus.stax2
+   org.eclipse.angus:angus-activation:jar:2.0.3:compile -- module org.eclipse.angus.activation
+   org.eclipse.jetty.compression:jetty-compression-common:jar:12.1.8:compile -- module org.eclipse.jetty.compression
+   org.eclipse.jetty.compression:jetty-compression-gzip:jar:12.1.8:compile -- module org.eclipse.jetty.compression.gzip
+   org.eclipse.jetty.compression:jetty-compression-server:jar:12.1.8:runtime -- module org.eclipse.jetty.compression.server
+   org.eclipse.jetty.ee11.websocket:jetty-ee11-websocket-jakarta-client:jar:12.1.8:compile -- module org.eclipse.jetty.ee11.websocket.jakarta.client
+   org.eclipse.jetty.ee11.websocket:jetty-ee11-websocket-jakarta-common:jar:12.1.8:compile -- module org.eclipse.jetty.ee11.websocket.jakarta.common
+   org.eclipse.jetty.ee11.websocket:jetty-ee11-websocket-jakarta-server:jar:12.1.8:compile -- module org.eclipse.jetty.ee11.websocket.jakarta.server
+   org.eclipse.jetty.ee11.websocket:jetty-ee11-websocket-jetty-server:jar:12.1.8:compile -- module org.eclipse.jetty.ee11.websocket.jetty.server
+   org.eclipse.jetty.ee11.websocket:jetty-ee11-websocket-servlet:jar:12.1.8:compile -- module org.eclipse.jetty.ee11.websocket.servlet
+   org.eclipse.jetty.ee11:jetty-ee11-annotations:jar:12.1.8:compile -- module org.eclipse.jetty.ee11.annotations
+   org.eclipse.jetty.ee11:jetty-ee11-plus:jar:12.1.8:compile -- module org.eclipse.jetty.ee11.plus
+   org.eclipse.jetty.ee11:jetty-ee11-servlet:jar:12.1.8:compile -- module org.eclipse.jetty.ee11.servlet
+   org.eclipse.jetty.ee11:jetty-ee11-webapp:jar:12.1.8:compile -- module org.eclipse.jetty.ee11.webapp
+   org.eclipse.jetty.ee:jetty-ee-webapp:jar:12.1.8:compile -- module org.eclipse.jetty.ee.webapp
+   org.eclipse.jetty.websocket:jetty-websocket-core-client:jar:12.1.8:compile -- module org.eclipse.jetty.websocket.core.client
+   org.eclipse.jetty.websocket:jetty-websocket-core-common:jar:12.1.8:compile -- module org.eclipse.jetty.websocket.core.common
+   org.eclipse.jetty.websocket:jetty-websocket-core-server:jar:12.1.8:compile -- module org.eclipse.jetty.websocket.core.server
+   org.eclipse.jetty.websocket:jetty-websocket-jetty-api:jar:12.1.8:compile -- module org.eclipse.jetty.websocket.api
+   org.eclipse.jetty.websocket:jetty-websocket-jetty-common:jar:12.1.8:compile -- module org.eclipse.jetty.websocket.common
+   org.eclipse.jetty.websocket:jetty-websocket-jetty-server:jar:12.1.8:compile -- module org.eclipse.jetty.websocket.server
+   org.eclipse.jetty:jetty-alpn-client:jar:12.1.8:compile -- module org.eclipse.jetty.alpn.client
+   org.eclipse.jetty:jetty-annotations:jar:12.1.8:compile -- module org.eclipse.jetty.annotations
+   org.eclipse.jetty:jetty-client:jar:12.1.8:compile -- module org.eclipse.jetty.client
+   org.eclipse.jetty:jetty-http:jar:12.1.8:compile -- module org.eclipse.jetty.http
+   org.eclipse.jetty:jetty-io:jar:12.1.8:compile -- module org.eclipse.jetty.io
+   org.eclipse.jetty:jetty-plus:jar:12.1.8:compile -- module org.eclipse.jetty.plus
+   org.eclipse.jetty:jetty-security:jar:12.1.8:compile -- module org.eclipse.jetty.security
+   org.eclipse.jetty:jetty-server:jar:12.1.8:compile -- module org.eclipse.jetty.server
+   org.eclipse.jetty:jetty-session:jar:12.1.8:compile -- module org.eclipse.jetty.session
+   org.eclipse.jetty:jetty-util:jar:12.1.8:compile -- module org.eclipse.jetty.util
+   org.eclipse.jetty:jetty-xml:jar:12.1.8:compile -- module org.eclipse.jetty.xml
+   org.glassfish.expressly:expressly:jar:6.0.0:compile -- module org.glassfish.expressly [auto]
+   org.glassfish.jaxb:jaxb-core:jar:4.0.6:compile -- module org.glassfish.jaxb.core
+   org.glassfish.jaxb:jaxb-runtime:jar:4.0.6:compile -- module org.glassfish.jaxb.runtime
+   org.glassfish.jaxb:txw2:jar:4.0.6:compile -- module com.sun.xml.txw2
+   org.hamcrest:hamcrest:jar:3.0:test -- module org.hamcrest [auto]
+   org.hdrhistogram:HdrHistogram:jar:2.2.2:runtime -- module HdrHistogram (auto)
+   org.hibernate.validator:hibernate-validator:jar:9.0.1.Final:compile -- module org.hibernate.validator
+   org.jboss.logging:jboss-logging:jar:3.6.3.Final:compile -- module org.jboss.logging
+   org.jetbrains:annotations:jar:17.0.0:test -- module org.jetbrains.annotations [auto]
+   org.jspecify:jspecify:jar:1.0.0:compile -- module org.jspecify
+   org.junit.jupiter:junit-jupiter-api:jar:6.0.3:test -- module org.junit.jupiter.api
+   org.junit.jupiter:junit-jupiter-engine:jar:6.0.3:test -- module org.junit.jupiter.engine
+   org.junit.jupiter:junit-jupiter-params:jar:6.0.3:test -- module org.junit.jupiter.params
+   org.junit.jupiter:junit-jupiter:jar:6.0.3:test -- module org.junit.jupiter
+   org.junit.platform:junit-platform-commons:jar:6.0.3:test -- module org.junit.platform.commons
+   org.junit.platform:junit-platform-engine:jar:6.0.3:test -- module org.junit.platform.engine
+   org.junit.platform:junit-platform-launcher:jar:6.0.3:test -- module org.junit.platform.launcher
+   org.latencyutils:LatencyUtils:jar:2.0.3:runtime -- module LatencyUtils (auto)
+   org.mapstruct:mapstruct:jar:1.6.3:compile -- module org.mapstruct [auto]
+   org.mockito:mockito-core:jar:5.20.0:test -- module org.mockito
+   org.mockito:mockito-junit-jupiter:jar:5.20.0:test -- module org.mockito.junit.jupiter
+   org.objenesis:objenesis:jar:3.3:test -- module org.objenesis [auto]
+   org.openapitools:jackson-databind-nullable:jar:0.2.10:compile -- module org.openapitools.jackson.nullable
+   org.opentest4j:opentest4j:jar:1.3.0:test -- module org.opentest4j
+   org.ow2.asm:asm-commons:jar:9.9.1:compile -- module org.objectweb.asm.commons
+   org.ow2.asm:asm-tree:jar:9.9.1:compile -- module org.objectweb.asm.tree
+   org.ow2.asm:asm:jar:9.7.1:compile -- module org.objectweb.asm
+   org.projectlombok:lombok:jar:1.18.46:provided -- module lombok
+   org.rnorth.duct-tape:duct-tape:jar:1.0.8:test -- module duct.tape (auto)
+   org.skyscreamer:jsonassert:jar:1.5.3:test -- module jsonassert (auto)
+   org.slf4j:jul-to-slf4j:jar:2.0.17:compile -- module jul.to.slf4j
+   org.slf4j:slf4j-api:jar:2.0.17:compile -- module org.slf4j
+   org.springframework.boot:spring-boot-actuator-autoconfigure:jar:4.0.6:compile -- module spring.boot.actuator.autoconfigure [auto]
+   org.springframework.boot:spring-boot-actuator:jar:4.0.6:compile -- module spring.boot.actuator [auto]
+   org.springframework.boot:spring-boot-autoconfigure:jar:4.0.6:compile -- module spring.boot.autoconfigure [auto]
+   org.springframework.boot:spring-boot-configuration-processor:jar:4.0.6:compile (optional) -- module spring.boot.configuration.processor [auto]
+   org.springframework.boot:spring-boot-health:jar:4.0.6:compile -- module spring.boot.health [auto]
+   org.springframework.boot:spring-boot-http-converter:jar:4.0.6:compile -- module spring.boot.http.converter [auto]
+   org.springframework.boot:spring-boot-jackson:jar:4.0.6:compile -- module spring.boot.jackson [auto]
+   org.springframework.boot:spring-boot-jetty:jar:4.0.6:compile -- module spring.boot.jetty [auto]
+   org.springframework.boot:spring-boot-micrometer-metrics:jar:4.0.6:compile -- module spring.boot.micrometer.metrics [auto]
+   org.springframework.boot:spring-boot-micrometer-observation:jar:4.0.6:compile -- module spring.boot.micrometer.observation [auto]
+   org.springframework.boot:spring-boot-servlet:jar:4.0.6:compile -- module spring.boot.servlet [auto]
+   org.springframework.boot:spring-boot-starter-actuator:jar:4.0.6:compile -- module spring.boot.starter.actuator [auto]
+   org.springframework.boot:spring-boot-starter-jackson:jar:4.0.6:compile -- module spring.boot.starter.jackson [auto]
+   org.springframework.boot:spring-boot-starter-jetty-runtime:jar:4.0.6:compile -- module spring.boot.starter.jetty.runtime [auto]
+   org.springframework.boot:spring-boot-starter-jetty:jar:4.0.6:compile -- module spring.boot.starter.jetty [auto]
+   org.springframework.boot:spring-boot-starter-logging:jar:4.0.6:compile -- module spring.boot.starter.logging [auto]
+   org.springframework.boot:spring-boot-starter-micrometer-metrics:jar:4.0.6:compile -- module spring.boot.starter.micrometer.metrics [auto]
+   org.springframework.boot:spring-boot-starter-test:jar:4.0.6:test -- module spring.boot.starter.test [auto]
+   org.springframework.boot:spring-boot-starter-validation:jar:4.0.6:compile -- module spring.boot.starter.validation [auto]
+   org.springframework.boot:spring-boot-starter-web:jar:4.0.6:compile -- module spring.boot.starter.web [auto]
+   org.springframework.boot:spring-boot-starter:jar:4.0.6:compile -- module spring.boot.starter [auto]
+   org.springframework.boot:spring-boot-test-autoconfigure:jar:4.0.6:test -- module spring.boot.test.autoconfigure [auto]
+   org.springframework.boot:spring-boot-test:jar:4.0.6:test -- module spring.boot.test [auto]
+   org.springframework.boot:spring-boot-validation:jar:4.0.6:compile -- module spring.boot.validation [auto]
+   org.springframework.boot:spring-boot-web-server:jar:4.0.6:compile -- module spring.boot.web.server [auto]
+   org.springframework.boot:spring-boot-webmvc:jar:4.0.6:compile -- module spring.boot.webmvc [auto]
+   org.springframework.boot:spring-boot:jar:4.0.6:compile -- module spring.boot [auto]
+   org.springframework:spring-aop:jar:7.0.7:compile -- module spring.aop [auto]
+   org.springframework:spring-beans:jar:7.0.7:compile -- module spring.beans [auto]
+   org.springframework:spring-context:jar:7.0.7:compile -- module spring.context [auto]
+   org.springframework:spring-core:jar:7.0.7:compile -- module spring.core [auto]
+   org.springframework:spring-expression:jar:7.0.7:compile -- module spring.expression [auto]
+   org.springframework:spring-test:jar:7.0.7:test -- module spring.test [auto]
+   org.springframework:spring-tx:jar:7.0.7:compile -- module spring.tx [auto]
+   org.springframework:spring-web:jar:7.0.7:compile -- module spring.web [auto]
+   org.springframework:spring-webmvc:jar:7.0.7:compile -- module spring.webmvc [auto]
+   org.testcontainers:junit-jupiter:jar:1.21.4:test -- module junit.jupiter (auto)
+   org.testcontainers:testcontainers:jar:2.0.5:test -- module testcontainers (auto)
+   org.xmlunit:xmlunit-core:jar:2.10.4:test -- module org.xmlunit [auto]
+   org.yaml:snakeyaml:jar:2.6:compile -- module org.yaml.snakeyaml
+   tools.jackson.core:jackson-core:jar:3.1.2:compile -- module tools.jackson.core
+   tools.jackson.core:jackson-databind:jar:3.1.2:compile -- module tools.jackson.databind
 
