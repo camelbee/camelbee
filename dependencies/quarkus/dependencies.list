@@ -7,7 +7,7 @@ The following files have been resolved:
    com.github.spotbugs:spotbugs-annotations:jar:4.9.8:compile -- module com.github.spotbugs.annotations [auto]
    com.google.code.findbugs:jsr305:jar:3.0.2:compile -- module jsr305 (auto)
    com.sun.istack:istack-commons-runtime:jar:4.1.2:compile -- module com.sun.istack.runtime
-   commons-codec:commons-codec:jar:1.21.0:test -- module org.apache.commons.codec
+   commons-codec:commons-codec:jar:1.22.0:test -- module org.apache.commons.codec
    commons-io:commons-io:jar:2.22.0:compile -- module org.apache.commons.io
    jakarta.activation:jakarta.activation-api:jar:2.1.4:compile -- module jakarta.activation
    jakarta.annotation:jakarta.annotation-api:jar:3.0.0:compile -- module jakarta.annotation
@@ -27,7 +27,7 @@ The following files have been resolved:
    org.openapitools:jackson-databind-nullable:jar:0.2.10:compile -- module org.openapitools.jackson.nullable
    org.projectlombok:lombok:jar:1.18.46:provided -- module lombok
    org.rnorth.duct-tape:duct-tape:jar:1.0.8:test -- module duct.tape (auto)
-   org.slf4j:slf4j-api:jar:2.0.17:test -- module org.slf4j
+   org.slf4j:slf4j-api:jar:2.0.18:test -- module org.slf4j
    org.testcontainers:junit-jupiter:jar:1.21.4:test -- module junit.jupiter (auto)
    org.testcontainers:testcontainers:jar:2.0.5:test -- module testcontainers (auto)
    org.yaml:snakeyaml:jar:2.6:compile -- module org.yaml.snakeyaml

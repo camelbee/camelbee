@@ -12,7 +12,7 @@ The following files have been resolved:
    com.github.spotbugs:spotbugs-annotations:jar:4.9.8:compile -- module com.github.spotbugs.annotations [auto]
    com.google.code.findbugs:jsr305:jar:3.0.2:compile -- module jsr305 (auto)
    com.jayway.jsonpath:json-path:jar:2.10.0:test -- module json.path [auto]
-   com.nimbusds:nimbus-jose-jwt:jar:10.9:compile -- module com.nimbusds.jose.jwt
+   com.nimbusds:nimbus-jose-jwt:jar:10.9.1:compile -- module com.nimbusds.jose.jwt
    com.sun.istack:istack-commons-runtime:jar:4.1.2:compile -- module com.sun.istack.runtime
    com.vaadin.external.google:android-json:jar:0.0.20131108.vaadin1:test -- module android.json (auto)
    commons-codec:commons-codec:jar:1.19.0:test -- module org.apache.commons.codec

@@ -15,7 +15,7 @@ The following files have been resolved:
    com.google.code.findbugs:jsr305:jar:3.0.2:compile -- module jsr305 (auto)
    com.hierynomus:asn-one:jar:0.6.0:compile -- module com.hierynomus.asnone [auto]
    com.jayway.jsonpath:json-path:jar:2.10.0:test -- module json.path [auto]
-   com.nimbusds:nimbus-jose-jwt:jar:10.9:compile -- module com.nimbusds.jose.jwt
+   com.nimbusds:nimbus-jose-jwt:jar:10.9.1:compile -- module com.nimbusds.jose.jwt
    com.rabbitmq:amqp-client:jar:5.27.1:compile -- module com.rabbitmq.client [auto]
    com.sun.istack:istack-commons-runtime:jar:4.1.2:compile -- module com.sun.istack.runtime
    com.vaadin.external.google:android-json:jar:0.0.20131108.vaadin1:test -- module android.json (auto)
@@ -57,10 +57,10 @@ The following files have been resolved:
    io.prometheus:prometheus-metrics-exposition-textformats:jar:1.4.3:runtime -- module io.prometheus.writer.text [auto]
    io.prometheus:prometheus-metrics-model:jar:1.4.3:compile -- module io.prometheus.metrics.model [auto]
    io.prometheus:prometheus-metrics-tracer-common:jar:1.4.3:compile -- module io.prometheus.metrics.tracer.common [auto]
-   io.rest-assured:json-path:jar:5.5.7:test -- module json.path (auto)
-   io.rest-assured:rest-assured-common:jar:5.5.7:test -- module rest.assured.common (auto)
-   io.rest-assured:rest-assured:jar:5.5.7:test -- module rest.assured (auto)
-   io.rest-assured:xml-path:jar:5.5.7:test -- module xml.path (auto)
+   io.rest-assured:json-path:jar:6.0.0:test -- module json.path (auto)
+   io.rest-assured:rest-assured-common:jar:6.0.0:test -- module rest.assured.common (auto)
+   io.rest-assured:rest-assured:jar:6.0.0:test -- module rest.assured (auto)
+   io.rest-assured:xml-path:jar:6.0.0:test -- module xml.path (auto)
    jakarta.activation:jakarta.activation-api:jar:2.1.4:compile -- module jakarta.activation
    jakarta.annotation:jakarta.annotation-api:jar:3.0.0:compile -- module jakarta.annotation
    jakarta.el:jakarta.el-api:jar:6.0.1:compile -- module jakarta.el
