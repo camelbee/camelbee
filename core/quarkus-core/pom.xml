@@ -30,6 +30,11 @@
 	<artifactId>camelbee-quarkus-core</artifactId>
 	<packaging>jar</packaging>
 
+	<properties>
+		<!-- Line coverage ~80%; gate held at 0.80. -->
+		<jacoco.line.coverage.minimum>0.80</jacoco.line.coverage.minimum>
+	</properties>
+
 	<dependencies>
 
 		<dependency>
@@ -85,7 +90,7 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-junit-jupiter</artifactId>
-			<version>5.23.0</version>
+			<version>${mockito-junit-jupiter.version}</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -95,7 +100,12 @@
 			<scope>test</scope>
 		</dependency>
 
-
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>${assertj-core.version}</version>
+			<scope>test</scope>
+		</dependency>
 
 	</dependencies>
 

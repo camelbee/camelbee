@@ -33,6 +33,10 @@
 
     <properties>
         <argLine>-Duser.language=en</argLine>
+        <!-- Minimum JaCoCo line coverage enforced by jacoco:check. Defaults to 0
+             (no floor) so modules without Java tests don't fail the build; each
+             tested module overrides this with its baseline and ratchets toward 0.80. -->
+        <jacoco.line.coverage.minimum>0.00</jacoco.line.coverage.minimum>
         <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
         <camel-maven-plugin.version>4.20.0</camel-maven-plugin.version>
         <checkstyle.version>13.5.0</checkstyle.version>
@@ -480,6 +484,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
+                    <!-- Include the JaCoCo agent (set by jacoco:prepare-agent into
+                         jacocoArgLine) so coverage execution data is recorded. -->
+                    <argLine>${jacocoArgLine} -Duser.language=en</argLine>
                     <excludes>
                         <exclude>**/*IntegrationTest.java</exclude>
                         <exclude>**/*BlackBoxTest.java</exclude>
@@ -568,6 +575,27 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                    </execution>
+                    <execution>
+                        <id>jacoco-check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>${jacoco.line.coverage.minimum}</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

@@ -79,6 +79,7 @@ The following files have been resolved:
    io.quarkus:quarkus-hibernate-validator-spi:jar:3.36.0:test -- module quarkus.hibernate.validator.spi (auto)
    io.quarkus:quarkus-ide-launcher:jar:3.36.0:compile -- module io.quarkus.launcher [auto]
    io.quarkus:quarkus-jackson:jar:3.36.0:provided -- module quarkus.jackson (auto)
+   io.quarkus:quarkus-jacoco:jar:3.36.0:test -- module quarkus.jacoco (auto)
    io.quarkus:quarkus-jaxb:jar:3.36.0:provided -- module quarkus.jaxb (auto)
    io.quarkus:quarkus-jaxp:jar:3.36.0:provided -- module quarkus.jaxp (auto)
    io.quarkus:quarkus-jsonp:jar:3.36.0:compile -- module quarkus.jsonp (auto)
@@ -334,6 +335,10 @@ The following files have been resolved:
    org.glassfish.jaxb:txw2:jar:4.0.8:compile -- module com.sun.xml.txw2
    org.graalvm.sdk:nativeimage:jar:23.1.2:test -- module org.graalvm.nativeimage
    org.graalvm.sdk:word:jar:23.1.2:test -- module org.graalvm.word
+   org.jacoco:org.jacoco.agent:jar:0.8.14:test -- module org.jacoco.agent [auto]
+   org.jacoco:org.jacoco.agent:jar:runtime:0.8.14:test -- module org.jacoco.agent.rt [auto]
+   org.jacoco:org.jacoco.core:jar:0.8.14:test -- module org.jacoco.core [auto]
+   org.jacoco:org.jacoco.report:jar:0.8.14:test -- module org.jacoco.report [auto]
    org.jasypt:jasypt:jar:1.9.3:provided -- module jasypt (auto)
    org.jboss.logging:commons-logging-jboss-logging:jar:2.0.0.Final:test -- module org.apache.commons.logging
    org.jboss.logging:jboss-logging:jar:3.6.3.Final:compile -- module org.jboss.logging

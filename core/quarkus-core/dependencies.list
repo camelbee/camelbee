@@ -302,6 +302,7 @@ The following files have been resolved:
    org.apache.wss4j:wss4j-ws-security-policy-stax:jar:4.0.1:provided -- module org.apache.wss4j.policystax [auto]
    org.apache.wss4j:wss4j-ws-security-stax:jar:4.0.1:provided -- module org.apache.wss4j.stax [auto]
    org.apiguardian:apiguardian-api:jar:1.1.2:test -- module org.apiguardian.api
+   org.assertj:assertj-core:jar:3.27.7:test -- module org.assertj.core
    org.codehaus.plexus:plexus-cipher:jar:2.0:test -- module plexus.cipher (auto)
    org.codehaus.plexus:plexus-classworlds:jar:2.6.0:test -- module plexus.classworlds (auto)
    org.codehaus.plexus:plexus-component-annotations:jar:2.1.0:test -- module plexus.component.annotations (auto)

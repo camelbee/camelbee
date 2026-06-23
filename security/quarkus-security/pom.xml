@@ -30,6 +30,11 @@
 	<artifactId>camelbee-quarkus-security</artifactId>
 	<packaging>jar</packaging>
 
+	<properties>
+		<!-- Line coverage ~91%; gate held at 0.80. -->
+		<jacoco.line.coverage.minimum>0.80</jacoco.line.coverage.minimum>
+	</properties>
+
 	<dependencies>
 
 		<dependency>
@@ -102,13 +107,21 @@
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-			<version>3.27.7</version>
+			<version>${assertj-core.version}</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.camel.quarkus</groupId>
 			<artifactId>camel-quarkus-junit5</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Captures code coverage for @QuarkusTest runs (the standard JaCoCo
+		     agent cannot instrument Quarkus's augmented test runtime). -->
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-jacoco</artifactId>
 			<scope>test</scope>
 		</dependency>
 

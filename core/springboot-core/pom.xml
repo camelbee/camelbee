@@ -30,6 +30,11 @@
     <artifactId>camelbee-springboot-core</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <!-- Line coverage ~80%; gate held at 0.80. -->
+        <jacoco.line.coverage.minimum>0.80</jacoco.line.coverage.minimum>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>

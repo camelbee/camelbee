@@ -30,6 +30,11 @@
     <artifactId>camelbee-springboot-security</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <!-- Line coverage ~91%; gate held at 0.80. -->
+        <jacoco.line.coverage.minimum>0.80</jacoco.line.coverage.minimum>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
