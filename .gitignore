@@ -30,3 +30,9 @@ target/
 *.gpg
 *.asc
 *.zip
+
+# macOS #
+.DS_Store
+
+# SDKMAN #
+.sdkmanrc
