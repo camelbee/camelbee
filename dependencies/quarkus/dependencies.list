@@ -19,9 +19,9 @@ The following files have been resolved:
    org.apache.ws.xmlschema:xmlschema-core:jar:2.3.2:compile -- module xmlschema.core (auto)
    org.codehaus.woodstox:stax2-api:jar:4.2.2:compile -- module org.codehaus.stax2
    org.eclipse.angus:angus-activation:jar:2.0.3:compile -- module org.eclipse.angus.activation
-   org.glassfish.jaxb:jaxb-core:jar:4.0.8:compile -- module org.glassfish.jaxb.core
-   org.glassfish.jaxb:jaxb-runtime:jar:4.0.8:compile -- module org.glassfish.jaxb.runtime
-   org.glassfish.jaxb:txw2:jar:4.0.8:compile -- module com.sun.xml.txw2
+   org.glassfish.jaxb:jaxb-core:jar:4.0.9:compile -- module org.glassfish.jaxb.core
+   org.glassfish.jaxb:jaxb-runtime:jar:4.0.9:compile -- module org.glassfish.jaxb.runtime
+   org.glassfish.jaxb:txw2:jar:4.0.9:compile -- module com.sun.xml.txw2
    org.jetbrains:annotations:jar:26.1.0:test -- module org.jetbrains.annotations
    org.mapstruct:mapstruct:jar:1.6.3:compile -- module org.mapstruct [auto]
    org.openapitools:jackson-databind-nullable:jar:0.2.10:compile -- module org.openapitools.jackson.nullable
