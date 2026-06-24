@@ -95,7 +95,7 @@
         <avro-maven-plugin.version>1.12.1</avro-maven-plugin.version>
         <maven-replacer-plugin.version>1.5.3</maven-replacer-plugin.version>
         <jakarta.xml.ws-api.version>4.0.3</jakarta.xml.ws-api.version>
-        <swagger-annotations-jakarta.version>2.2.50</swagger-annotations-jakarta.version>
+        <swagger-annotations-jakarta.version>2.2.52</swagger-annotations-jakarta.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
 
         <!-- ================================================================ -->
