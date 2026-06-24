@@ -19,7 +19,7 @@
         <spring-cloud-dependencies.version>2025.1.1</spring-cloud-dependencies.version>
         <camel-spring-boot-bom.version>4.20.0</camel-spring-boot-bom.version>
         <jakarta-inject.version>2.0.1.MR</jakarta-inject.version>
-        <cxf-rt-transports-http-jetty.version>4.2.1</cxf-rt-transports-http-jetty.version>
+        <cxf-rt-transports-http-jetty.version>4.2.2</cxf-rt-transports-http-jetty.version>
         <logstash-logback-encoder.version>9.0</logstash-logback-encoder.version>
         <rest-assured.version>6.0.0</rest-assured.version>
     </properties>
