@@ -88,10 +88,11 @@ function SimpleChart({ series, unit }: SimpleChartProps) {
         />
         <Tooltip
           contentStyle={{ backgroundColor: tooltipBg, border: tooltipBorder, fontSize: 11 }}
-          labelFormatter={formatTime}
-          formatter={(value: number) =>
-            unit === '%' ? `${value.toFixed(1)}%` : unit === 'MB' ? `${value.toFixed(1)} MB` : unit === 'ms' ? `${value.toFixed(1)} ms` : value.toFixed(1)
-          }
+          labelFormatter={(label) => formatTime(Number(label))}
+          formatter={(value) => {
+            const v = Number(value);
+            return unit === '%' ? `${v.toFixed(1)}%` : unit === 'MB' ? `${v.toFixed(1)} MB` : unit === 'ms' ? `${v.toFixed(1)} ms` : v.toFixed(1);
+          }}
         />
         <Legend wrapperStyle={{ fontSize: 10 }} />
         {series.map((s) => (
