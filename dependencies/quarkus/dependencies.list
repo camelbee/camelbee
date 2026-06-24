@@ -15,7 +15,7 @@ The following files have been resolved:
    net.java.dev.jna:jna:jar:5.8.0:test -- module com.sun.jna [auto]
    org.apache.commons:commons-compress:jar:1.28.0:test -- module org.apache.commons.compress
    org.apache.commons:commons-lang3:jar:3.20.0:compile -- module org.apache.commons.lang3
-   org.apache.cxf:cxf-core:jar:4.2.1:compile -- module org.apache.cxf.core [auto]
+   org.apache.cxf:cxf-core:jar:4.2.2:compile -- module org.apache.cxf.core [auto]
    org.apache.ws.xmlschema:xmlschema-core:jar:2.3.2:compile -- module xmlschema.core (auto)
    org.codehaus.woodstox:stax2-api:jar:4.2.2:compile -- module org.codehaus.stax2
    org.eclipse.angus:angus-activation:jar:2.0.3:compile -- module org.eclipse.angus.activation

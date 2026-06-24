@@ -4,7 +4,7 @@ The following files have been resolved:
    com.fasterxml.jackson.core:jackson-annotations:jar:2.21:compile -- module com.fasterxml.jackson.annotation
    com.fasterxml.jackson.core:jackson-core:jar:2.21.2:provided -- module com.fasterxml.jackson.core
    com.fasterxml.jackson.core:jackson-databind:jar:2.21.2:provided -- module com.fasterxml.jackson.databind
-   com.fasterxml.woodstox:woodstox-core:jar:7.1.1:compile -- module com.ctc.wstx
+   com.fasterxml.woodstox:woodstox-core:jar:7.2.0:compile -- module com.ctc.wstx
    com.fasterxml:classmate:jar:1.7.3:provided -- module com.fasterxml.classmate
    com.github.docker-java:docker-java-api:jar:3.7.1:test -- module com.github.dockerjava.api [auto]
    com.github.docker-java:docker-java-transport-zerodep:jar:3.7.1:test -- module com.github.dockerjava.transport.zerodep [auto]
@@ -110,7 +110,7 @@ The following files have been resolved:
    org.apache.camel:camel-xslt:jar:4.20.0:compile -- module camel.xslt (auto)
    org.apache.commons:commons-compress:jar:1.28.0:test -- module org.apache.commons.compress
    org.apache.commons:commons-lang3:jar:3.20.0:compile -- module org.apache.commons.lang3
-   org.apache.cxf:cxf-core:jar:4.2.1:compile -- module org.apache.cxf.core [auto]
+   org.apache.cxf:cxf-core:jar:4.2.2:compile -- module org.apache.cxf.core [auto]
    org.apache.cxf:cxf-rt-transports-http-jetty:jar:4.2.1:provided -- module org.apache.cxf.transport.http.jetty [auto]
    org.apache.cxf:cxf-rt-transports-http:jar:4.2.1:provided -- module org.apache.cxf.transport.http [auto]
    org.apache.httpcomponents.client5:httpclient5:jar:5.5.2:provided -- module org.apache.httpcomponents.client5.httpclient5 [auto]
@@ -125,7 +125,7 @@ The following files have been resolved:
    org.apiguardian:apiguardian-api:jar:1.1.2:test -- module org.apiguardian.api
    org.assertj:assertj-core:jar:3.27.7:test -- module org.assertj.core
    org.awaitility:awaitility:jar:4.3.0:test -- module awaitility (auto)
-   org.codehaus.woodstox:stax2-api:jar:4.2.2:compile -- module org.codehaus.stax2
+   org.codehaus.woodstox:stax2-api:jar:4.3.0:compile -- module org.codehaus.stax2
    org.eclipse.angus:angus-activation:jar:2.0.3:compile -- module org.eclipse.angus.activation
    org.eclipse.jetty.ee11:jetty-ee11-servlet:jar:12.1.8:provided -- module org.eclipse.jetty.ee11.servlet
    org.eclipse.jetty:jetty-http:jar:12.1.8:provided -- module org.eclipse.jetty.http

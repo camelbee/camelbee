@@ -244,7 +244,7 @@ The following files have been resolved:
    org.apache.camel:camel-xslt:jar:4.20.0:test -- module camel.xslt (auto)
    org.apache.commons:commons-compress:jar:1.28.0:test -- module org.apache.commons.compress
    org.apache.commons:commons-lang3:jar:3.20.0:compile -- module org.apache.commons.lang3
-   org.apache.cxf:cxf-core:jar:4.2.1:compile -- module org.apache.cxf.core [auto]
+   org.apache.cxf:cxf-core:jar:4.2.2:compile -- module org.apache.cxf.core [auto]
    org.apache.cxf:cxf-rt-bindings-soap:jar:4.2.0:provided -- module org.apache.cxf.binding.soap [auto]
    org.apache.cxf:cxf-rt-bindings-xml:jar:4.2.0:provided -- module org.apache.cxf.binding.xml [auto]
    org.apache.cxf:cxf-rt-databinding-jaxb:jar:4.2.0:provided -- module org.apache.cxf.databinding.jaxb [auto]
