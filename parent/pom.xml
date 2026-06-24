@@ -49,7 +49,7 @@
         <dependency-lock-maven-plugin.version>1.0.2</dependency-lock-maven-plugin.version>
         <formatter-maven-plugin.version>2.29.0</formatter-maven-plugin.version>
         <impsort-maven-plugin.version>1.13.0</impsort-maven-plugin.version>
-        <jandex-maven-plugin.version>3.5.3</jandex-maven-plugin.version>
+        <jandex-maven-plugin.version>3.6.0</jandex-maven-plugin.version>
         <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
         <jackson-databind-nullable.version>0.2.10</jackson-databind-nullable.version>
         <!-- Shared by the generated microservices' MCP support (quarkus test + springboot
