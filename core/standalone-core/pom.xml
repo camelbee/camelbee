@@ -30,6 +30,11 @@
     <artifactId>camelbee-standalone-core</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <!-- Match the Quarkus/Spring Boot cores' coverage gate. -->
+        <jacoco.line.coverage.minimum>0.80</jacoco.line.coverage.minimum>
+    </properties>
+
     <dependencies>
         <!-- Camel engine + standalone bootstrap -->
         <dependency>
@@ -92,7 +97,25 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>5.23.0</version>
+            <version>${mockito-junit-jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- AssertJ for the unit tests. Unlike the Quarkus/Spring Boot cores (which get it
+             transitively via their starter-test), the standalone core has no such umbrella, so
+             pin it explicitly at the same version used elsewhere in the project. -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj-core.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- SLF4J backend for the unit tests. A backend with a real MDCAdapter is required to
+             exercise MdcContext: slf4j-api alone (and slf4j-simple) bind a no-op MDC, whereas
+             logback-classic provides a working thread-local MDC. Test scope only. -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback-classic.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -103,7 +126,7 @@
                  platform-http-main static handler can serve it (see CamelBee.register). -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.5.0</version>
+                <version>${maven-resources-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>copy-ui-dist</id>

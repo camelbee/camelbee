@@ -1,4 +1,6 @@
 The following files have been resolved:
+   ch.qos.logback:logback-classic:jar:1.5.18:test -- module ch.qos.logback.classic
+   ch.qos.logback:logback-core:jar:1.5.18:test -- module ch.qos.logback.core
    com.fasterxml.jackson.core:jackson-annotations:jar:2.21:compile -- module com.fasterxml.jackson.annotation
    com.fasterxml.jackson.core:jackson-core:jar:2.21.4:compile -- module com.fasterxml.jackson.core
    com.fasterxml.jackson.core:jackson-databind:jar:2.21.2:compile -- module com.fasterxml.jackson.databind
@@ -47,7 +49,7 @@ The following files have been resolved:
    jakarta.annotation:jakarta.annotation-api:jar:3.0.0:compile -- module jakarta.annotation
    jakarta.xml.bind:jakarta.xml.bind-api:jar:4.0.5:compile -- module jakarta.xml.bind
    net.bytebuddy:byte-buddy-agent:jar:1.17.7:test -- module net.bytebuddy.agent
-   net.bytebuddy:byte-buddy:jar:1.17.7:test -- module net.bytebuddy
+   net.bytebuddy:byte-buddy:jar:1.18.3:test -- module net.bytebuddy
    net.java.dev.jna:jna:jar:5.18.1:test -- module com.sun.jna [auto]
    org.apache.camel:camel-api:jar:4.20.0:compile -- module camel.api (auto)
    org.apache.camel:camel-attachments:jar:4.20.0:provided -- module camel.attachments (auto)
@@ -107,6 +109,7 @@ The following files have been resolved:
    org.apache.cxf:cxf-core:jar:4.2.2:compile -- module org.apache.cxf.core [auto]
    org.apache.ws.xmlschema:xmlschema-core:jar:2.3.2:compile -- module xmlschema.core (auto)
    org.apiguardian:apiguardian-api:jar:1.1.2:test -- module org.apiguardian.api
+   org.assertj:assertj-core:jar:3.27.7:test -- module org.assertj.core
    org.codehaus.woodstox:stax2-api:jar:4.3.0:compile -- module org.codehaus.stax2
    org.eclipse.angus:angus-activation:jar:2.0.3:compile -- module org.eclipse.angus.activation
    org.glassfish.jaxb:jaxb-core:jar:4.0.9:compile -- module org.glassfish.jaxb.core

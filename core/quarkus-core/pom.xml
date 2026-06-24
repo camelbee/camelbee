@@ -117,7 +117,7 @@
 			<plugin>
 				<groupId>io.smallrye</groupId>
 				<artifactId>jandex-maven-plugin</artifactId>
-				<version>3.5.3</version>
+				<version>${jandex-maven-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>make-index</id>
@@ -129,7 +129,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.5.0</version>
+				<version>${maven-resources-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>copy-ui-dist</id>

@@ -34,6 +34,11 @@
         <jackson-jsr310.version>2.21.4</jackson-jsr310.version>
         <micrometer.version>1.16.5</micrometer.version>
         <rest-assured.version>6.0.0</rest-assured.version>
+        <!-- Test libraries + the runtime logging backend, centralized here (consumed by
+             standalone-core and the standalone sample via their parent chain). -->
+        <assertj-core.version>3.27.7</assertj-core.version>
+        <mockito-junit-jupiter.version>5.23.0</mockito-junit-jupiter.version>
+        <logback-classic.version>1.5.18</logback-classic.version>
     </properties>
 
     <dependencyManagement>

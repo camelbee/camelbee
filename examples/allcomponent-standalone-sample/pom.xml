@@ -60,11 +60,13 @@
             <artifactId>camel-file</artifactId>
         </dependency>
 
-        <!-- logging backend for the standalone app -->
+        <!-- Logging backend for the standalone app. Logback (not slf4j-simple) is used because it
+             provides a working MDC adapter, which CamelBee's structured logging relies on to surface
+             requestId/transactionId/routeId/endpoint via the %X pattern in logback.xml. -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>2.0.13</version>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback-classic.version}</version>
         </dependency>
     </dependencies>
 

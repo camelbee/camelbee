@@ -22,6 +22,12 @@
         <cxf-rt-transports-http-jetty.version>4.2.2</cxf-rt-transports-http-jetty.version>
         <logstash-logback-encoder.version>9.0</logstash-logback-encoder.version>
         <rest-assured.version>6.0.0</rest-assured.version>
+        <!-- Used by generated microservices (declared conditionally in the archetype):
+             spring-ai (MCP), Apicurio serdes (Kafka schema registry), and a Groovy pin for
+             rest-assured (the Spring Boot 4 BOM ships Groovy 5, which breaks rest-assured 5.x). -->
+        <spring-ai-bom.version>2.0.0-M2</spring-ai-bom.version>
+        <apicurio-registry-serdes.version>2.6.13.Final</apicurio-registry-serdes.version>
+        <groovy.version>4.0.22</groovy.version>
     </properties>
 
     <dependencyManagement>
@@ -69,6 +75,48 @@
                 <version>${rest-assured.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <!-- spring-ai BOM for the generated microservices' MCP support. Imported last so the
+                 Spring Boot / Camel BOMs above win for any overlapping managed versions. -->
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>${spring-ai-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Apicurio serdes for Kafka schema-registry (Avro) in generated microservices. -->
+            <dependency>
+                <groupId>io.apicurio</groupId>
+                <artifactId>apicurio-registry-serdes-avro-serde</artifactId>
+                <version>${apicurio-registry-serdes.version}</version>
+            </dependency>
+
+            <!-- MCP SDK vs WireMock conflict pin (shared version with the Quarkus side). -->
+            <dependency>
+                <groupId>com.networknt</groupId>
+                <artifactId>json-schema-validator</artifactId>
+                <version>${json-schema-validator.version}</version>
+            </dependency>
+
+            <!-- Pin Groovy for rest-assured (Spring Boot 4 BOM ships Groovy 5.x). Test scope in
+                 the generated microservices. -->
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-xml</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-json</artifactId>
+                <version>${groovy.version}</version>
             </dependency>
 
         </dependencies>

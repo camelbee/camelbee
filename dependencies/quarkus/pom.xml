@@ -47,6 +47,9 @@
         <org.awaitility.awaitility>4.3.0</org.awaitility.awaitility>
         <org.jetbrains.kotlin.kotlin-reflect.version>2.3.21</org.jetbrains.kotlin.kotlin-reflect.version>
         <com.google.crypto.tink.version>1.21.0</com.google.crypto.tink.version>
+        <!-- MCP support for generated microservices (declared conditionally in the archetype). -->
+        <quarkus-mcp-server.version>1.9.1</quarkus-mcp-server.version>
+        <mcp-sdk.version>0.17.1</mcp-sdk.version>
     </properties>
 
     <dependencyManagement>
@@ -95,6 +98,28 @@
               <groupId>com.google.crypto.tink</groupId>
               <artifactId>tink</artifactId>
               <version>${com.google.crypto.tink.version}</version>
+            </dependency>
+
+            <!-- MCP support for generated microservices (declared conditionally in the archetype). -->
+            <dependency>
+              <groupId>io.quarkiverse.mcp</groupId>
+              <artifactId>quarkus-mcp-server-http</artifactId>
+              <version>${quarkus-mcp-server.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>io.quarkiverse.mcp</groupId>
+              <artifactId>quarkus-mcp-server-test</artifactId>
+              <version>${quarkus-mcp-server.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>io.modelcontextprotocol.sdk</groupId>
+              <artifactId>mcp</artifactId>
+              <version>${mcp-sdk.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>com.networknt</groupId>
+              <artifactId>json-schema-validator</artifactId>
+              <version>${json-schema-validator.version}</version>
             </dependency>
 
         </dependencies>
