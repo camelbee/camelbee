@@ -29,7 +29,7 @@ The following files have been resolved:
    com.google.inject:guice:jar:classes:5.1.0:test -- module com.google.guice [auto]
    com.ibm.async:asyncutil:jar:0.1.0:provided -- module asyncutil (auto)
    com.sun.istack:istack-commons-runtime:jar:4.1.2:compile -- module com.sun.istack.runtime
-   com.sun.xml.messaging.saaj:saaj-impl:jar:3.0.5:provided -- module com.sun.xml.messaging.saaj
+   com.sun.xml.messaging.saaj:saaj-impl:jar:3.0.6:provided -- module com.sun.xml.messaging.saaj
    commons-cli:commons-cli:jar:1.8.0:test -- module org.apache.commons.cli
    commons-codec:commons-codec:jar:1.22.0:provided -- module org.apache.commons.codec
    commons-io:commons-io:jar:2.22.0:compile -- module org.apache.commons.io
