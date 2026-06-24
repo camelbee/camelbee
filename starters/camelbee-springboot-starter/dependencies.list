@@ -137,9 +137,9 @@ The following files have been resolved:
    org.apache.commons:commons-compress:jar:1.28.0:test -- module org.apache.commons.compress
    org.apache.commons:commons-lang3:jar:3.20.0:compile -- module org.apache.commons.lang3
    org.apache.cxf:cxf-core:jar:4.2.2:compile -- module org.apache.cxf.core [auto]
-   org.apache.groovy:groovy-json:jar:4.0.22:test -- module org.apache.groovy.json [auto]
-   org.apache.groovy:groovy-xml:jar:4.0.22:test -- module org.apache.groovy.xml [auto]
-   org.apache.groovy:groovy:jar:4.0.22:test -- module org.apache.groovy [auto]
+   org.apache.groovy:groovy-json:jar:4.0.32:test -- module org.apache.groovy.json [auto]
+   org.apache.groovy:groovy-xml:jar:4.0.32:test -- module org.apache.groovy.xml [auto]
+   org.apache.groovy:groovy:jar:4.0.32:test -- module org.apache.groovy [auto]
    org.apache.httpcomponents:httpclient:jar:4.5.13:test -- module org.apache.httpcomponents.httpclient [auto]
    org.apache.httpcomponents:httpcore:jar:4.4.16:test -- module org.apache.httpcomponents.httpcore [auto]
    org.apache.httpcomponents:httpmime:jar:4.5.13:test -- module org.apache.httpcomponents.httpmime [auto]
