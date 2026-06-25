@@ -84,7 +84,7 @@
         <sonar.coverage.exclusions>**/*Test*.*, **/*Config*.*</sonar.coverage.exclusions>
         <sonar.projectKey>camelbee.${project.name}</sonar.projectKey>
         <sonar.qualitygate.wait>true</sonar.qualitygate.wait>
-        <spotbugs-annotations.version>4.9.8</spotbugs-annotations.version>
+        <spotbugs-annotations.version>4.10.2</spotbugs-annotations.version>
         <spotbugs-maven-plugin.version>4.10.2.0</spotbugs-maven-plugin.version>
         <spotbugs.version>4.10.2</spotbugs.version>
 
@@ -128,7 +128,7 @@
           → Use <dependencyManagement> to enforce versions
         -->
         <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
-        <proto-google-common-protos.version>2.71.0</proto-google-common-protos.version>
+        <proto-google-common-protos.version>2.72.0</proto-google-common-protos.version>
         <protoc.version>3.25.8</protoc.version>
         <protoc-gen-grpc-java.version>1.78.0</protoc-gen-grpc-java.version>
         <!-- ================================================================ -->
