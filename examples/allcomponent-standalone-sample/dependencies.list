@@ -1,11 +1,11 @@
 The following files have been resolved:
    ch.qos.logback:logback-classic:jar:1.5.35:compile -- module ch.qos.logback.classic
    ch.qos.logback:logback-core:jar:1.5.35:compile -- module ch.qos.logback.core
-   com.fasterxml.jackson.core:jackson-annotations:jar:2.21:compile -- module com.fasterxml.jackson.annotation
-   com.fasterxml.jackson.core:jackson-core:jar:2.21.4:compile -- module com.fasterxml.jackson.core
+   com.fasterxml.jackson.core:jackson-annotations:jar:2.22:compile -- module com.fasterxml.jackson.annotation
+   com.fasterxml.jackson.core:jackson-core:jar:2.22.0:compile -- module com.fasterxml.jackson.core
    com.fasterxml.jackson.core:jackson-databind:jar:2.21.2:compile -- module com.fasterxml.jackson.databind
    com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:jar:2.21.2:compile -- module com.fasterxml.jackson.dataformat.yaml
-   com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar:2.21.4:compile -- module com.fasterxml.jackson.datatype.jsr310
+   com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar:2.22.0:compile -- module com.fasterxml.jackson.datatype.jsr310
    com.fasterxml.woodstox:woodstox-core:jar:7.2.0:compile -- module com.ctc.wstx
    com.github.docker-java:docker-java-api:jar:3.7.1:test -- module com.github.dockerjava.api [auto]
    com.github.docker-java:docker-java-transport-zerodep:jar:3.7.1:test -- module com.github.dockerjava.transport.zerodep [auto]
@@ -19,7 +19,7 @@ The following files have been resolved:
    io.micrometer:micrometer-commons:jar:1.16.5:compile -- module micrometer.commons [auto]
    io.micrometer:micrometer-core:jar:1.16.5:compile -- module micrometer.core [auto]
    io.micrometer:micrometer-observation:jar:1.16.5:compile -- module micrometer.observation [auto]
-   io.micrometer:micrometer-registry-prometheus:jar:1.16.5:compile -- module micrometer.registry.prometheus [auto]
+   io.micrometer:micrometer-registry-prometheus:jar:1.17.0:compile -- module micrometer.registry.prometheus [auto]
    io.netty:netty-buffer:jar:4.1.132.Final:compile -- module io.netty.buffer [auto]
    io.netty:netty-codec-dns:jar:4.1.132.Final:compile -- module io.netty.codec.dns [auto]
    io.netty:netty-codec-http2:jar:4.1.132.Final:compile -- module io.netty.codec.http2 [auto]
@@ -33,12 +33,12 @@ The following files have been resolved:
    io.netty:netty-resolver:jar:4.1.132.Final:compile -- module io.netty.resolver [auto]
    io.netty:netty-transport-native-unix-common:jar:4.1.132.Final:compile -- module io.netty.transport.unix.common [auto]
    io.netty:netty-transport:jar:4.1.132.Final:compile -- module io.netty.transport [auto]
-   io.prometheus:prometheus-metrics-config:jar:1.4.3:compile -- module io.prometheus.metrics.config [auto]
-   io.prometheus:prometheus-metrics-core:jar:1.4.3:compile -- module io.prometheus.metrics.core [auto]
-   io.prometheus:prometheus-metrics-exposition-formats:jar:1.4.3:runtime -- module io.prometheus.metrics.expositionformats [auto]
-   io.prometheus:prometheus-metrics-exposition-textformats:jar:1.4.3:runtime -- module io.prometheus.writer.text [auto]
-   io.prometheus:prometheus-metrics-model:jar:1.4.3:compile -- module io.prometheus.metrics.model [auto]
-   io.prometheus:prometheus-metrics-tracer-common:jar:1.4.3:compile -- module io.prometheus.metrics.tracer.common [auto]
+   io.prometheus:prometheus-metrics-config:jar:1.7.0:compile -- module io.prometheus.metrics.config [auto]
+   io.prometheus:prometheus-metrics-core:jar:1.7.0:compile -- module io.prometheus.metrics.core [auto]
+   io.prometheus:prometheus-metrics-exposition-formats:jar:1.7.0:runtime -- module io.prometheus.metrics.expositionformats [auto]
+   io.prometheus:prometheus-metrics-exposition-textformats:jar:1.7.0:runtime -- module io.prometheus.writer.text [auto]
+   io.prometheus:prometheus-metrics-model:jar:1.7.0:compile -- module io.prometheus.metrics.model [auto]
+   io.prometheus:prometheus-metrics-tracer-common:jar:1.7.0:compile -- module io.prometheus.metrics.tracer.common [auto]
    io.vertx:vertx-auth-common:jar:4.5.26:compile -- module io.vertx.auth.common [auto]
    io.vertx:vertx-auth-jwt:jar:4.5.26:compile -- module io.vertx.auth.jwt [auto]
    io.vertx:vertx-auth-properties:jar:4.5.26:compile -- module io.vertx.auth.properties [auto]
