@@ -1,9 +1,9 @@
 The following files have been resolved:
-   ch.qos.logback:logback-classic:jar:1.5.32:compile -- module ch.qos.logback.classic
-   ch.qos.logback:logback-core:jar:1.5.32:compile -- module ch.qos.logback.core
+   ch.qos.logback:logback-classic:jar:1.5.34:compile -- module ch.qos.logback.classic
+   ch.qos.logback:logback-core:jar:1.5.34:compile -- module ch.qos.logback.core
    com.fasterxml.jackson.core:jackson-annotations:jar:2.21:compile -- module com.fasterxml.jackson.annotation
-   com.fasterxml.jackson.core:jackson-core:jar:2.21.2:provided -- module com.fasterxml.jackson.core
-   com.fasterxml.jackson.core:jackson-databind:jar:2.21.2:provided -- module com.fasterxml.jackson.databind
+   com.fasterxml.jackson.core:jackson-core:jar:2.21.4:provided -- module com.fasterxml.jackson.core
+   com.fasterxml.jackson.core:jackson-databind:jar:2.21.4:provided -- module com.fasterxml.jackson.databind
    com.fasterxml.woodstox:woodstox-core:jar:7.2.0:compile -- module com.ctc.wstx
    com.fasterxml:classmate:jar:1.7.3:provided -- module com.fasterxml.classmate
    com.github.docker-java:docker-java-api:jar:3.7.1:test -- module com.github.dockerjava.api [auto]
@@ -15,19 +15,19 @@ The following files have been resolved:
    com.nimbusds:nimbus-jose-jwt:jar:10.9.1:compile -- module com.nimbusds.jose.jwt
    com.sun.istack:istack-commons-runtime:jar:4.1.2:compile -- module com.sun.istack.runtime
    com.vaadin.external.google:android-json:jar:0.0.20131108.vaadin1:test -- module android.json (auto)
-   commons-codec:commons-codec:jar:1.19.0:test -- module org.apache.commons.codec
+   commons-codec:commons-codec:jar:1.21.0:test -- module org.apache.commons.codec
    commons-io:commons-io:jar:2.22.0:compile -- module org.apache.commons.io
    commons-logging:commons-logging:jar:1.3.6:compile -- module org.apache.commons.logging
    io.camelbee:camelbee-springboot-core:jar:3.2.1:compile -- module camelbee.springboot.core (auto)
-   io.micrometer:micrometer-commons:jar:1.16.5:compile -- module micrometer.commons [auto]
-   io.micrometer:micrometer-observation:jar:1.16.5:compile -- module micrometer.observation [auto]
+   io.micrometer:micrometer-commons:jar:1.17.0:compile -- module micrometer.commons [auto]
+   io.micrometer:micrometer-observation:jar:1.17.0:compile -- module micrometer.observation [auto]
    jakarta.activation:jakarta.activation-api:jar:2.1.4:compile -- module jakarta.activation
    jakarta.annotation:jakarta.annotation-api:jar:3.0.0:compile -- module jakarta.annotation
    jakarta.servlet:jakarta.servlet-api:jar:6.1.0:provided -- module jakarta.servlet
    jakarta.validation:jakarta.validation-api:jar:3.1.1:provided -- module jakarta.validation
-   jakarta.xml.bind:jakarta.xml.bind-api:jar:4.0.4:compile -- module jakarta.xml.bind
-   net.bytebuddy:byte-buddy-agent:jar:1.17.8:test -- module net.bytebuddy.agent
-   net.bytebuddy:byte-buddy:jar:1.17.8:test -- module net.bytebuddy
+   jakarta.xml.bind:jakarta.xml.bind-api:jar:4.0.5:compile -- module jakarta.xml.bind
+   net.bytebuddy:byte-buddy-agent:jar:1.18.10:test -- module net.bytebuddy.agent
+   net.bytebuddy:byte-buddy:jar:1.18.10:test -- module net.bytebuddy
    net.java.dev.jna:jna:jar:5.18.1:test -- module com.sun.jna [auto]
    net.minidev:accessors-smart:jar:2.6.0:test -- module accessors.smart (auto)
    net.minidev:json-smart:jar:2.6.0:test -- module json.smart (auto)
@@ -115,32 +115,32 @@ The following files have been resolved:
    org.apache.cxf:cxf-core:jar:4.2.2:compile -- module org.apache.cxf.core [auto]
    org.apache.cxf:cxf-rt-transports-http-jetty:jar:4.2.2:provided -- module org.apache.cxf.transport.http.jetty [auto]
    org.apache.cxf:cxf-rt-transports-http:jar:4.2.2:provided -- module org.apache.cxf.transport.http [auto]
-   org.apache.httpcomponents.client5:httpclient5:jar:5.5.2:provided -- module org.apache.httpcomponents.client5.httpclient5 [auto]
-   org.apache.httpcomponents.core5:httpcore5-h2:jar:5.3.6:provided -- module org.apache.httpcomponents.core5.httpcore5.h2 [auto]
-   org.apache.httpcomponents.core5:httpcore5:jar:5.3.6:provided -- module org.apache.httpcomponents.core5.httpcore5 [auto]
+   org.apache.httpcomponents.client5:httpclient5:jar:5.6.1:provided -- module org.apache.httpcomponents.client5.httpclient5 [auto]
+   org.apache.httpcomponents.core5:httpcore5-h2:jar:5.4.2:provided -- module org.apache.httpcomponents.core5.httpcore5.h2 [auto]
+   org.apache.httpcomponents.core5:httpcore5:jar:5.4.2:provided -- module org.apache.httpcomponents.core5.httpcore5 [auto]
    org.apache.logging.log4j:log4j-api:jar:2.25.4:compile -- module org.apache.logging.log4j
    org.apache.logging.log4j:log4j-to-slf4j:jar:2.25.4:compile -- module org.apache.logging.log4j.to.slf4j
-   org.apache.tomcat.embed:tomcat-embed-core:jar:11.0.21:compile -- module org.apache.tomcat.embed.core
-   org.apache.tomcat.embed:tomcat-embed-el:jar:11.0.21:compile -- module org.apache.tomcat.embed.el
-   org.apache.tomcat.embed:tomcat-embed-websocket:jar:11.0.21:compile -- module org.apache.tomcat.embed.websocket
+   org.apache.tomcat.embed:tomcat-embed-core:jar:11.0.22:compile -- module org.apache.tomcat.embed.core
+   org.apache.tomcat.embed:tomcat-embed-el:jar:11.0.22:compile -- module org.apache.tomcat.embed.el
+   org.apache.tomcat.embed:tomcat-embed-websocket:jar:11.0.22:compile -- module org.apache.tomcat.embed.websocket
    org.apache.ws.xmlschema:xmlschema-core:jar:2.3.2:compile -- module xmlschema.core (auto)
    org.apiguardian:apiguardian-api:jar:1.1.2:test -- module org.apiguardian.api
    org.assertj:assertj-core:jar:3.27.7:test -- module org.assertj.core
    org.awaitility:awaitility:jar:4.3.0:test -- module awaitility (auto)
    org.codehaus.woodstox:stax2-api:jar:4.3.0:compile -- module org.codehaus.stax2
    org.eclipse.angus:angus-activation:jar:2.0.3:compile -- module org.eclipse.angus.activation
-   org.eclipse.jetty.ee11:jetty-ee11-servlet:jar:12.1.8:provided -- module org.eclipse.jetty.ee11.servlet
-   org.eclipse.jetty:jetty-http:jar:12.1.8:provided -- module org.eclipse.jetty.http
-   org.eclipse.jetty:jetty-io:jar:12.1.8:provided -- module org.eclipse.jetty.io
-   org.eclipse.jetty:jetty-security:jar:12.1.8:provided -- module org.eclipse.jetty.security
-   org.eclipse.jetty:jetty-server:jar:12.1.8:provided -- module org.eclipse.jetty.server
-   org.eclipse.jetty:jetty-session:jar:12.1.8:provided -- module org.eclipse.jetty.session
-   org.eclipse.jetty:jetty-util:jar:12.1.8:provided -- module org.eclipse.jetty.util
-   org.glassfish.jaxb:jaxb-core:jar:4.0.6:compile -- module org.glassfish.jaxb.core
-   org.glassfish.jaxb:jaxb-runtime:jar:4.0.6:compile -- module org.glassfish.jaxb.runtime
-   org.glassfish.jaxb:txw2:jar:4.0.6:compile -- module com.sun.xml.txw2
+   org.eclipse.jetty.ee11:jetty-ee11-servlet:jar:12.1.10:provided -- module org.eclipse.jetty.ee11.servlet
+   org.eclipse.jetty:jetty-http:jar:12.1.10:provided -- module org.eclipse.jetty.http
+   org.eclipse.jetty:jetty-io:jar:12.1.10:provided -- module org.eclipse.jetty.io
+   org.eclipse.jetty:jetty-security:jar:12.1.10:provided -- module org.eclipse.jetty.security
+   org.eclipse.jetty:jetty-server:jar:12.1.10:provided -- module org.eclipse.jetty.server
+   org.eclipse.jetty:jetty-session:jar:12.1.10:provided -- module org.eclipse.jetty.session
+   org.eclipse.jetty:jetty-util:jar:12.1.10:provided -- module org.eclipse.jetty.util
+   org.glassfish.jaxb:jaxb-core:jar:4.0.9:compile -- module org.glassfish.jaxb.core
+   org.glassfish.jaxb:jaxb-runtime:jar:4.0.9:compile -- module org.glassfish.jaxb.runtime
+   org.glassfish.jaxb:txw2:jar:4.0.9:compile -- module com.sun.xml.txw2
    org.hamcrest:hamcrest:jar:3.0:test -- module org.hamcrest [auto]
-   org.hibernate.validator:hibernate-validator:jar:9.0.1.Final:provided -- module org.hibernate.validator
+   org.hibernate.validator:hibernate-validator:jar:9.1.0.Final:provided -- module org.hibernate.validator
    org.jboss.logging:jboss-logging:jar:3.6.3.Final:provided -- module org.jboss.logging
    org.jetbrains:annotations:jar:17.0.0:test -- module org.jetbrains.annotations [auto]
    org.jspecify:jspecify:jar:1.0.0:compile -- module org.jspecify
@@ -152,8 +152,8 @@ The following files have been resolved:
    org.junit.platform:junit-platform-engine:jar:6.0.3:test -- module org.junit.platform.engine
    org.junit.platform:junit-platform-launcher:jar:6.0.3:test -- module org.junit.platform.launcher
    org.mapstruct:mapstruct:jar:1.6.3:compile -- module org.mapstruct [auto]
-   org.mockito:mockito-core:jar:5.20.0:test -- module org.mockito
-   org.mockito:mockito-junit-jupiter:jar:5.20.0:test -- module org.mockito.junit.jupiter
+   org.mockito:mockito-core:jar:5.23.0:test -- module org.mockito
+   org.mockito:mockito-junit-jupiter:jar:5.23.0:test -- module org.mockito.junit.jupiter
    org.objenesis:objenesis:jar:3.3:test -- module org.objenesis [auto]
    org.openapitools:jackson-databind-nullable:jar:0.2.10:compile -- module org.openapitools.jackson.nullable
    org.opentest4j:opentest4j:jar:1.3.0:test -- module org.opentest4j
@@ -161,40 +161,40 @@ The following files have been resolved:
    org.projectlombok:lombok:jar:1.18.46:provided -- module lombok
    org.rnorth.duct-tape:duct-tape:jar:1.0.8:test -- module duct.tape (auto)
    org.skyscreamer:jsonassert:jar:1.5.3:test -- module jsonassert (auto)
-   org.slf4j:jul-to-slf4j:jar:2.0.17:compile -- module jul.to.slf4j
-   org.slf4j:slf4j-api:jar:2.0.17:compile -- module org.slf4j
-   org.springframework.boot:spring-boot-autoconfigure:jar:4.0.6:compile -- module spring.boot.autoconfigure [auto]
-   org.springframework.boot:spring-boot-http-converter:jar:4.0.6:compile -- module spring.boot.http.converter [auto]
-   org.springframework.boot:spring-boot-jackson:jar:4.0.6:compile -- module spring.boot.jackson [auto]
-   org.springframework.boot:spring-boot-servlet:jar:4.0.6:compile -- module spring.boot.servlet [auto]
-   org.springframework.boot:spring-boot-starter-jackson:jar:4.0.6:compile -- module spring.boot.starter.jackson [auto]
-   org.springframework.boot:spring-boot-starter-logging:jar:4.0.6:compile -- module spring.boot.starter.logging [auto]
-   org.springframework.boot:spring-boot-starter-test:jar:4.0.6:test -- module spring.boot.starter.test [auto]
-   org.springframework.boot:spring-boot-starter-tomcat-runtime:jar:4.0.6:compile -- module spring.boot.starter.tomcat.runtime [auto]
-   org.springframework.boot:spring-boot-starter-tomcat:jar:4.0.6:compile -- module spring.boot.starter.tomcat [auto]
-   org.springframework.boot:spring-boot-starter-validation:jar:4.0.6:provided -- module spring.boot.starter.validation [auto]
-   org.springframework.boot:spring-boot-starter-web:jar:4.0.6:compile -- module spring.boot.starter.web [auto]
-   org.springframework.boot:spring-boot-starter:jar:4.0.6:compile -- module spring.boot.starter [auto]
-   org.springframework.boot:spring-boot-test-autoconfigure:jar:4.0.6:test -- module spring.boot.test.autoconfigure [auto]
-   org.springframework.boot:spring-boot-test:jar:4.0.6:test -- module spring.boot.test [auto]
-   org.springframework.boot:spring-boot-tomcat:jar:4.0.6:compile -- module spring.boot.tomcat [auto]
-   org.springframework.boot:spring-boot-validation:jar:4.0.6:provided -- module spring.boot.validation [auto]
-   org.springframework.boot:spring-boot-web-server:jar:4.0.6:compile -- module spring.boot.web.server [auto]
-   org.springframework.boot:spring-boot-webmvc:jar:4.0.6:compile -- module spring.boot.webmvc [auto]
-   org.springframework.boot:spring-boot:jar:4.0.6:compile -- module spring.boot [auto]
-   org.springframework:spring-aop:jar:7.0.7:compile -- module spring.aop [auto]
-   org.springframework:spring-beans:jar:7.0.7:compile -- module spring.beans [auto]
-   org.springframework:spring-context:jar:7.0.7:compile -- module spring.context [auto]
-   org.springframework:spring-core:jar:7.0.7:compile -- module spring.core [auto]
-   org.springframework:spring-expression:jar:7.0.7:compile -- module spring.expression [auto]
-   org.springframework:spring-test:jar:7.0.7:test -- module spring.test [auto]
-   org.springframework:spring-tx:jar:7.0.7:compile -- module spring.tx [auto]
-   org.springframework:spring-web:jar:7.0.7:compile -- module spring.web [auto]
-   org.springframework:spring-webmvc:jar:7.0.7:compile -- module spring.webmvc [auto]
+   org.slf4j:jul-to-slf4j:jar:2.0.18:compile -- module jul.to.slf4j
+   org.slf4j:slf4j-api:jar:2.0.18:compile -- module org.slf4j
+   org.springframework.boot:spring-boot-autoconfigure:jar:4.1.0:compile -- module spring.boot.autoconfigure [auto]
+   org.springframework.boot:spring-boot-http-converter:jar:4.1.0:compile -- module spring.boot.http.converter [auto]
+   org.springframework.boot:spring-boot-jackson:jar:4.1.0:compile -- module spring.boot.jackson [auto]
+   org.springframework.boot:spring-boot-servlet:jar:4.1.0:compile -- module spring.boot.servlet [auto]
+   org.springframework.boot:spring-boot-starter-jackson:jar:4.1.0:compile -- module spring.boot.starter.jackson [auto]
+   org.springframework.boot:spring-boot-starter-logging:jar:4.1.0:compile -- module spring.boot.starter.logging [auto]
+   org.springframework.boot:spring-boot-starter-test:jar:4.1.0:test -- module spring.boot.starter.test [auto]
+   org.springframework.boot:spring-boot-starter-tomcat-runtime:jar:4.1.0:compile -- module spring.boot.starter.tomcat.runtime [auto]
+   org.springframework.boot:spring-boot-starter-tomcat:jar:4.1.0:compile -- module spring.boot.starter.tomcat [auto]
+   org.springframework.boot:spring-boot-starter-validation:jar:4.1.0:provided -- module spring.boot.starter.validation [auto]
+   org.springframework.boot:spring-boot-starter-web:jar:4.1.0:compile -- module spring.boot.starter.web [auto]
+   org.springframework.boot:spring-boot-starter:jar:4.1.0:compile -- module spring.boot.starter [auto]
+   org.springframework.boot:spring-boot-test-autoconfigure:jar:4.1.0:test -- module spring.boot.test.autoconfigure [auto]
+   org.springframework.boot:spring-boot-test:jar:4.1.0:test -- module spring.boot.test [auto]
+   org.springframework.boot:spring-boot-tomcat:jar:4.1.0:compile -- module spring.boot.tomcat [auto]
+   org.springframework.boot:spring-boot-validation:jar:4.1.0:provided -- module spring.boot.validation [auto]
+   org.springframework.boot:spring-boot-web-server:jar:4.1.0:compile -- module spring.boot.web.server [auto]
+   org.springframework.boot:spring-boot-webmvc:jar:4.1.0:compile -- module spring.boot.webmvc [auto]
+   org.springframework.boot:spring-boot:jar:4.1.0:compile -- module spring.boot [auto]
+   org.springframework:spring-aop:jar:7.0.8:compile -- module spring.aop [auto]
+   org.springframework:spring-beans:jar:7.0.8:compile -- module spring.beans [auto]
+   org.springframework:spring-context:jar:7.0.8:compile -- module spring.context [auto]
+   org.springframework:spring-core:jar:7.0.8:compile -- module spring.core [auto]
+   org.springframework:spring-expression:jar:7.0.8:compile -- module spring.expression [auto]
+   org.springframework:spring-test:jar:7.0.8:test -- module spring.test [auto]
+   org.springframework:spring-tx:jar:7.0.8:compile -- module spring.tx [auto]
+   org.springframework:spring-web:jar:7.0.8:compile -- module spring.web [auto]
+   org.springframework:spring-webmvc:jar:7.0.8:compile -- module spring.webmvc [auto]
    org.testcontainers:junit-jupiter:jar:1.21.4:test -- module junit.jupiter (auto)
    org.testcontainers:testcontainers:jar:2.0.5:test -- module testcontainers (auto)
-   org.xmlunit:xmlunit-core:jar:2.10.4:test -- module org.xmlunit [auto]
+   org.xmlunit:xmlunit-core:jar:2.11.0:test -- module org.xmlunit [auto]
    org.yaml:snakeyaml:jar:2.6:compile -- module org.yaml.snakeyaml
-   tools.jackson.core:jackson-core:jar:3.1.2:compile -- module tools.jackson.core
-   tools.jackson.core:jackson-databind:jar:3.1.2:compile -- module tools.jackson.databind
+   tools.jackson.core:jackson-core:jar:3.1.4:compile -- module tools.jackson.core
+   tools.jackson.core:jackson-databind:jar:3.1.4:compile -- module tools.jackson.databind
 

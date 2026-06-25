@@ -7,11 +7,11 @@ The following files have been resolved:
    com.github.spotbugs:spotbugs-annotations:jar:4.10.2:compile -- module com.github.spotbugs.annotations [auto]
    com.google.code.findbugs:jsr305:jar:3.0.2:compile -- module jsr305 (auto)
    com.sun.istack:istack-commons-runtime:jar:4.1.2:compile -- module com.sun.istack.runtime
-   commons-codec:commons-codec:jar:1.19.0:test -- module org.apache.commons.codec
+   commons-codec:commons-codec:jar:1.21.0:test -- module org.apache.commons.codec
    commons-io:commons-io:jar:2.22.0:compile -- module org.apache.commons.io
    jakarta.activation:jakarta.activation-api:jar:2.1.4:compile -- module jakarta.activation
    jakarta.annotation:jakarta.annotation-api:jar:3.0.0:compile -- module jakarta.annotation
-   jakarta.xml.bind:jakarta.xml.bind-api:jar:4.0.4:compile -- module jakarta.xml.bind
+   jakarta.xml.bind:jakarta.xml.bind-api:jar:4.0.5:compile -- module jakarta.xml.bind
    net.java.dev.jna:jna:jar:5.18.1:test -- module com.sun.jna [auto]
    org.apache.commons:commons-compress:jar:1.28.0:test -- module org.apache.commons.compress
    org.apache.commons:commons-lang3:jar:3.20.0:compile -- module org.apache.commons.lang3
@@ -19,15 +19,15 @@ The following files have been resolved:
    org.apache.ws.xmlschema:xmlschema-core:jar:2.3.2:compile -- module xmlschema.core (auto)
    org.codehaus.woodstox:stax2-api:jar:4.3.0:compile -- module org.codehaus.stax2
    org.eclipse.angus:angus-activation:jar:2.0.3:compile -- module org.eclipse.angus.activation
-   org.glassfish.jaxb:jaxb-core:jar:4.0.6:compile -- module org.glassfish.jaxb.core
-   org.glassfish.jaxb:jaxb-runtime:jar:4.0.6:compile -- module org.glassfish.jaxb.runtime
-   org.glassfish.jaxb:txw2:jar:4.0.6:compile -- module com.sun.xml.txw2
+   org.glassfish.jaxb:jaxb-core:jar:4.0.9:compile -- module org.glassfish.jaxb.core
+   org.glassfish.jaxb:jaxb-runtime:jar:4.0.9:compile -- module org.glassfish.jaxb.runtime
+   org.glassfish.jaxb:txw2:jar:4.0.9:compile -- module com.sun.xml.txw2
    org.jetbrains:annotations:jar:17.0.0:test -- module org.jetbrains.annotations [auto]
    org.mapstruct:mapstruct:jar:1.6.3:compile -- module org.mapstruct [auto]
    org.openapitools:jackson-databind-nullable:jar:0.2.10:compile -- module org.openapitools.jackson.nullable
    org.projectlombok:lombok:jar:1.18.46:provided -- module lombok
    org.rnorth.duct-tape:duct-tape:jar:1.0.8:test -- module duct.tape (auto)
-   org.slf4j:slf4j-api:jar:2.0.17:test -- module org.slf4j
+   org.slf4j:slf4j-api:jar:2.0.18:test -- module org.slf4j
    org.testcontainers:junit-jupiter:jar:1.21.4:test -- module junit.jupiter (auto)
    org.testcontainers:testcontainers:jar:2.0.5:test -- module testcontainers (auto)
    org.yaml:snakeyaml:jar:2.6:compile -- module org.yaml.snakeyaml
