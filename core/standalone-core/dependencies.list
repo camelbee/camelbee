@@ -1,6 +1,6 @@
 The following files have been resolved:
-   ch.qos.logback:logback-classic:jar:1.5.35:test -- module ch.qos.logback.classic
-   ch.qos.logback:logback-core:jar:1.5.35:test -- module ch.qos.logback.core
+   ch.qos.logback:logback-classic:jar:1.5.36:test -- module ch.qos.logback.classic
+   ch.qos.logback:logback-core:jar:1.5.36:test -- module ch.qos.logback.core
    com.fasterxml.jackson.core:jackson-annotations:jar:2.22:compile -- module com.fasterxml.jackson.annotation
    com.fasterxml.jackson.core:jackson-core:jar:2.22.0:compile -- module com.fasterxml.jackson.core
    com.fasterxml.jackson.core:jackson-databind:jar:2.21.2:compile -- module com.fasterxml.jackson.databind
