@@ -25,7 +25,7 @@
         <!-- Used by generated microservices (declared conditionally in the archetype):
              spring-ai (MCP), Apicurio serdes (Kafka schema registry), and a Groovy pin for
              rest-assured (the Spring Boot 4 BOM ships Groovy 5, which breaks rest-assured 5.x). -->
-        <spring-ai-bom.version>2.0.0-M2</spring-ai-bom.version>
+        <spring-ai-bom.version>2.0.0</spring-ai-bom.version>
         <apicurio-registry-serdes.version>2.6.13.Final</apicurio-registry-serdes.version>
         <groovy.version>4.0.32</groovy.version>
     </properties>
