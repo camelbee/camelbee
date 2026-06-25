@@ -49,7 +49,7 @@
         <com.google.crypto.tink.version>1.22.0</com.google.crypto.tink.version>
         <!-- MCP support for generated microservices (declared conditionally in the archetype). -->
         <quarkus-mcp-server.version>1.13.0</quarkus-mcp-server.version>
-        <mcp-sdk.version>0.18.3</mcp-sdk.version>
+        <mcp-sdk.version>2.0.0</mcp-sdk.version>
     </properties>
 
     <dependencyManagement>
