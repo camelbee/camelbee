@@ -1,6 +1,6 @@
 The following files have been resolved:
-   com.fasterxml.jackson.core:jackson-annotations:jar:2.21:test -- module com.fasterxml.jackson.annotation
-   com.fasterxml.woodstox:woodstox-core:jar:7.1.1:compile -- module com.ctc.wstx
+   com.fasterxml.jackson.core:jackson-annotations:jar:2.22:test -- module com.fasterxml.jackson.annotation
+   com.fasterxml.woodstox:woodstox-core:jar:7.2.1:compile -- module com.ctc.wstx
    com.github.docker-java:docker-java-api:jar:3.7.1:test -- module com.github.dockerjava.api [auto]
    com.github.docker-java:docker-java-transport-zerodep:jar:3.7.1:test -- module com.github.dockerjava.transport.zerodep [auto]
    com.github.docker-java:docker-java-transport:jar:3.7.1:test -- module com.github.dockerjava.transport [auto]
@@ -17,7 +17,7 @@ The following files have been resolved:
    org.apache.commons:commons-lang3:jar:3.20.0:compile -- module org.apache.commons.lang3
    org.apache.cxf:cxf-core:jar:4.2.2:compile -- module org.apache.cxf.core [auto]
    org.apache.ws.xmlschema:xmlschema-core:jar:2.3.2:compile -- module xmlschema.core (auto)
-   org.codehaus.woodstox:stax2-api:jar:4.2.2:compile -- module org.codehaus.stax2
+   org.codehaus.woodstox:stax2-api:jar:4.3.0:compile -- module org.codehaus.stax2
    org.eclipse.angus:angus-activation:jar:2.0.3:compile -- module org.eclipse.angus.activation
    org.glassfish.jaxb:jaxb-core:jar:4.0.9:compile -- module org.glassfish.jaxb.core
    org.glassfish.jaxb:jaxb-runtime:jar:4.0.9:compile -- module org.glassfish.jaxb.runtime
