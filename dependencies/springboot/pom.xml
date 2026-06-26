@@ -26,6 +26,11 @@
              spring-ai (MCP) and Apicurio serdes (Kafka schema registry). -->
         <spring-ai-bom.version>2.0.0</spring-ai-bom.version>
         <apicurio-registry-serdes.version>2.6.13.Final</apicurio-registry-serdes.version>
+        <!-- Match the avro-maven-plugin (1.12.1) used to generate the Avro record classes, and the
+             1.12.1 runtime Camel 4.20.0 ships. apicurio-registry-serdes-avro-serde transitively pulls
+             avro 1.12.0, which would win mediation and lacks Utf8.compareSequences(...) — breaking the
+             generated code. The Quarkus side is already on 1.12.1 via its platform BOM. -->
+        <avro.version>1.12.1</avro.version>
     </properties>
 
     <dependencyManagement>
@@ -90,6 +95,14 @@
                 <groupId>io.apicurio</groupId>
                 <artifactId>apicurio-registry-serdes-avro-serde</artifactId>
                 <version>${apicurio-registry-serdes.version}</version>
+            </dependency>
+
+            <!-- Force avro 1.12.1 over apicurio's transitive 1.12.0 so the runtime matches the
+                 avro-maven-plugin codegen (see avro.version above). -->
+            <dependency>
+                <groupId>org.apache.avro</groupId>
+                <artifactId>avro</artifactId>
+                <version>${avro.version}</version>
             </dependency>
 
             <!-- MCP SDK vs WireMock conflict pin (shared version with the Quarkus side). -->
