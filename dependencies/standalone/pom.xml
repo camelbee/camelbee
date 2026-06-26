@@ -38,7 +38,7 @@
              standalone-core and the standalone sample via their parent chain). -->
         <assertj-core.version>3.27.7</assertj-core.version>
         <mockito-junit-jupiter.version>5.23.0</mockito-junit-jupiter.version>
-        <logback-classic.version>1.5.36</logback-classic.version>
+        <logback-classic.version>1.5.37</logback-classic.version>
     </properties>
 
     <dependencyManagement>
