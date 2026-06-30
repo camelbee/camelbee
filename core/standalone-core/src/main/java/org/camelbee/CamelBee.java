@@ -116,10 +116,10 @@ public final class CamelBee {
     final RouteContextService routeContextService = new RouteContextService(camelContext);
     final LoggingService loggingService = new LoggingService();
 
-    final ExchangeCreatedEventTracer createdTracer = new ExchangeCreatedEventTracer(messageService);
+    final ExchangeCreatedEventTracer createdTracer = new ExchangeCreatedEventTracer();
     final ExchangeSendingEventTracer sendingTracer = new ExchangeSendingEventTracer(messageService, routeContextService);
-    final ExchangeSentEventTracer sentTracer = new ExchangeSentEventTracer(messageService);
-    final ExchangeCompletedEventTracer completedTracer = new ExchangeCompletedEventTracer(messageService);
+    final ExchangeSentEventTracer sentTracer = new ExchangeSentEventTracer();
+    final ExchangeCompletedEventTracer completedTracer = new ExchangeCompletedEventTracer();
 
     final TracerService tracerService = new TracerService(config.isLoggingEnabled(), config.isTracerEnabled(),
         config.getTracerMaxIdleTime(), createdTracer, sendingTracer, sentTracer, completedTracer, messageService,

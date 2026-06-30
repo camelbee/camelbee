@@ -21,7 +21,7 @@ import java.time.ZonedDateTime;
  * This class allows switching between system clocks and fixed clocks for unit testing,
  * supporting different time zones and clock configurations.
  */
-public class TimeProvider {
+public final class TimeProvider {
 
   /**
    * Default time zone used by the system (UTC).

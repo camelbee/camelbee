@@ -30,7 +30,6 @@ import org.apache.camel.support.DefaultExchange;
 import org.camelbee.debugger.model.exchange.Message;
 import org.camelbee.debugger.model.exchange.MessageEventType;
 import org.camelbee.debugger.model.exchange.MessageType;
-import org.camelbee.debugger.service.MessageService;
 import org.camelbee.utils.ExchangeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,12 +44,6 @@ public class ExchangeCreatedEventTracer {
    * The logger.
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(ExchangeCreatedEventTracer.class);
-
-  private final MessageService messageService;
-
-  public ExchangeCreatedEventTracer(MessageService messageService) {
-    this.messageService = messageService;
-  }
 
   /**
    * Trace ExchangeCreatedEvent.

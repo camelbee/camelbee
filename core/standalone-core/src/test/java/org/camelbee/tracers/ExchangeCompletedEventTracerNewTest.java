@@ -15,7 +15,6 @@ import org.apache.camel.support.DefaultExchange;
 import org.camelbee.debugger.model.exchange.Message;
 import org.camelbee.debugger.model.exchange.MessageEventType;
 import org.camelbee.debugger.model.exchange.MessageType;
-import org.camelbee.debugger.service.MessageService;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -35,7 +34,7 @@ class ExchangeCompletedEventTracerNewTest {
   void start() {
     camelContext = new DefaultCamelContext();
     camelContext.start();
-    tracer = new ExchangeCompletedEventTracer(mock(MessageService.class));
+    tracer = new ExchangeCompletedEventTracer();
   }
 
   @AfterAll

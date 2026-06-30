@@ -27,7 +27,6 @@ import org.apache.camel.support.DefaultExchange;
 import org.camelbee.debugger.model.exchange.Message;
 import org.camelbee.debugger.model.exchange.MessageEventType;
 import org.camelbee.debugger.model.exchange.MessageType;
-import org.camelbee.debugger.service.MessageService;
 import org.camelbee.utils.ExchangeUtils;
 import org.camelbee.utils.TracerUtils;
 import org.slf4j.Logger;
@@ -42,12 +41,6 @@ public class ExchangeCompletedEventTracer {
    * The logger.
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(ExchangeCompletedEventTracer.class);
-
-  private final MessageService messageService;
-
-  public ExchangeCompletedEventTracer(MessageService messageService) {
-    this.messageService = messageService;
-  }
 
   /**
    * Trace ExchangeCompletedEvent.

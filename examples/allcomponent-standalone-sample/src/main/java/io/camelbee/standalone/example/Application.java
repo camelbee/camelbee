@@ -33,6 +33,12 @@ public final class Application {
   private Application() {
   }
 
+  /**
+   * Application entry point: starts the Camel main application with CamelBee monitoring attached.
+   *
+   * @param args the command-line arguments
+   * @throws Exception if the Camel application fails to start
+   */
   public static void main(String[] args) throws Exception {
     Main main = new Main();
     main.configure().addRoutesBuilder(new MusicianRoute());
