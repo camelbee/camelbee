@@ -1,11 +1,11 @@
 The following files have been resolved:
-   ch.qos.logback:logback-classic:jar:1.5.37:compile -- module ch.qos.logback.classic
-   ch.qos.logback:logback-core:jar:1.5.37:compile -- module ch.qos.logback.core
+   ch.qos.logback:logback-classic:jar:1.5.38:compile -- module ch.qos.logback.classic
+   ch.qos.logback:logback-core:jar:1.5.38:compile -- module ch.qos.logback.core
    com.fasterxml.jackson.core:jackson-annotations:jar:2.22:compile -- module com.fasterxml.jackson.annotation
-   com.fasterxml.jackson.core:jackson-core:jar:2.22.0:compile -- module com.fasterxml.jackson.core
+   com.fasterxml.jackson.core:jackson-core:jar:2.22.1:compile -- module com.fasterxml.jackson.core
    com.fasterxml.jackson.core:jackson-databind:jar:2.21.2:compile -- module com.fasterxml.jackson.databind
    com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:jar:2.21.2:compile -- module com.fasterxml.jackson.dataformat.yaml
-   com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar:2.22.0:compile -- module com.fasterxml.jackson.datatype.jsr310
+   com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar:2.22.1:compile -- module com.fasterxml.jackson.datatype.jsr310
    com.fasterxml.woodstox:woodstox-core:jar:7.2.0:compile -- module com.ctc.wstx
    com.github.docker-java:docker-java-api:jar:3.7.1:test -- module com.github.dockerjava.api [auto]
    com.github.docker-java:docker-java-transport-zerodep:jar:3.7.1:test -- module com.github.dockerjava.transport.zerodep [auto]
@@ -15,7 +15,7 @@ The following files have been resolved:
    com.sun.istack:istack-commons-runtime:jar:4.1.2:compile -- module com.sun.istack.runtime
    commons-codec:commons-codec:jar:1.19.0:test -- module org.apache.commons.codec
    commons-io:commons-io:jar:2.22.0:compile -- module org.apache.commons.io
-   io.camelbee:camelbee-standalone-core:jar:3.2.1:compile -- module camelbee.standalone.core (auto)
+   io.camelbee:camelbee-standalone-core:jar:3.3.1:compile -- module camelbee.standalone.core (auto)
    io.micrometer:micrometer-commons:jar:1.16.5:compile -- module micrometer.commons [auto]
    io.micrometer:micrometer-core:jar:1.16.5:compile -- module micrometer.core [auto]
    io.micrometer:micrometer-observation:jar:1.16.5:compile -- module micrometer.observation [auto]

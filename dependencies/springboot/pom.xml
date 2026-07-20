@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.camelbee</groupId>
         <artifactId>dependencies</artifactId>
-        <version>3.2.1</version>
+        <version>3.3.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -23,9 +23,14 @@
         <logstash-logback-encoder.version>9.0</logstash-logback-encoder.version>
         <rest-assured.version>6.0.0</rest-assured.version>
         <!-- Used by generated microservices (declared conditionally in the archetype):
-             spring-ai (MCP) and Apicurio serdes (Kafka schema registry). -->
+             spring-ai (MCP), Apicurio serdes (Kafka schema registry), and langchain4j
+             (LANGCHAIN4JAGENT / LANGCHAIN4JEMBEDDING backends). -->
         <spring-ai-bom.version>2.0.0</spring-ai-bom.version>
         <apicurio-registry-serdes.version>2.6.13.Final</apicurio-registry-serdes.version>
+        <!-- Verified against the actual 1.15.1 jars (javap on AnthropicChatModel$Builder /
+             MistralAiChatModel$Builder etc.) for base URLs, endpoint paths, auth headers, and
+             response shapes — don't bump without re-verifying provider wiring in the archetype. -->
+        <langchain4j.version>1.15.1</langchain4j.version>
         <!-- Match the avro-maven-plugin (1.12.1) used to generate the Avro record classes, and the
              1.12.1 runtime Camel 4.20.0 ships. apicurio-registry-serdes-avro-serde transitively pulls
              avro 1.12.0, which would win mediation and lacks Utf8.compareSequences(...) — breaking the
@@ -95,6 +100,17 @@
                 <groupId>io.apicurio</groupId>
                 <artifactId>apicurio-registry-serdes-avro-serde</artifactId>
                 <version>${apicurio-registry-serdes.version}</version>
+            </dependency>
+
+            <!-- langchain4j BOM for the LANGCHAIN4JAGENT / LANGCHAIN4JEMBEDDING backends. Pins every
+                 dev.langchain4j:* artifact (provider models, embedding stores) to one mutually
+                 compatible set. Imported after the Spring Boot / Camel BOMs so those win on overlap. -->
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-bom</artifactId>
+                <version>${langchain4j.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <!-- Force avro 1.12.1 over apicurio's transitive 1.12.0 so the runtime matches the

@@ -21,7 +21,7 @@
     <parent>
         <groupId>io.camelbee</groupId>
         <artifactId>dependencies</artifactId>
-        <version>3.2.1</version>
+        <version>3.3.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -50,6 +50,12 @@
         <!-- MCP support for generated microservices (declared conditionally in the archetype). -->
         <quarkus-mcp-server.version>1.13.0</quarkus-mcp-server.version>
         <mcp-sdk.version>2.0.0</mcp-sdk.version>
+        <!-- langchain4j BOM for the LANGCHAIN4JAGENT / LANGCHAIN4JEMBEDDING backends (declared
+             conditionally in the archetype). Verified against the actual 1.15.1 jars (javap on
+             AnthropicChatModel$Builder / MistralAiChatModel$Builder etc.) for base URLs, endpoint
+             paths, auth headers, and response shapes — don't bump without re-verifying provider
+             wiring in the archetype. Kept in sync with the SpringBoot side. -->
+        <langchain4j.version>1.15.1</langchain4j.version>
     </properties>
 
     <dependencyManagement>
@@ -120,6 +126,17 @@
               <groupId>com.networknt</groupId>
               <artifactId>json-schema-validator</artifactId>
               <version>${json-schema-validator.version}</version>
+            </dependency>
+
+            <!-- langchain4j BOM for the LANGCHAIN4JAGENT / LANGCHAIN4JEMBEDDING backends. Pins every
+                 dev.langchain4j:* artifact (provider models, embedding stores) to one mutually
+                 compatible set. Imported after the Quarkus platform BOMs so those win on overlap. -->
+            <dependency>
+              <groupId>dev.langchain4j</groupId>
+              <artifactId>langchain4j-bom</artifactId>
+              <version>${langchain4j.version}</version>
+              <type>pom</type>
+              <scope>import</scope>
             </dependency>
 
         </dependencies>

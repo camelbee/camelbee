@@ -6,7 +6,7 @@
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee</artifactId>
   <packaging>pom</packaging>
-  <version>3.2.1</version>
+  <version>3.3.1</version>
 
 
   <name>CamelBee</name>
@@ -75,7 +75,7 @@
           <plugin>
             <groupId>org.sonatype.central</groupId>
             <artifactId>central-publishing-maven-plugin</artifactId>
-            <version>0.7.0</version>
+            <version>0.8.0</version>
             <extensions>true</extensions>
             <configuration>
               <publishingServerId>central</publishingServerId>

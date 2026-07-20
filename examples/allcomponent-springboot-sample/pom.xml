@@ -22,12 +22,12 @@
   <parent>
     <groupId>io.camelbee</groupId>
     <artifactId>camelbee-springboot-starter</artifactId>
-    <version>3.2.1</version>
+    <version>3.3.1</version>
     <relativePath>../../starters/camelbee-springboot-starter/pom.xml</relativePath>
   </parent>
 
   <artifactId>allcomponent-springboot-sample</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>3.3.1</version>
   <packaging>jar</packaging>
 
 

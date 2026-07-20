@@ -45,8 +45,8 @@ The following files have been resolved:
    io.agroal:agroal-api:jar:3.2:compile -- module io.agroal.api
    io.agroal:agroal-narayana:jar:3.2:compile -- module io.agroal.narayana [auto]
    io.agroal:agroal-pool:jar:3.2:compile -- module io.agroal.pool
-   io.camelbee:camelbee-quarkus-core:jar:3.2.1:compile -- module camelbee.quarkus.core (auto)
-   io.camelbee:camelbee-quarkus-security:jar:3.2.1:compile -- module camelbee.quarkus.security (auto)
+   io.camelbee:camelbee-quarkus-core:jar:3.3.1:compile -- module camelbee.quarkus.core (auto)
+   io.camelbee:camelbee-quarkus-security:jar:3.3.1:compile -- module camelbee.quarkus.security (auto)
    io.micrometer:micrometer-commons:jar:1.16.6:compile -- module micrometer.commons [auto]
    io.micrometer:micrometer-core:jar:1.16.6:compile -- module micrometer.core [auto]
    io.micrometer:micrometer-observation:jar:1.16.6:compile -- module micrometer.observation [auto]

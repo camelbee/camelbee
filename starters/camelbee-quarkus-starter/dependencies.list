@@ -27,8 +27,8 @@ The following files have been resolved:
    commons-cli:commons-cli:jar:1.8.0:test -- module org.apache.commons.cli
    commons-codec:commons-codec:jar:1.22.0:test -- module org.apache.commons.codec
    commons-io:commons-io:jar:2.22.0:compile -- module org.apache.commons.io
-   io.camelbee:camelbee-quarkus-core:jar:3.2.1:compile -- module camelbee.quarkus.core (auto)
-   io.camelbee:camelbee-quarkus-security:jar:3.2.1:compile -- module camelbee.quarkus.security (auto)
+   io.camelbee:camelbee-quarkus-core:jar:3.3.1:compile -- module camelbee.quarkus.core (auto)
+   io.camelbee:camelbee-quarkus-security:jar:3.3.1:compile -- module camelbee.quarkus.security (auto)
    io.micrometer:micrometer-commons:jar:1.16.6:compile -- module micrometer.commons [auto]
    io.micrometer:micrometer-core:jar:1.16.6:compile -- module micrometer.core [auto]
    io.micrometer:micrometer-observation:jar:1.16.6:compile -- module micrometer.observation [auto]
