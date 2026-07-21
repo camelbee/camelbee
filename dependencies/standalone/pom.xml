@@ -33,7 +33,7 @@
         <camel.version>4.20.0</camel.version>
         <jackson-jsr310.version>2.22.1</jackson-jsr310.version>
         <micrometer.version>1.17.0</micrometer.version>
-        <rest-assured.version>6.0.0</rest-assured.version>
+        <rest-assured.version>6.0.1</rest-assured.version>
         <!-- Test libraries + the runtime logging backend, centralized here (consumed by
              standalone-core and the standalone sample via their parent chain). -->
         <assertj-core.version>3.27.7</assertj-core.version>
