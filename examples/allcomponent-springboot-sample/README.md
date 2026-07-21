@@ -10,9 +10,9 @@ This project showcases how the library integrates with the embedded CamelBee UI,
 ### Initiate all the backend components
 
 Before running this application, it is essential to verify that all the backend services it relies on are operational.
-You can start these backend services by executing the following docker-compose command in the "./camelbee/examples/allcomponent-springboot-sample/backends" directory:
+You can start these backend services by executing the following docker-compose command:
 
-`docker-compose -f compose-backends.yml up -d`
+`docker-compose -f backends/compose-backends.yml up -d`
 
 ### Running the Springboot Application with Maven
 

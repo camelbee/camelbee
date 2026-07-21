@@ -10,9 +10,9 @@ This project showcases how the library integrates with the embedded CamelBee UI,
 ### Initiate all the backend components
 
 Before running this application, it is essential to verify that all the backend services it relies on are operational.
-You can start these backend services by executing the following docker-compose command in the "./camelbee/examples/allcomponent-quarkus-sample/backends" directory:
+You can start these backend services by executing the following docker-compose command:
 
-`docker-compose -f compose-backends.yml up -d`
+`docker-compose -f backends/compose-backends.yml up -d`
 
 ### Running the Quarkus Application with Maven
 
@@ -20,6 +20,9 @@ To execute this application, you must first ensure that you have successfully in
 Once the library is in place, follow these steps to run the application:
 
 `mvn clean compile quarkus:dev`
+
+> **Note:** Quarkus 3.x requires **Maven 3.9+** (and Java 21). With an older Maven you will get
+> `Detected Maven Version (x.y.z) is not supported, it must be in [3.9.0,)`.
 
 ## Visualizing with the Embedded UI
 

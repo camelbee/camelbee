@@ -58,7 +58,7 @@ spring:
     hibernate:
       # To be updated in real production usage!
       ddl-auto: none
-    database-platform: org.hibernate.dialect.MariaDB106Dialect
+    database-platform: org.hibernate.dialect.MariaDBDialect
     show-sql: false
   # Spring JMS configuration
   artemis:
@@ -138,9 +138,10 @@ camel:
     consumer-property:
       bridgeErrorHandler: true
   # jackson properties
+  # (no object-mapper reference: since Spring Boot 4 the auto-configured mapper is Jackson 3,
+  # which camel-jackson (Jackson 2) cannot reuse — Camel creates its own mapper instead)
   dataformat:
     jackson:
-      object-mapper: jacksonObjectMapper
       disable-features: FAIL_ON_EMPTY_BEANS
       pretty-print: true
       include: NON_NULL

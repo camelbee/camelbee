@@ -89,6 +89,13 @@
     </dependency>
     <!-- /JMS -->
 
+    <!-- Provides the auto-configured Rabbit ConnectionFactory (spring.rabbitmq.*): since
+         Spring Boot 4 the AMQP auto-configuration lives in its own module, no longer in core. -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-amqp</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.apache.camel.springboot</groupId>
       <artifactId>camel-spring-rabbitmq-starter</artifactId>
