@@ -1,4 +1,4 @@
-// camel-k: dependency=mvn:io.camelbee:camelbee-quarkus-core:3.2.1
+// camel-k: dependency=mvn:io.camelbee:camelbee-quarkus-core:3.3.1
 // camel-k: dependency=mvn:org.apache.camel.quarkus:camel-quarkus-rest
 // camel-k: dependency=mvn:org.apache.camel.quarkus:camel-quarkus-jackson
 // camel-k: dependency=mvn:io.quarkus:quarkus-resteasy-jackson

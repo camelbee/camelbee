@@ -5,6 +5,8 @@
 The CamelBee SpringBoot AllComponents Project serves as an illustrative demonstration of the camelbee-springboot-core library's capabilities.
 This project showcases how the library integrates with the embedded CamelBee UI, offering an immersive visualization experience.
 
+## Running the Application with Maven
+
 ### Initiate all the backend components
 
 Before running this application, it is essential to verify that all the backend services it relies on are operational.
@@ -26,3 +28,5 @@ After launching the application, open a web browser and navigate to:
 `http://localhost:8080/camelbee/index.html`
 
 The embedded CamelBee UI provides route visualization, message tracing, debugging with replay, filtering, endpoint triggering, and metrics directly in your browser.
+
+For a guide to the UI's pages and features, see the [CamelBee User Guide](../../docs/camelbee_userguide.md).

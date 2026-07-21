@@ -21,7 +21,7 @@ Add the CamelBee core dependency:
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-springboot-core</artifactId>
-  <version>3.0.2</version>
+  <version>3.3.1</version>
 </dependency>
 ```
 
@@ -70,7 +70,7 @@ Only suitable for new projects without an existing parent POM. Simply use `camel
 <parent>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-springboot-starter</artifactId>
-  <version>3.0.2</version>
+  <version>3.3.1</version>
 </parent>
 ```
 
@@ -129,7 +129,7 @@ mvn -f pom-custom.xml clean install    # run in ./camelbee/core/springboot-core
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-springboot-core-custom</artifactId>
-  <version>3.0.2</version>
+  <version>3.3.1</version>
 </dependency>
 ```
 
@@ -237,3 +237,9 @@ camelbee/
 |   |-- allcomponent-springboot-sample/
 |   |   |-- ...
 ```
+
+## Related Documentation
+
+- [CamelBee User Guide](../../docs/camelbee_userguide.md) — a tour of the UI's pages and features
+- Using Quarkus? See the [Quarkus Core README](../quarkus-core/README.md)
+- Using plain Camel (`camel-main`)? See the [Standalone Core README](../standalone-core/README.md)

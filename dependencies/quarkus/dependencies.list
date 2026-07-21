@@ -4,7 +4,7 @@ The following files have been resolved:
    com.github.docker-java:docker-java-api:jar:3.7.1:test -- module com.github.dockerjava.api [auto]
    com.github.docker-java:docker-java-transport-zerodep:jar:3.7.1:test -- module com.github.dockerjava.transport.zerodep [auto]
    com.github.docker-java:docker-java-transport:jar:3.7.1:test -- module com.github.dockerjava.transport [auto]
-   com.github.spotbugs:spotbugs-annotations:jar:4.10.2:compile -- module com.github.spotbugs.annotations [auto]
+   com.github.spotbugs:spotbugs-annotations:jar:4.10.3:compile -- module com.github.spotbugs.annotations [auto]
    com.google.code.findbugs:jsr305:jar:3.0.2:compile -- module jsr305 (auto)
    com.sun.istack:istack-commons-runtime:jar:4.1.2:compile -- module com.sun.istack.runtime
    commons-codec:commons-codec:jar:1.22.0:test -- module org.apache.commons.codec

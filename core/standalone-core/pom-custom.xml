@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2023 Rahmi Ege Karaosmanoglu
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>io.camelbee</groupId>
+    <artifactId>camelbee-standalone-core-custom</artifactId>
+    <packaging>jar</packaging>
+    <version>3.3.1</version>
+
+    <name>camelbee-standalone-core</name>
+    <description>CamelBee Standalone Core Library</description>
+
+    <properties>
+        <camel.version>4.20.0</camel.version>
+        <jackson-jsr310.version>2.22.1</jackson-jsr310.version>
+        <micrometer.version>1.17.0</micrometer.version>
+        <assertj-core.version>3.27.7</assertj-core.version>
+        <mockito-junit-jupiter.version>5.23.0</mockito-junit-jupiter.version>
+        <logback-classic.version>1.5.38</logback-classic.version>
+        <commons-lang3.version>3.20.0</commons-lang3.version>
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <maven-resources-plugin.version>3.4.0</maven-resources-plugin.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-bom</artifactId>
+                <version>${camel.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <!-- Camel engine + standalone bootstrap -->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-main</artifactId>
+        </dependency>
+
+        <!-- platform-http SPI; the concrete HTTP server is supplied by the starter at runtime -->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-platform-http</artifactId>
+        </dependency>
+
+        <!-- The CamelBee UI + REST API are registered as Vert.x handlers on the camel-main
+             management server's router (ManagementHttpServer / VertxPlatformHttpRouter), so this is
+             needed to compile. Scoped 'provided': the runtime server is brought by the starter, and
+             plain-core users without it degrade gracefully (see CamelBee.attach). -->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-platform-http-main</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Used by MdcContext, ExchangeUtils, UuidResolver and ExchangeSendingEventTracer -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+
+        <!-- JSON binding for the endpoints -->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson-jsr310.version}</version>
+        </dependency>
+
+        <!-- Optional metrics support: only active when the starter (or app) brings these on the
+             classpath. Optional so plain core consumers are not forced to depend on micrometer. -->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-micrometer</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <version>${micrometer.version}</version>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Tests -->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-test-junit5</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito-junit-jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj-core.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback-classic.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <source>21</source>
+                    <target>21</target>
+                </configuration>
+            </plugin>
+
+            <!-- Embed the CamelBee UI on the classpath under /camelbee so the
+                 platform-http-main static handler can serve it (see CamelBee.register). -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven-resources-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>copy-ui-dist</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}/camelbee</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/../../ui/dist</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

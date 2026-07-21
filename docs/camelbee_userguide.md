@@ -23,8 +23,10 @@ CamelBee is an Apache Camel library for microservices monitoring and debugging. 
 
 To enable your Camel microservices to work with CamelBee, follow the setup instructions in the core library READMEs:
 
-- **Spring Boot:** [CamelBee SpringBoot Core README](https://github.com/egekaraosmanoglu/camelbee/tree/main/core/springboot-core)
-- **Quarkus:** [CamelBee Quarkus Core README](https://github.com/egekaraosmanoglu/camelbee/tree/main/core/quarkus-core)
+- **Spring Boot:** [CamelBee SpringBoot Core README](https://github.com/camelbee/camelbee/tree/main/core/springboot-core)
+- **Quarkus:** [CamelBee Quarkus Core README](https://github.com/camelbee/camelbee/tree/main/core/quarkus-core)
+- **Standalone (plain Camel / `camel-main`):** [CamelBee Standalone Core README](https://github.com/camelbee/camelbee/tree/main/core/standalone-core)
+- **Camel K:** runs on the Camel Quarkus runtime, so the Quarkus core works unchanged — see the [Camel K Sample README](https://github.com/camelbee/camelbee/tree/main/examples/camelk-sample)
 
 For working examples, see the [camelbee-examples](https://github.com/camelbee/camelbee-examples) repository.
 
@@ -32,7 +34,11 @@ Once your application is running, the CamelBee UI is available at:
 
 `http://localhost:8080/camelbee/index.html`
 
-The UI has four main sections accessible from the top navigation bar: **Debugger**, **Metrics**, and **Settings**.
+> For the Standalone core, the UI is served on the separate camel-main management server instead, at `http://localhost:8081/camelbee` by default.
+
+> On Camel K, expose the integration's HTTP port (e.g. `kubectl port-forward svc/your-route 8080:80`) and open `http://localhost:8080/camelbee`.
+
+The UI has three main sections accessible from the top navigation bar: **Debugger**, **Metrics**, and **Settings**.
 
 ---
 

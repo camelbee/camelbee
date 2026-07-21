@@ -21,7 +21,7 @@ Add the CamelBee core dependency:
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-quarkus-core</artifactId>
-  <version>3.0.2</version>
+  <version>3.3.1</version>
 </dependency>
 ```
 
@@ -57,7 +57,7 @@ Only suitable for new projects without an existing parent POM. Simply use `camel
 <parent>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-quarkus-starter</artifactId>
-  <version>3.0.2</version>
+  <version>3.3.1</version>
 </parent>
 ```
 
@@ -103,7 +103,7 @@ mvn -f pom-custom.xml clean install    # run in ./camelbee/core/quarkus-core
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-quarkus-core-custom</artifactId>
-  <version>3.0.2</version>
+  <version>3.3.1</version>
 </dependency>
 ```
 
@@ -191,3 +191,10 @@ camelbee/
 |   |-- allcomponent-quarkus-sample/
 |   |   |-- ...
 ```
+
+## Related Documentation
+
+- [CamelBee User Guide](../../docs/camelbee_userguide.md) — a tour of the UI's pages and features
+- Using Spring Boot? See the [Spring Boot Core README](../springboot-core/README.md)
+- Using plain Camel (`camel-main`)? See the [Standalone Core README](../standalone-core/README.md)
+- Running on Camel K? The Quarkus core works there unchanged — see the [Camel K sample](../../examples/camelk-sample/README.md)

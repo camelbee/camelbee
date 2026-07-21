@@ -9,7 +9,7 @@ integration file you run with the `kamel` CLI.
 ## How it works
 
 - The modeline at the top of [`MusicianRoute.java`](./MusicianRoute.java) adds:
-  - `mvn:io.camelbee:camelbee-quarkus-core:3.2.1` — the CamelBee monitoring beans + embedded UI.
+  - `mvn:io.camelbee:camelbee-quarkus-core:3.3.1` — the CamelBee monitoring beans + embedded UI.
   - `camel-quarkus-rest`, `camel-quarkus-jackson`, `quarkus-resteasy-jackson` — the REST stack the
     CamelBee endpoints require (these are `provided` in the core, so consumers add them; versions are
     omitted so Camel K resolves them from its own runtime BOM).
@@ -23,10 +23,35 @@ integration file you run with the `kamel` CLI.
 ## Prerequisites
 
 - A Kubernetes cluster with the **Camel K operator** installed, and the `kamel` CLI.
-- A Camel K runtime aligned with **camel-quarkus 3.35.x** (the version `camelbee-quarkus-core:3.2.1`
+- A Camel K runtime aligned with **camel-quarkus 3.37.x** (the version `camelbee-quarkus-core:3.3.1`
   is built against). If your operator's runtime differs significantly, pin a compatible Camel K
   runtime version (e.g. `kamel run ... --runtime-version <x>`) or rebuild CamelBee against your
-  Camel Quarkus version.
+  Camel Quarkus version (see below).
+
+### Rebuilding CamelBee against your runtime's Camel Quarkus version
+
+If you cannot pin the runtime, build a custom core matching your operator's Camel Quarkus version
+using the provided `pom-custom.xml`:
+
+1. In `camelbee/core/quarkus-core/`, set `quarkus.platform.version` in `pom-custom.xml` to your
+   runtime's Camel Quarkus version, then build:
+
+   ```sh
+   mvn -f pom-custom.xml clean install
+   ```
+
+   This produces `io.camelbee:camelbee-quarkus-core-custom:3.3.1` (it also ships the Jandex index,
+   so bean discovery works the same way).
+
+2. Camel K builds integrations **in-cluster**, so the operator cannot see your local `~/.m2` —
+   publish the custom jar to a Maven repository the operator can reach (e.g. your org's
+   Nexus/Artifactory, configured in the IntegrationPlatform's Maven settings).
+
+3. Reference it in the modeline instead of the published core:
+
+   ```
+   // camel-k: dependency=mvn:io.camelbee:camelbee-quarkus-core-custom:3.3.1
+   ```
 
 > Note: this integration has not been validated on a live cluster as part of this change — the
 > Jandex enabler in `camelbee-quarkus-core` was verified locally (the jar contains
@@ -59,7 +84,15 @@ Then open <http://localhost:8080/camelbee> and point the UI at the same origin. 
 - `GET  /camelbee/routes`         — route topology
 - `POST /camelbee/tracer/status`  — body `ACTIVE` / `INACTIVE` to toggle tracing
 - `GET  /camelbee/messages`       — traced messages
-- `GET  /q/health`, `GET /q/metrics` — Quarkus health/metrics
+- `GET  /q/health`, `GET /q/metrics` — Quarkus health/metrics (require extra extensions, see below)
+
+> The modeline covers route topology, tracing and the embedded UI. To also populate the UI's
+> health panel and metrics page, add these extensions as extra modeline lines:
+>
+> ```
+> // camel-k: dependency=mvn:org.apache.camel.quarkus:camel-quarkus-microprofile-health
+> // camel-k: dependency=mvn:io.quarkus:quarkus-micrometer-registry-prometheus
+> ```
 
 ## Using the starter instead
 
@@ -67,5 +100,5 @@ To pull the full CamelBee bundle (core + security + common Camel Quarkus deps) r
 dependency line with the pom starter:
 
 ```
-// camel-k: dependency=mvn:io.camelbee:camelbee-quarkus-starter:pom:3.2.1
+// camel-k: dependency=mvn:io.camelbee:camelbee-quarkus-starter:pom:3.3.1
 ```

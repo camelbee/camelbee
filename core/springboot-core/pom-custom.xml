@@ -20,12 +20,12 @@
     <groupId>io.camelbee</groupId>
     <artifactId>camelbee-springboot-core-custom</artifactId>
     <packaging>jar</packaging>
-    <version>3.2.1</version>
+    <version>3.3.1</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.9</version>
+        <version>4.1.0</version>
         <relativePath/>
     </parent>
 
@@ -34,8 +34,8 @@
 
     <properties>
         <spring-boot-starter.version>${project.parent.version}</spring-boot-starter.version>
-        <camel.spring.version>4.16.0</camel.spring.version>
-        <cxf-rt-transports-http-jetty.version>4.1.4</cxf-rt-transports-http-jetty.version>
+        <camel.spring.version>4.20.0</camel.spring.version>
+        <cxf-rt-transports-http-jetty.version>4.2.2</cxf-rt-transports-http-jetty.version>
         <maven.compiler.version>3.11.0</maven.compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -101,8 +101,15 @@
 
         <dependency>
             <groupId>org.apache.camel</groupId>
-            <artifactId>camel-test-spring-junit5</artifactId>
+            <artifactId>camel-test-spring-junit6</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <!-- Used by MdcContext, ExchangeUtils, UuidResolver and ExchangeSendingEventTracer -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.20.0</version>
         </dependency>
 
     </dependencies>

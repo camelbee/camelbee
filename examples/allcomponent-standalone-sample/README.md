@@ -23,3 +23,5 @@ After launching the application, open a web browser and navigate to:
 `http://localhost:8081/camelbee`
 
 The embedded CamelBee UI provides route visualization, message tracing, debugging with replay, filtering, endpoint triggering, and metrics directly in your browser.
+
+For a guide to the UI's pages and features, see the [CamelBee User Guide](../../docs/camelbee_userguide.md).
