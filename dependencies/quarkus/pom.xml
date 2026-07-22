@@ -55,7 +55,7 @@
              AnthropicChatModel$Builder / MistralAiChatModel$Builder etc.) for base URLs, endpoint
              paths, auth headers, and response shapes — don't bump without re-verifying provider
              wiring in the archetype. Kept in sync with the SpringBoot side. -->
-        <langchain4j.version>1.15.1</langchain4j.version>
+        <langchain4j.version>1.18.0</langchain4j.version>
     </properties>
 
     <dependencyManagement>

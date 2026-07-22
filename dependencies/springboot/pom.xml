@@ -30,7 +30,7 @@
         <!-- Verified against the actual 1.15.1 jars (javap on AnthropicChatModel$Builder /
              MistralAiChatModel$Builder etc.) for base URLs, endpoint paths, auth headers, and
              response shapes — don't bump without re-verifying provider wiring in the archetype. -->
-        <langchain4j.version>1.15.1</langchain4j.version>
+        <langchain4j.version>1.18.0</langchain4j.version>
         <!-- Match the avro-maven-plugin (1.12.1) used to generate the Avro record classes, and the
              1.12.1 runtime Camel 4.20.0 ships. apicurio-registry-serdes-avro-serde transitively pulls
              avro 1.12.0, which would win mediation and lacks Utf8.compareSequences(...) — breaking the
