@@ -51,7 +51,7 @@
         <impsort-maven-plugin.version>1.13.0</impsort-maven-plugin.version>
         <jandex-maven-plugin.version>3.6.0</jandex-maven-plugin.version>
         <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
-        <jackson-databind-nullable.version>0.2.10</jackson-databind-nullable.version>
+        <jackson-databind-nullable.version>0.2.11</jackson-databind-nullable.version>
         <!-- Shared by the generated microservices' MCP support (quarkus test + springboot
              dependencyManagement override); pinned to resolve the MCP SDK vs WireMock conflict. -->
         <json-schema-validator.version>3.0.6</json-schema-validator.version>
