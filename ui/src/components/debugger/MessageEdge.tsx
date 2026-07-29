@@ -210,6 +210,19 @@ function MessageEdgeInner(props: Props) {
         </g>
       )}
 
+      {/* Latency badge (roadmap #9) */}
+      {hasMessages && data?.avgTimeTaken !== undefined && (
+        <text
+          x={labelX}
+          y={labelY + 22}
+          textAnchor="middle"
+          className="text-[9px] font-medium"
+          fill={isDark ? '#9ca3af' : '#6b7280'}
+        >
+          {`${data.avgTimeTaken}ms avg / ${data.maxTimeTaken}ms max`}
+        </text>
+      )}
+
       {/* Animated flow dots */}
       {visibleFlows.map((flow) => (
         <FlowDot

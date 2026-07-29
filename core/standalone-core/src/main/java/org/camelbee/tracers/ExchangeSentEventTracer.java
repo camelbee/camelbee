@@ -67,7 +67,7 @@ public class ExchangeSentEventTracer {
       final String responseSentBody = ExchangeUtils.readBodyAsString(exchange, true);
       final var requestHeaders = ExchangeUtils.getHeaders(exchange);
 
-      return processSentMessage(exchange, responseSentBody, requestHeaders);
+      return processSentMessage(exchange, responseSentBody, requestHeaders, event.getTimeTaken());
 
     } catch (Exception e) {
       LOGGER.warn("Could not trace ExchangeSentEvent: {} with exception: {}", exchange, e);
@@ -76,7 +76,7 @@ public class ExchangeSentEventTracer {
 
   }
 
-  private Message processSentMessage(Exchange exchange, String responseSentBody, String requestHeaders) {
+  private Message processSentMessage(Exchange exchange, String responseSentBody, String requestHeaders, long timeTaken) {
 
     Deque<String> routeStack = (Deque<String>) exchange.getProperty(CURRENT_ROUTE_TRACE_STACK);
 
@@ -116,7 +116,7 @@ public class ExchangeSentEventTracer {
     }
 
     return new Message(exchange.getExchangeId(), MessageEventType.SENT, responseSentBody, requestHeaders, callerRoute,
-        currentRoute, endpointId, messageType, errorMessage);
+        currentRoute, endpointId, messageType, errorMessage, timeTaken);
   }
 
 }

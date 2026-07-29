@@ -53,4 +53,16 @@ describe('Toolbar', () => {
       expect(fetchMock).toHaveBeenCalledWith('/camelbee/messages', expect.objectContaining({ method: 'DELETE' })),
     );
   });
+
+  // Roadmap #12 (message-cap warning).
+  it('shows a warning when the server-side message cap has been reached', () => {
+    useDebuggerStore.setState({ capReached: true });
+    renderWithProviders(<Toolbar context={context} />);
+    expect(screen.getByText('⚠ Message cap reached')).toBeInTheDocument();
+  });
+
+  it('hides the cap warning when the cap has not been reached', () => {
+    renderWithProviders(<Toolbar context={context} />);
+    expect(screen.queryByText('⚠ Message cap reached')).not.toBeInTheDocument();
+  });
 });

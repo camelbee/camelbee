@@ -31,7 +31,7 @@ export function DebuggerPage() {
     prevDataRef.current = data;
 
     if (data.messages.length > 0 || data.info.addVersion !== addVersion || data.info.resetVersion !== resetVersion) {
-      appendMessages(data.messages, data.info.addVersion, data.info.resetVersion);
+      appendMessages(data.messages, data.info.addVersion, data.info.resetVersion, data.info.capReached);
     }
   }, [messagesQuery.data, addVersion, resetVersion, appendMessages]);
 

@@ -32,6 +32,7 @@ class RouteContextServiceTest {
             .errorHandler(deadLetterChannel("mock:dlq"))
             .to("mock:out")
             .toD("mock:dynamic")
+            .wireTap("mock:tap")
             .enrich("mock:enrich")
             .pollEnrich("mock:pollenrich")
             .recipientList(constant("mock:r1,mock:r2"))
@@ -39,6 +40,10 @@ class RouteContextServiceTest {
 
         from("direct:second").routeId("secondRoute")
             .to("mock:second-out");
+
+        from("direct:third").routeId("thirdRoute").description("Handles the third widget")
+            .to("mock:third").id("toThird").description("Sends the widget onward")
+            .poll("mock:polled");
       }
     });
     camelContext.start();
@@ -57,7 +62,7 @@ class RouteContextServiceTest {
   void getCamelRoutes_extractsRoutesAndAllOutputTypes() {
     List<CamelRoute> routes = service.getCamelRoutes();
 
-    assertThat(routes).hasSize(2);
+    assertThat(routes).hasSize(3);
 
     CamelRoute main = routes.stream()
         .filter(r -> r.getId().equals("mainRoute"))
@@ -80,5 +85,127 @@ class RouteContextServiceTest {
     List<CamelRoute> first = service.getCamelRoutes();
     List<CamelRoute> second = service.getCamelRoutes();
     assertThat(second).isSameAs(first);
+  }
+
+  /**
+   * T0 characterization (see README-camel421-notes.md, FINAL ROADMAP v2):
+   * pins the EXACT wire format of {@code CamelRouteOutput} as produced today.
+   * The description strings are Camel's {@code toString()} output — NOT a
+   * stable contract — so this test is the tripwire that catches format drift
+   * on Camel version bumps. If it fails after a bump, the UI's string
+   * matching (endpointParser.ts) must be re-checked against the new formats.
+   */
+  @Test
+  void getCamelRoutes_characterization_exactOutputSerialization() {
+    CamelRoute main = service.getCamelRoutes().stream()
+        .filter(r -> r.getId().equals("mainRoute"))
+        .findFirst()
+        .orElseThrow();
+
+    // Pass order is fixed by extractOutputs: To, ToDynamic(+WireTap),
+    // Enrich, PollEnrich, RecipientList, RoutingSlip.
+    assertThat(main.getOutputs())
+        .extracting(CamelRouteOutput::getDescription)
+        .containsExactly(
+            // NOTE: lowercase "to[…]" — Camel's actual recipe (SendDefinition
+            // getLabel), unlike the capitalized DynamicTo/WireTap wrappers.
+            // The UI matches case-insensitively, so this is safe — but any
+            // NEW matching code must never assume "To[".
+            "to[mock:out]",
+            "DynamicTo[toD[mock:dynamic]]",
+            "WireTap[mock:tap]",
+            "Enrich[constant{mock:enrich}]",
+            "PollEnrich[constant{mock:pollenrich}]",
+            "RecipientList[constant{mock:r1,mock:r2}]",
+            "RoutingSlip[constant{mock:slip}]");
+
+    // wireTap is collected by the ToDynamicDefinition pass (WireTapDefinition
+    // is its subclass). A dedicated WireTapDefinition pass must NEVER be
+    // added — it would double-collect every wireTap (roadmap: deleted #2).
+    CamelRouteOutput wireTap = main.getOutputs().stream()
+        .filter(o -> o.getDescription().startsWith("WireTap["))
+        .findFirst()
+        .orElseThrow();
+    assertThat(wireTap.getType()).isEqualTo("org.apache.camel.model.WireTapDefinition");
+    assertThat(main.getOutputs())
+        .filteredOn(o -> o.getDescription().startsWith("WireTap["))
+        .hasSize(1);
+
+    // The model's delimiter is NULL unless set explicitly in the DSL — the
+    // "," default is applied at runtime by the reifier, not stored in the
+    // definition. The UI compensates with `output.delimiter ?? ','`
+    // (endpointParser.ts) — that fallback is load-bearing, do not remove.
+    assertThat(main.getOutputs())
+        .filteredOn(o -> o.getDescription().startsWith("RecipientList["))
+        .extracting(CamelRouteOutput::getDelimiter)
+        .containsOnlyNulls();
+
+    // Nested outputs are always null today (roadmap #7: leave as is).
+    assertThat(main.getOutputs())
+        .extracting(CamelRouteOutput::getOutputs)
+        .containsOnlyNulls();
+
+    // Every output has a non-blank id (the UI's primary message-match key).
+    assertThat(main.getOutputs())
+        .extracting(CamelRouteOutput::getId)
+        .allSatisfy(id -> assertThat(id).isNotBlank());
+  }
+
+  /**
+   * Roadmap #1+15 (route descriptions): {@code <description>} text is populated
+   * from {@code getDescriptionText()} on both the route and its outputs, via the
+   * new add-only constructor overloads (README-camel421-notes.md, FINAL ROADMAP v2).
+   */
+  @Test
+  void getCamelRoutes_populatesRouteAndNodeDescriptions() {
+    CamelRoute third = service.getCamelRoutes().stream()
+        .filter(r -> r.getId().equals("thirdRoute"))
+        .findFirst()
+        .orElseThrow();
+
+    assertThat(third.getRouteDescription()).isEqualTo("Handles the third widget");
+
+    CamelRouteOutput toThird = third.getOutputs().stream()
+        .filter(o -> o.getId().equals("toThird"))
+        .findFirst()
+        .orElseThrow();
+    assertThat(toThird.getNodeDescription()).isEqualTo("Sends the widget onward");
+
+    // Routes/outputs without an explicit <description> stay null, not empty string.
+    CamelRoute main = service.getCamelRoutes().stream()
+        .filter(r -> r.getId().equals("mainRoute"))
+        .findFirst()
+        .orElseThrow();
+    assertThat(main.getRouteDescription()).isNull();
+    assertThat(main.getOutputs()).extracting(CamelRouteOutput::getNodeDescription).containsOnlyNulls();
+  }
+
+  /**
+   * Roadmap #22 (poll() extraction): PollDefinition is a genuine coverage gap —
+   * Camel's own RouteTopologyDumper collects it (it implements
+   * EndpointRequiredDefinition) but CamelBee did not, before this change.
+   * PollDefinition extends NoOutputDefinition (NOT ToDynamicDefinition), so this
+   * is a new pass, not a duplicate of the WireTap situation (roadmap: deleted #2).
+   */
+  @Test
+  void getCamelRoutes_extractsPollOutputs() {
+    CamelRoute third = service.getCamelRoutes().stream()
+        .filter(r -> r.getId().equals("thirdRoute"))
+        .findFirst()
+        .orElseThrow();
+
+    assertThat(third.getOutputs())
+        .extracting(CamelRouteOutput::getDescription)
+        .anySatisfy(d -> assertThat(d).isEqualTo("Poll[mock:polled]"));
+
+    CamelRouteOutput poll = third.getOutputs().stream()
+        .filter(o -> o.getDescription().startsWith("Poll["))
+        .findFirst()
+        .orElseThrow();
+    assertThat(poll.getType()).isEqualTo("org.apache.camel.model.PollDefinition");
+    // Never collected twice via any other filter pass.
+    assertThat(third.getOutputs())
+        .filteredOn(o -> o.getDescription().startsWith("Poll["))
+        .hasSize(1);
   }
 }

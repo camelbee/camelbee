@@ -30,6 +30,7 @@ public class MessageListInfo {
   private final long addVersion;
   private final Instant lastModified;
   private final Instant lastResetTime;
+  private final boolean capReached;
 
   /**
    * MessageListInfo Constructor.
@@ -41,11 +42,28 @@ public class MessageListInfo {
    * @param lastResetTime The lastResetTime.
    */
   public MessageListInfo(int count, long resetVersion, long addVersion, Instant lastModified, Instant lastResetTime) {
+    this(count, resetVersion, addVersion, lastModified, lastResetTime, false);
+  }
+
+  /**
+   * MessageListInfo Constructor.
+   *
+   * @param count         The count.
+   * @param resetVersion  The resetVersion.
+   * @param addVersion    The addVersion.
+   * @param lastModified  The lastModified.
+   * @param lastResetTime The lastResetTime.
+   * @param capReached    True once {@code camelbee.tracer-max-messages-count} has been hit and
+   *                      further messages are being silently dropped.
+   */
+  public MessageListInfo(int count, long resetVersion, long addVersion, Instant lastModified, Instant lastResetTime,
+      boolean capReached) {
     this.count = count;
     this.resetVersion = resetVersion;
     this.addVersion = addVersion;
     this.lastModified = lastModified;
     this.lastResetTime = lastResetTime;
+    this.capReached = capReached;
   }
 
   public int getCount() {
@@ -66,5 +84,9 @@ public class MessageListInfo {
 
   public Instant getLastResetTime() {
     return lastResetTime;
+  }
+
+  public boolean isCapReached() {
+    return capReached;
   }
 }

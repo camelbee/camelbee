@@ -61,6 +61,29 @@ describe('MessagePanel', () => {
     expect(screen.getByText('boom!')).toBeInTheDocument();
   });
 
+  // Roadmap #9 (latency): the response's timeTaken is shown next to the status badge.
+  it('shows the response duration when timeTaken is present', () => {
+    useDebuggerStore.getState().clearMessages();
+    useDebuggerStore.getState().appendMessages(
+      [
+        makeMessage({ exchangeId: 'C', endpointId: 'out-1', messageType: 'REQUEST', exchangeEventType: 'SENDING', messageBody: 'req-body-C' }),
+        makeMessage({ exchangeId: 'C', endpointId: 'out-1', messageType: 'RESPONSE', exchangeEventType: 'SENT', messageBody: 'res-body-C', timeTaken: 77 }),
+      ],
+      1,
+      0,
+    );
+    useDebuggerStore.getState().selectEdge('edge-1');
+    render(<MessagePanel edges={edges} />);
+    expect(screen.getByText('77ms')).toBeInTheDocument();
+  });
+
+  it('omits the duration when timeTaken is 0 (SENDING/no timing data)', () => {
+    seedMessages();
+    useDebuggerStore.getState().selectEdge('edge-1');
+    render(<MessagePanel edges={edges} />);
+    expect(screen.queryByText(/^\d+ms$/)).not.toBeInTheDocument();
+  });
+
   it('navigates between interactions with Prev/Next', () => {
     seedMessages();
     useDebuggerStore.getState().selectEdge('edge-1');

@@ -31,6 +31,7 @@ import org.apache.camel.Route;
 import org.apache.camel.builder.DeadLetterChannelBuilder;
 import org.apache.camel.model.EnrichDefinition;
 import org.apache.camel.model.ModelCamelContext;
+import org.apache.camel.model.PollDefinition;
 import org.apache.camel.model.PollEnrichDefinition;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.ProcessorDefinitionHelper;
@@ -109,7 +110,7 @@ public class RouteContextService {
 
       CamelRoute metaRoute = new CamelRoute(routeDefinition.getId(),
           updateWithSystemProperties(routeDefinition.getInput().toString()), outputs,
-          routeDefinition.isRest(), errorHandler);
+          routeDefinition.isRest(), errorHandler, routeDefinition.getDescriptionText());
 
       if (isRestApiRoute) {
         restRoutes.add(metaRoute);
@@ -133,27 +134,31 @@ public class RouteContextService {
 
     ProcessorDefinitionHelper.filterTypeInOutputs(outputss, ToDefinition.class).stream()
         .forEach(p -> outputs.add(new CamelRouteOutput(p.getId(), updateWithSystemProperties(p.toString()),
-            null, p.getClass().getTypeName(), null)));
+            null, p.getClass().getTypeName(), null, p.getDescriptionText())));
 
     ProcessorDefinitionHelper.filterTypeInOutputs(outputss, ToDynamicDefinition.class).stream()
         .forEach(p -> outputs.add(new CamelRouteOutput(p.getId(), updateWithSystemProperties(p.toString()),
-            null, p.getClass().getTypeName(), null)));
+            null, p.getClass().getTypeName(), null, p.getDescriptionText())));
+
+    ProcessorDefinitionHelper.filterTypeInOutputs(outputss, PollDefinition.class).stream()
+        .forEach(p -> outputs.add(new CamelRouteOutput(p.getId(), updateWithSystemProperties(p.toString()),
+            null, p.getClass().getTypeName(), null, p.getDescriptionText())));
 
     ProcessorDefinitionHelper.filterTypeInOutputs(outputss, EnrichDefinition.class).stream()
         .forEach(p -> outputs.add(new CamelRouteOutput(p.getId(), updateWithSystemProperties(p.toString()),
-            null, p.getClass().getTypeName(), null)));
+            null, p.getClass().getTypeName(), null, p.getDescriptionText())));
 
     ProcessorDefinitionHelper.filterTypeInOutputs(outputss, PollEnrichDefinition.class).stream()
         .forEach(p -> outputs.add(new CamelRouteOutput(p.getId(), updateWithSystemProperties(p.toString()),
-            null, p.getClass().getTypeName(), null)));
+            null, p.getClass().getTypeName(), null, p.getDescriptionText())));
 
     ProcessorDefinitionHelper.filterTypeInOutputs(outputss, RecipientListDefinition.class).stream()
         .forEach(p -> outputs.add(new CamelRouteOutput(p.getId(), updateWithSystemProperties(p.toString()),
-            p.getDelimiter(), p.getClass().getTypeName(), null)));
+            p.getDelimiter(), p.getClass().getTypeName(), null, p.getDescriptionText())));
 
     ProcessorDefinitionHelper.filterTypeInOutputs(outputss, RoutingSlipDefinition.class).stream()
         .forEach(p -> outputs.add(new CamelRouteOutput(p.getId(), updateWithSystemProperties(p.toString()),
-            p.getUriDelimiter(), p.getClass().getTypeName(), null)));
+            p.getUriDelimiter(), p.getClass().getTypeName(), null, p.getDescriptionText())));
 
   }
 

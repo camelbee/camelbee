@@ -51,6 +51,37 @@ describe('RouteGraph', () => {
     expect(() => render(<RouteGraph context={context} />)).not.toThrow();
   });
 
+  // Roadmap #9 (latency): avg/max accumulation from SENT messages with timeTaken > 0
+  // runs without throwing. (MessageEdge.test.tsx covers the badge's exact text —
+  // ReactFlow doesn't render edges in jsdom without real node measurement, so this
+  // stays a smoke test like the sibling cases above.)
+  it('processes SENT messages with timeTaken without throwing', () => {
+    const sent1 = makeMessage({
+      exchangeId: 'lat-1',
+      exchangeEventType: 'SENT',
+      messageType: 'RESPONSE',
+      endpointId: staticEdge.data!.outputId,
+      routeId: staticEdge.data!.sourceRouteId,
+      endpoint: staticEdge.data!.targetUri ?? staticEdge.data!.targetInputUri ?? 'x',
+      timeTaken: 20,
+    });
+    const sent2 = makeMessage({
+      exchangeId: 'lat-2',
+      exchangeEventType: 'SENT',
+      messageType: 'RESPONSE',
+      endpointId: staticEdge.data!.outputId,
+      routeId: staticEdge.data!.sourceRouteId,
+      endpoint: staticEdge.data!.targetUri ?? staticEdge.data!.targetInputUri ?? 'x',
+      timeTaken: 60,
+    });
+
+    act(() => {
+      useDebuggerStore.getState().appendMessages([sent1, sent2], 1, 0);
+    });
+
+    expect(() => render(<RouteGraph context={context} />)).not.toThrow();
+  });
+
   it('creates a dynamic edge for a message with no static match', () => {
     const sourceRoute = context.routes[0]!;
     const dynamic = makeMessage({

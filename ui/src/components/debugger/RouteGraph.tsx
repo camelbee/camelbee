@@ -243,7 +243,10 @@ export function RouteGraph({ context, onDynamicEdgeAdded }: RouteGraphProps) {
     const sliced = filteredMessages.slice(0, timelineIndex);
 
     // Build counts from the full slice
-    const counts = new Map<string, { exchanges: Set<string>; hasError: boolean }>();
+    const counts = new Map<
+      string,
+      { exchanges: Set<string>; hasError: boolean; totalTimeTaken: number; timeTakenCount: number; maxTimeTaken: number }
+    >();
     for (const msg of sliced) {
       let matched = matchMessageToEdge(msg, graphEdgesRef.current);
       // If no static edge matched, try to create a dynamic one
@@ -251,9 +254,21 @@ export function RouteGraph({ context, onDynamicEdgeAdded }: RouteGraphProps) {
         matched = createDynamicEdge(msg);
       }
       if (matched) {
-        const entry = counts.get(matched.id) ?? { exchanges: new Set(), hasError: false };
+        const entry = counts.get(matched.id) ?? {
+          exchanges: new Set(),
+          hasError: false,
+          totalTimeTaken: 0,
+          timeTakenCount: 0,
+          maxTimeTaken: 0,
+        };
         entry.exchanges.add(msg.exchangeId);
         if (msg.messageType === 'ERROR_RESPONSE') entry.hasError = true;
+        // Only SENT events carry a real elapsed time (roadmap #9).
+        if (msg.exchangeEventType === 'SENT' && msg.timeTaken > 0) {
+          entry.totalTimeTaken += msg.timeTaken;
+          entry.timeTakenCount += 1;
+          entry.maxTimeTaken = Math.max(entry.maxTimeTaken, msg.timeTaken);
+        }
         counts.set(matched.id, entry);
       }
     }
@@ -287,6 +302,7 @@ export function RouteGraph({ context, onDynamicEdgeAdded }: RouteGraphProps) {
       currentEdges.map((e) => {
         const stats = counts.get(e.id);
         const count = stats?.exchanges.size ?? 0;
+        const hasTiming = (stats?.timeTakenCount ?? 0) > 0;
         return {
           ...e,
           data: {
@@ -295,6 +311,10 @@ export function RouteGraph({ context, onDynamicEdgeAdded }: RouteGraphProps) {
             hasError: stats?.hasError ?? false,
             animated: count > 0,
             activeFlows: newFlows.get(e.id) ?? [],
+            avgTimeTaken: hasTiming
+              ? Math.round(stats!.totalTimeTaken / stats!.timeTakenCount)
+              : undefined,
+            maxTimeTaken: hasTiming ? stats!.maxTimeTaken : undefined,
           },
         };
       }),

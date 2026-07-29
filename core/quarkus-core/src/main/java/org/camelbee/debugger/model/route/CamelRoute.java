@@ -33,6 +33,8 @@ public class CamelRoute {
 
   private final String errorHandler;
 
+  private final String routeDescription;
+
   /**
    * Constructor.
    *
@@ -44,11 +46,28 @@ public class CamelRoute {
    */
   public CamelRoute(String id, String input, List<CamelRouteOutput> outputs, Boolean rest,
       String errorHandler) {
+    this(id, input, outputs, rest, errorHandler, null);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param id               The id.
+   * @param input            The input.
+   * @param outputs          The outputs.
+   * @param rest             The rest.
+   * @param errorHandler     The errorHandler.
+   * @param routeDescription The route's {@code <description>} text (from
+   *                         {@code RouteDefinition.getDescriptionText()}), or null if unset.
+   */
+  public CamelRoute(String id, String input, List<CamelRouteOutput> outputs, Boolean rest,
+      String errorHandler, String routeDescription) {
     this.id = id;
     this.input = input;
     this.outputs = outputs;
     this.rest = rest;
     this.errorHandler = errorHandler;
+    this.routeDescription = routeDescription;
   }
 
   public String getId() {
@@ -73,5 +92,9 @@ public class CamelRoute {
 
   public String getErrorHandler() {
     return errorHandler;
+  }
+
+  public String getRouteDescription() {
+    return routeDescription;
   }
 }

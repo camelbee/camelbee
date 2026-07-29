@@ -69,6 +69,24 @@ describe('extractStaticEndpointsFromOutput', () => {
   it('returns null for outputs with no endpoint', () => {
     expect(extractStaticEndpointsFromOutput(output({ description: 'Log[hello]' }))).toBeNull();
   });
+
+  // Roadmap #22 (poll() extraction): Poll[uri] is matched the same way as
+  // To[uri] — README-camel421-notes.md, FINAL ROADMAP v2.
+  it('extracts a single external Poll[] target', () => {
+    expect(
+      extractStaticEndpointsFromOutput(
+        output({ description: 'Poll[kafka:orders]', type: 'org.apache.camel.model.PollDefinition' }),
+      ),
+    ).toEqual(['kafka:orders']);
+  });
+
+  it('ignores internal direct:/seda: Poll[] targets', () => {
+    expect(
+      extractStaticEndpointsFromOutput(
+        output({ description: 'Poll[direct:next]', type: 'org.apache.camel.model.PollDefinition' }),
+      ),
+    ).toBeNull();
+  });
 });
 
 describe('outputReferencesInput', () => {
@@ -91,5 +109,15 @@ describe('outputReferencesInput', () => {
     expect(outputReferencesInput(output({ description: 'To[direct:other]' }), 'direct:next')).toBe(
       false,
     );
+  });
+
+  // Roadmap #22 (poll() extraction).
+  it('matches a direct Poll[] reference', () => {
+    expect(
+      outputReferencesInput(
+        output({ description: 'Poll[direct:next]', type: 'org.apache.camel.model.PollDefinition' }),
+        'direct:next',
+      ),
+    ).toBe(true);
   });
 });

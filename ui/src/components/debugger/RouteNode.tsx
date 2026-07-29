@@ -5,6 +5,21 @@ import { getComponentColors } from '@/utils/colorMap';
 
 type Props = NodeProps & { data: RouteNodeData };
 
+/**
+ * Build a multi-line hover tooltip with id, description, input URI, error
+ * handler and REST info (roadmap #1+15 — Camel's NodeLabelMode.BOTH
+ * semantics: description as the label, everything else on hover).
+ */
+function buildTooltip(data: RouteNodeData): string {
+  const lines: string[] = [];
+  if (data.routeId) lines.push(`Route: ${data.routeId}`);
+  if (data.description) lines.push(`Description: ${data.description}`);
+  if (data.inputUri) lines.push(`Input: ${data.inputUri}`);
+  if (data.errorHandler) lines.push(`Error handler: ${data.errorHandler}`);
+  if (data.isRest) lines.push('REST endpoint');
+  return lines.length > 0 ? lines.join('\n') : data.label;
+}
+
 function RouteNodeInner({ data, selected }: Props) {
   const colors = getComponentColors(
     data.kind === 'error' ? 'error' : data.componentType,
@@ -54,7 +69,7 @@ function RouteNodeInner({ data, selected }: Props) {
           </span>
           <p
             className={`mt-0.5 truncate text-xs ${isEndpoint ? 'text-white/90' : 'text-gray-700 dark:text-gray-200'}`}
-            title={data.label}
+            title={buildTooltip(data)}
           >
             {data.label}
           </p>

@@ -32,6 +32,8 @@ public class CamelRouteOutput {
   private final String type;
   private final List<CamelRouteOutput> outputs;
 
+  private final String nodeDescription;
+
   /**
    * Constructor.
    *
@@ -43,11 +45,29 @@ public class CamelRouteOutput {
    */
   public CamelRouteOutput(String id, String description, String delimiter, String type,
       List<CamelRouteOutput> outputs) {
+    this(id, description, delimiter, type, outputs, null);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param id              The id.
+   * @param description     The description (Camel's {@code toString()} of the processor
+   *                        definition — NOT a stable contract, see README-camel421-notes.md).
+   * @param delimiter       The delimiter.
+   * @param type            The type.
+   * @param outputs         The outputs.
+   * @param nodeDescription The processor's {@code <description>} text (from
+   *                        {@code OptionalIdentifiedDefinition.getDescriptionText()}), or null.
+   */
+  public CamelRouteOutput(String id, String description, String delimiter, String type,
+      List<CamelRouteOutput> outputs, String nodeDescription) {
     this.id = id;
     this.description = description;
     this.delimiter = delimiter;
     this.type = type;
     this.outputs = outputs;
+    this.nodeDescription = nodeDescription;
   }
 
   public String getId() {
@@ -68,5 +88,9 @@ public class CamelRouteOutput {
 
   public List<CamelRouteOutput> getOutputs() {
     return outputs;
+  }
+
+  public String getNodeDescription() {
+    return nodeDescription;
   }
 }

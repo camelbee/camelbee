@@ -18,6 +18,13 @@ export interface RouteNodeData {
   kind: 'consumer' | 'internal' | 'producer' | 'error';
   routeId?: string;
   isCallable?: boolean;
+  /** Route's <description> text, for the hover tooltip (roadmap #1+15). */
+  description?: string;
+  /** Full input URI, for the hover tooltip. */
+  inputUri?: string;
+  /** Error-handler target input URI, for the hover tooltip. */
+  errorHandler?: string;
+  isRest?: boolean;
   [key: string]: unknown;
 }
 
@@ -39,6 +46,9 @@ export interface MessageEdgeData {
   animated: boolean;
   isErrorHandler: boolean;
   activeFlows: ActiveFlow[];
+  /** Average/max elapsed ms across SENT messages on this edge (roadmap #9). */
+  avgTimeTaken?: number;
+  maxTimeTaken?: number;
   [key: string]: unknown;
 }
 
@@ -136,8 +146,16 @@ function truncateLabel(label: string, max = 32): string {
   return label.length > max ? label.substring(0, max) + '…' : label;
 }
 
-/** Build a human-readable label for a route node. */
+/**
+ * Build a human-readable label for a route node.
+ * Roadmap #1+15: prefer the route's <description> when present (id/URI fallback).
+ */
 function routeLabel(route: CamelRoute): string {
+  if (route.routeDescription) {
+    return route.rest
+      ? `REST ${truncateLabel(route.routeDescription)}`
+      : truncateLabel(route.routeDescription);
+  }
   const inputUri = extractInputUri(route.input);
   if (route.rest) return `REST ${route.id}`;
   // If route ID is auto-generated (e.g. "route1", "route2"), use the input URI
@@ -187,6 +205,10 @@ export function buildRouteGraph(context: CamelBeeContext): {
         kind,
         routeId: route.id,
         isCallable: kind === 'consumer',
+        description: route.routeDescription ?? undefined,
+        inputUri,
+        errorHandler: route.errorHandler ?? undefined,
+        isRest: route.rest,
       },
     });
     return nodeId;

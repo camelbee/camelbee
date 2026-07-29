@@ -113,6 +113,11 @@ export function MessagePanel({ edges }: MessagePanelProps) {
               <span className="truncate text-[10px] text-gray-400 dark:text-gray-500">
                 {current.exchangeId}
               </span>
+              {!!current.response?.timeTaken && (
+                <span className="ml-auto shrink-0 text-[10px] tabular-nums text-gray-400 dark:text-gray-500">
+                  {current.response.timeTaken}ms
+                </span>
+              )}
             </div>
 
             {/* Request */}

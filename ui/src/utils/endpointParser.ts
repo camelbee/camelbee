@@ -44,8 +44,8 @@ export function extractStaticEndpointsFromOutput(
 
   const lower = desc.toLowerCase();
 
-  // To[X], DynamicTo[X], DynamicTo[toD[X]], WireTap[X]
-  for (const prefix of ['To[', 'DynamicTo[', 'WireTap[']) {
+  // To[X], DynamicTo[X], DynamicTo[toD[X]], WireTap[X], Poll[X]
+  for (const prefix of ['To[', 'DynamicTo[', 'WireTap[', 'Poll[']) {
     if (lower.startsWith(prefix.toLowerCase())) {
       let uri = stripWrapper(desc, prefix);
       // Handle DynamicTo[toD[X]] — strip the inner toD[] wrapper
@@ -94,8 +94,8 @@ export function outputReferencesInput(
   const descLower = desc.toLowerCase();
   const inputLower = inputTrimmed.toLowerCase();
 
-  // Direct match: To[input], DynamicTo[input], DynamicTo[toD[input]], WireTap[input]
-  for (const prefix of ['To[', 'DynamicTo[', 'WireTap[']) {
+  // Direct match: To[input], DynamicTo[input], DynamicTo[toD[input]], WireTap[input], Poll[input]
+  for (const prefix of ['To[', 'DynamicTo[', 'WireTap[', 'Poll[']) {
     if (descLower === `${prefix.toLowerCase()}${inputLower}]`) {
       return true;
     }

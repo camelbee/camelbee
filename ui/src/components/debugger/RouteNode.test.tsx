@@ -36,4 +36,28 @@ describe('RouteNode', () => {
     renderNode({ label: 'sel', componentType: 'direct', kind: 'internal' }, true);
     expect(screen.getByText('sel')).toBeInTheDocument();
   });
+
+  // Roadmap #1+15 (route descriptions): richer hover tooltip.
+  it('builds a multi-line tooltip from routeId/description/inputUri/errorHandler/isRest', () => {
+    renderNode({
+      label: 'Handles orders',
+      componentType: 'direct',
+      kind: 'consumer',
+      routeId: 'orderRoute',
+      description: 'Handles orders',
+      inputUri: 'direct:orders',
+      errorHandler: 'direct:dlq',
+      isRest: true,
+    });
+    const el = screen.getByText('Handles orders');
+    expect(el).toHaveAttribute(
+      'title',
+      'Route: orderRoute\nDescription: Handles orders\nInput: direct:orders\nError handler: direct:dlq\nREST endpoint',
+    );
+  });
+
+  it('falls back to the label as the tooltip when no extra metadata is present', () => {
+    renderNode({ label: 'orders-in', componentType: 'kafka', kind: 'consumer' });
+    expect(screen.getByText('orders-in')).toHaveAttribute('title', 'orders-in');
+  });
 });

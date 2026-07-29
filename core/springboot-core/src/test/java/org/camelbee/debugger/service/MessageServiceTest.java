@@ -1,6 +1,7 @@
 package org.camelbee.debugger.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -96,5 +97,48 @@ class MessageServiceTest {
   private Message createTestMessage(String exchangeId) {
     return new Message(exchangeId, MessageEventType.SENT, "test-body", "test-headers",
         "direct:caller", "direct:current", "endpoint-1", MessageType.RESPONSE, null);
+  }
+
+  /**
+   * Roadmap #12 (message-cap warning): once the cap is hit, further messages are
+   * still silently dropped (unchanged behavior) but {@code capReached} now flags
+   * it so the UI can warn instead of appearing idle (README-camel421-notes.md,
+   * FINAL ROADMAP v2).
+   */
+  @Test
+  void capReachedIsFalseUntilCapIsHit() {
+    MessageService capped = new MessageService(2);
+
+    capped.addMessage(createTestMessage("exchange-1"));
+    assertFalse(capped.getMessageListInfo().isCapReached());
+
+    capped.addMessage(createTestMessage("exchange-2"));
+    assertFalse(capped.getMessageListInfo().isCapReached());
+  }
+
+  @Test
+  void capReachedBecomesTrueOnceMaxTracedMessageCountIsExceeded() {
+    MessageService capped = new MessageService(2);
+    capped.addMessage(createTestMessage("exchange-1"));
+    capped.addMessage(createTestMessage("exchange-2"));
+
+    // This third message is silently dropped (existing behavior, unchanged) ...
+    capped.addMessage(createTestMessage("exchange-3"));
+
+    // ... but is now surfaced via the flag instead of being invisible.
+    assertEquals(2, capped.getMessageList().size());
+    assertTrue(capped.getMessageListInfo().isCapReached());
+  }
+
+  @Test
+  void resetClearsCapReachedFlag() {
+    MessageService capped = new MessageService(1);
+    capped.addMessage(createTestMessage("exchange-1"));
+    capped.addMessage(createTestMessage("exchange-2")); // dropped, sets capReached
+    assertTrue(capped.getMessageListInfo().isCapReached());
+
+    capped.reset();
+
+    assertFalse(capped.getMessageListInfo().isCapReached());
   }
 }

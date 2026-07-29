@@ -46,6 +46,9 @@ public class MessageService {
   private volatile Instant lastModified = Instant.now();
   private volatile Instant lastResetTime = Instant.now();
 
+  // True once maxTracedMessageCount has been hit and further messages are being dropped
+  private volatile boolean capReached = false;
+
   public List<Message> getMessageList() {
     return messageList;
   }
@@ -66,10 +69,15 @@ public class MessageService {
    * @param message The message.
    */
   public void addMessage(Message message) {
-    if (message != null && maxTracedMessageCount > messageList.size()) {
+    if (message == null) {
+      return;
+    }
+    if (maxTracedMessageCount > messageList.size()) {
       messageList.add(message);
       addVersion.incrementAndGet();
       lastModified = Instant.now();
+    } else {
+      capReached = true;
     }
   }
 
@@ -83,6 +91,7 @@ public class MessageService {
     addVersion.set(0); // Reset add version when list is cleared
     lastModified = Instant.now();
     lastResetTime = Instant.now();
+    capReached = false;
   }
 
   /**
@@ -119,7 +128,8 @@ public class MessageService {
         resetVersion.get(),
         addVersion.get(),
         lastModified,
-        lastResetTime
+        lastResetTime,
+        capReached
     );
   }
 }

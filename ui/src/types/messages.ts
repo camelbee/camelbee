@@ -16,6 +16,8 @@ export interface Message {
   messageType: MessageType;
   exception: string | null;
   timeStamp: string;
+  /** Elapsed ms from ExchangeSentEvent.getTimeTaken(); 0 for non-SENT message types. */
+  timeTaken: number;
 }
 
 /** Matches Java: org.camelbee.debugger.model.exchange.MessageListInfo */
@@ -25,6 +27,8 @@ export interface MessageListInfo {
   addVersion: number;
   lastModified: string;
   lastResetTime: string;
+  /** True once camelbee.tracer-max-messages-count has been hit and messages are being dropped. */
+  capReached: boolean;
 }
 
 /** Matches Java: org.camelbee.debugger.model.exchange.MessageListWithInfo */

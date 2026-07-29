@@ -20,11 +20,15 @@ interface DebuggerState {
   isTracing: boolean;
   selectedEdgeId: string | null;
 
+  /** True once the server-side tracer-max-messages-count cap has been hit (roadmap #12). */
+  capReached: boolean;
+
   /* Actions */
   appendMessages: (
     newMessages: Message[],
     newAddVersion: number,
     newResetVersion: number,
+    newCapReached?: boolean,
   ) => void;
   setTimelineIndex: (index: number) => void;
   stepForward: () => void;
@@ -64,8 +68,9 @@ export const useDebuggerStore = create<DebuggerState>((set, get) => ({
   filteredMessages: [],
   isTracing: false,
   selectedEdgeId: null,
+  capReached: false,
 
-  appendMessages: (newMessages, newAddVersion, newResetVersion) => {
+  appendMessages: (newMessages, newAddVersion, newResetVersion, newCapReached = false) => {
     const state = get();
 
     // If reset version changed, server cleared messages
@@ -79,6 +84,7 @@ export const useDebuggerStore = create<DebuggerState>((set, get) => ({
         filteredMessages: filtered,
         timelineIndex: filtered.length,
         prevTimelineIndex: 0,
+        capReached: newCapReached,
       });
       return;
     }
@@ -93,6 +99,7 @@ export const useDebuggerStore = create<DebuggerState>((set, get) => ({
       filteredMessages: filtered,
       timelineIndex: filtered.length,
       prevTimelineIndex: state.timelineIndex,
+      capReached: newCapReached,
     });
   },
 
@@ -142,5 +149,6 @@ export const useDebuggerStore = create<DebuggerState>((set, get) => ({
       addVersion: -1,
       resetVersion: -1,
       selectedEdgeId: null,
+      capReached: false,
     }),
 }));

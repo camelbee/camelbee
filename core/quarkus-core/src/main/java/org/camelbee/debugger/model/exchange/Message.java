@@ -42,6 +42,8 @@ public class Message {
 
   private final String timeStamp;
 
+  private final long timeTaken;
+
   /**
    * Message Constructor.
    *
@@ -56,6 +58,25 @@ public class Message {
   @SuppressWarnings("java:S107")
   public Message(String exchangeId, MessageEventType exchangeEventType, String messageBody, String headers, String routeId, String endpoint,
       String endpointId, MessageType messageType, String exception) {
+    this(exchangeId, exchangeEventType, messageBody, headers, routeId, endpoint, endpointId, messageType, exception, 0L);
+  }
+
+  /**
+   * Message Constructor.
+   *
+   * @param exchangeId  The exchangeId.
+   * @param messageBody The messageBody.
+   * @param headers     The headers.
+   * @param routeId     The routeId.
+   * @param endpoint    The endpoint.
+   * @param messageType The messageType.
+   * @param exception   The exception.
+   * @param timeTaken   Elapsed time in milliseconds from {@code ExchangeSentEvent.getTimeTaken()},
+   *                    or 0 for message types that don't carry it (CREATED/SENDING/COMPLETED).
+   */
+  @SuppressWarnings("java:S107")
+  public Message(String exchangeId, MessageEventType exchangeEventType, String messageBody, String headers, String routeId, String endpoint,
+      String endpointId, MessageType messageType, String exception, long timeTaken) {
     this.exchangeId = exchangeId;
     this.exchangeEventType = exchangeEventType;
     this.messageBody = messageBody;
@@ -66,6 +87,7 @@ public class Message {
     this.messageType = messageType;
     this.exception = exception;
     this.timeStamp = "%d".formatted(System.currentTimeMillis());
+    this.timeTaken = timeTaken;
   }
 
   public String getExchangeId() {
@@ -110,5 +132,9 @@ public class Message {
 
   public String getTimeStamp() {
     return timeStamp;
+  }
+
+  public long getTimeTaken() {
+    return timeTaken;
   }
 }

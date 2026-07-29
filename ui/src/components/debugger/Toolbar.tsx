@@ -17,6 +17,7 @@ export function Toolbar({ context, health }: ToolbarProps) {
   const setFilterText = useDebuggerStore((s) => s.setFilterText);
   const filterText = useDebuggerStore((s) => s.filterText);
   const clearMessages = useDebuggerStore((s) => s.clearMessages);
+  const capReached = useDebuggerStore((s) => s.capReached);
 
   const [localFilter, setLocalFilter] = useState(filterText);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -74,6 +75,17 @@ export function Toolbar({ context, health }: ToolbarProps) {
       </div>
 
       <div className="flex-1" />
+
+      {/* Cap-reached warning (roadmap #12) */}
+      {capReached && (
+        <span
+          role="status"
+          title="camelbee.tracer-max-messages-count has been reached — older messages may be missing, not the tracer being idle"
+          className="rounded bg-amber-500/20 px-2 py-1 text-[11px] font-medium text-amber-700 dark:text-amber-400"
+        >
+          ⚠ Message cap reached
+        </span>
+      )}
 
       {/* Filter */}
       <input
