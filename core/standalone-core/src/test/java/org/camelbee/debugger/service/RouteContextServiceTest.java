@@ -209,4 +209,46 @@ class RouteContextServiceTest {
         .filteredOn(o -> o.getDescription().startsWith("Poll["))
         .hasSize(1);
   }
+
+  /**
+   * Roadmap #3 (query-param-proof edge matching): adjustRestInputRoutes previously
+   * matched a REST-openapi route's synthetic "From[direct:opId]" output description
+   * against a real route's raw input string with plain {@code .equals()}. A real
+   * route's {@code from()} commonly carries query params (bridgeErrorHandler,
+   * timeout, ...) that the synthetic, query-free description never has, so the
+   * exact-equality check silently failed to flag the route as REST.
+   */
+  @Test
+  void adjustRestInputRoutes_matchesDespiteQueryParamsOnTheRealRouteInput() {
+    CamelRoute restRoute = new CamelRoute("restRoute", "From[rest-openapi:///openapi.json]",
+        List.of(new CamelRouteOutput("", "From[direct:orderOp]", null, null, null)), true, null);
+    CamelRoute targetRoute = new CamelRoute("orderRoute",
+        "From[direct:orderOp?bridgeErrorHandler=true]", List.of(), false, null);
+
+    service.adjustRestInputRoutes(List.of(restRoute), List.of(targetRoute));
+
+    assertThat(targetRoute.getRest()).isTrue();
+  }
+
+  @Test
+  void adjustRestInputRoutes_isCaseInsensitive() {
+    CamelRoute restRoute = new CamelRoute("restRoute", "From[rest-openapi:///openapi.json]",
+        List.of(new CamelRouteOutput("", "FROM[Direct:OrderOp]", null, null, null)), true, null);
+    CamelRoute targetRoute = new CamelRoute("orderRoute", "From[direct:orderOp]", List.of(), false, null);
+
+    service.adjustRestInputRoutes(List.of(restRoute), List.of(targetRoute));
+
+    assertThat(targetRoute.getRest()).isTrue();
+  }
+
+  @Test
+  void adjustRestInputRoutes_doesNotFlagUnrelatedRoutes() {
+    CamelRoute restRoute = new CamelRoute("restRoute", "From[rest-openapi:///openapi.json]",
+        List.of(new CamelRouteOutput("", "From[direct:orderOp]", null, null, null)), true, null);
+    CamelRoute unrelatedRoute = new CamelRoute("otherRoute", "From[direct:otherOp]", List.of(), false, null);
+
+    service.adjustRestInputRoutes(List.of(restRoute), List.of(unrelatedRoute));
+
+    assertThat(unrelatedRoute.getRest()).isFalse();
+  }
 }

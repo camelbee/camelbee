@@ -33,6 +33,18 @@ function stripWrapper(s: string, prefix: string): string {
 }
 
 /**
+ * Strip the query-string portion of a URI: "direct:x?block=false" -> "direct:x".
+ * For direct:/seda: endpoints, identity is the scheme+path — query params
+ * (block, timeout, bridgeErrorHandler, ...) configure behavior, not identity,
+ * and are common on one side of a to/from pair but not the other
+ * (roadmap #3).
+ */
+function stripQuery(uri: string): string {
+  const idx = uri.indexOf('?');
+  return idx === -1 ? uri : uri.substring(0, idx);
+}
+
+/**
  * Extract static endpoint URIs from an output description.
  * Port of MessageStaticEndpointUtil.cs
  */
@@ -92,17 +104,21 @@ export function outputReferencesInput(
   if (!desc) return false;
 
   const descLower = desc.toLowerCase();
-  const inputLower = inputTrimmed.toLowerCase();
+  // Query params (block=false, timeout=..., bridgeErrorHandler=..., etc.) are
+  // common on one side of a to/from pair but not the other, and don't change
+  // direct:/seda: identity — strip before comparing (roadmap #3).
+  const inputBase = stripQuery(inputTrimmed).toLowerCase();
 
   // Direct match: To[input], DynamicTo[input], DynamicTo[toD[input]], WireTap[input], Poll[input]
   for (const prefix of ['To[', 'DynamicTo[', 'WireTap[', 'Poll[']) {
-    if (descLower === `${prefix.toLowerCase()}${inputLower}]`) {
-      return true;
+    if (descLower.startsWith(prefix.toLowerCase())) {
+      let uri = stripWrapper(desc, prefix);
+      // Handle DynamicTo[toD[X]] — strip the inner toD[] wrapper
+      if (uri.toLowerCase().startsWith('tod[') && uri.endsWith(']')) {
+        uri = uri.substring(4, uri.length - 1);
+      }
+      return stripQuery(uri).toLowerCase() === inputBase;
     }
-  }
-  // Handle DynamicTo[toD[input]]
-  if (descLower === `dynamicto[tod[${inputLower}]]`) {
-    return true;
   }
 
   // Contained match for Enrich, PollEnrich, RecipientList, RoutingSlip
@@ -116,13 +132,13 @@ export function outputReferencesInput(
     descLower.startsWith(p),
   );
   if (startsWithContainer) {
-    // Check if input appears inside braces, possibly comma-delimited
-    return (
-      desc.includes(`{${inputTrimmed}}`) ||
-      desc.includes(`{${inputTrimmed},`) ||
-      desc.includes(`,${inputTrimmed},`) ||
-      desc.includes(`,${inputTrimmed}}`)
-    );
+    const inner = extractBetweenBraces(desc);
+    if (!inner) return false;
+    const delimiter = output.delimiter ?? ',';
+    const parts = inner
+      .split(delimiter)
+      .map((s) => stripQuery(s.trim()).toLowerCase());
+    return parts.includes(inputBase);
   }
 
   return false;

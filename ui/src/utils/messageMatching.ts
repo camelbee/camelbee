@@ -138,7 +138,10 @@ export interface Interaction {
 
 /**
  * Group messages matched to an edge into request/response pairs keyed by
- * exchangeId.
+ * exchangeId. A single exchangeId may produce multiple pairs (Roadmap #18):
+ * Camel redeliveries/retries reuse the same exchangeId for every attempt, so
+ * a new REQUEST always starts a new pair rather than overwriting the
+ * previous attempt's request/response.
  */
 export function buildInteractionsForEdge(
   messages: Message[],
@@ -146,26 +149,35 @@ export function buildInteractionsForEdge(
 ): Interaction[] {
   const matched = messages.filter((m) => matchMessageToEdge(m, [edge]) !== null);
 
-  const byExchange = new Map<string, { request: Message | null; response: Message | null }>();
+  type Pair = { request: Message | null; response: Message | null };
+  const byExchange = new Map<string, Pair[]>();
 
   for (const m of matched) {
-    let entry = byExchange.get(m.exchangeId);
-    if (!entry) {
-      entry = { request: null, response: null };
-      byExchange.set(m.exchangeId, entry);
+    let pairs = byExchange.get(m.exchangeId);
+    if (!pairs) {
+      pairs = [];
+      byExchange.set(m.exchangeId, pairs);
     }
     if (m.messageType === 'REQUEST') {
-      entry.request = m;
+      pairs.push({ request: m, response: null });
     } else {
-      // RESPONSE or ERROR_RESPONSE
-      entry.response = m;
+      // RESPONSE or ERROR_RESPONSE: fill the most recent pair still awaiting
+      // a response (a retry), or open a new response-only pair if none exists.
+      const open = [...pairs].reverse().find((p) => p.response === null);
+      if (open) {
+        open.response = m;
+      } else {
+        pairs.push({ request: null, response: m });
+      }
     }
   }
 
-  return Array.from(byExchange.entries()).map(([exchangeId, pair]) => ({
-    exchangeId,
-    request: pair.request,
-    response: pair.response,
-    isError: pair.response?.messageType === 'ERROR_RESPONSE',
-  }));
+  return Array.from(byExchange.entries()).flatMap(([exchangeId, pairs]) =>
+    pairs.map((pair) => ({
+      exchangeId,
+      request: pair.request,
+      response: pair.response,
+      isError: pair.response?.messageType === 'ERROR_RESPONSE',
+    })),
+  );
 }

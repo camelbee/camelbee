@@ -79,7 +79,7 @@ const fixture: CamelBeeContext = {
         output('wiretap-1', 'WireTap[direct:auditTap]', WIRETAP),
         output('to-kafka-1', `To[${KAFKA_URI}]`, TO),
         output('tod-1', 'DynamicTo[toD[seda:dispatch]]', TOD),
-        // KNOWN BUG (#3): query param on a direct: target — matches nothing.
+        // FIXED (#3): query param on a direct: target now matches correctly.
         output('to-qp-1', 'To[direct:notify?block=false]', TO),
       ],
     },
@@ -141,8 +141,8 @@ const fixture: CamelBeeContext = {
       input: 'From[timer:tick?period=5000]',
       rest: false,
       errorHandler: null,
-      // KNOWN BUG (#3): query param on a seda: target — output vanishes
-      // entirely (no edge, no producer node).
+      // FIXED (#3): query param on a seda: target now correctly resolves
+      // to an edge (still no producer node — it's internal, not external).
       outputs: [output('to-seda-miss', 'To[seda:dispatch?size=100]', TO)],
     },
     {
@@ -208,15 +208,17 @@ describe('T0: buildRouteGraph characterization', () => {
     }
   });
 
-  it('KNOWN BUG (#3): a route only referenced with query params appears as a disconnected consumer', () => {
-    // processOrder calls To[direct:notify?block=false]; exact string matching
-    // misses it, so `notify` is wrongly classified as an entry-point consumer.
-    expect(kindOf(makeNodeId('notify'))).toBe('consumer');
+  it('FIXED (#3): a route referenced only with query params is correctly linked, not a disconnected consumer', () => {
+    // processOrder calls To[direct:notify?block=false]; query-param-proof
+    // matching now recognizes it, so `notify` is correctly classified as
+    // internal (called by another route), with a real edge into it.
+    expect(kindOf(makeNodeId('notify'))).toBe('internal');
     const notifyEdges = edges.filter(
       (e) =>
         e.source === makeNodeId('notify') || e.target === makeNodeId('notify'),
     );
-    expect(notifyEdges).toEqual([]);
+    expect(notifyEdges).toHaveLength(1);
+    expect(notifyEdges[0]!.data!.outputId).toBe('to-qp-1');
   });
 
   it('CURRENT BEHAVIOR: an error-handler target route drawn in the orphan pass stays kind=internal, not error', () => {
@@ -252,6 +254,9 @@ describe('T0: buildRouteGraph characterization', () => {
       { s: makeNodeId('shipA'), t: makeNodeId('shipB'), o: 'rs-1', eh: false },
       { s: makeNodeId('shipA'), t: makeProducerId('mock:ship'), o: 'rs-1', eh: false },
       { s: makeNodeId('orderErrors'), t: makeProducerId('mock:errors'), o: 'to-mock-err', eh: false },
+      // FIXED (#3): these two edges were missing before query-param-proof matching.
+      { s: makeNodeId('processOrder'), t: makeNodeId('notify'), o: 'to-qp-1', eh: false },
+      { s: makeNodeId('route1'), t: makeNodeId('dispatch'), o: 'to-seda-miss', eh: false },
     ]
       .map((e) => ({
         source: e.s,
@@ -268,9 +273,9 @@ describe('T0: buildRouteGraph characterization', () => {
     expect(actual).toEqual(expected);
   });
 
-  it('KNOWN BUG (#3): To[seda:dispatch?size=100] output vanishes entirely', () => {
-    // Neither an edge to `dispatch` nor a producer node is created for it.
-    expect(edges.some((e) => e.data!.outputId === 'to-seda-miss')).toBe(false);
+  it('FIXED (#3): To[seda:dispatch?size=100] resolves to a real edge, not a phantom producer', () => {
+    // An edge to `dispatch` now exists; still no producer node (it's internal).
+    expect(edges.some((e) => e.data!.outputId === 'to-seda-miss')).toBe(true);
     expect(nodeById.has(makeProducerId('seda:dispatch?size=100'))).toBe(false);
   });
 
@@ -398,16 +403,17 @@ describe('T0: interaction building characterization', () => {
     expect(byId.get('ex-3')!.isError).toBe(true);
   });
 
-  it('KNOWN BUG (#18): a retried request on the same edge+exchange overwrites the first', () => {
+  it('FIXED (#18): a retried request on the same edge+exchange is kept as its own interaction', () => {
     const messages: Message[] = [
       msg({ exchangeId: 'ex-1', messageBody: 'first-attempt' }),
       msg({ exchangeId: 'ex-1', messageBody: 'second-attempt' }),
     ];
 
     const interactions = buildInteractionsForEdge(messages, kafkaEdge);
-    // Loops/redeliveries collapse to ONE interaction, keeping only the last
-    // request — roadmap #18 will change this to a list of pairs.
-    expect(interactions).toHaveLength(1);
-    expect(interactions[0]!.request?.messageBody).toBe('second-attempt');
+    // Loops/redeliveries no longer collapse — each REQUEST on the same
+    // exchangeId starts a new pair (roadmap #18).
+    expect(interactions).toHaveLength(2);
+    expect(interactions[0]!.request?.messageBody).toBe('first-attempt');
+    expect(interactions[1]!.request?.messageBody).toBe('second-attempt');
   });
 });

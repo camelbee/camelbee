@@ -116,6 +116,31 @@ class ExchangeSendingEventTracerNewTest {
     assertThat(exchange.getProperty(CURRENT_ROUTE_TRACE_STACK)).isNotNull();
   }
 
+  // Roadmap #13h: no route's outputs contain this endpointId (empty route
+  // list), so getCallerRouteIdFromRouteContext must fall back to the
+  // endpoint URI instead of an empty string. "" would make both CURRENT_ROUTE_NAME
+  // and the backfilled previous message's routeId empty, and messageMatching.ts
+  // treats an empty routeId as falsy and drops the message before any edge
+  // matching even runs (silently missing from the topology view).
+  @Test
+  void fallsBackToEndpointUriWhenNoRouteOutputMatchesTheEndpointId() {
+    when(routeContextService.getCamelRoutes()).thenReturn(List.of());
+
+    Exchange exchange = new DefaultExchange(camelContext);
+    // Simulates the platform-http first-message backfill: a CREATED message
+    // for this exchange with no routeId yet, waiting to be backfilled once
+    // the caller route is (attempted to be) determined.
+    Message previous = new Message(exchange.getExchangeId(), MessageEventType.CREATED, null, null,
+        null, "mock:dynamic", null, MessageType.REQUEST, null);
+    when(messageService.getMessageList()).thenReturn(List.of(previous));
+
+    Message message = tracer.traceEvent(eventFor(exchange, "mock:dynamic"));
+
+    assertThat(message).isNotNull();
+    assertThat(exchange.getProperty(CURRENT_ROUTE_NAME)).isEqualTo("mock:dynamic");
+    assertThat(previous.getRouteId()).isEqualTo("mock:dynamic");
+  }
+
   @Test
   void initializeRouteStack_scansRoutesAndBackfillsPreviousMessageRouteId() {
     Exchange exchange = new DefaultExchange(camelContext);

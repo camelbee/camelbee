@@ -120,4 +120,55 @@ describe('outputReferencesInput', () => {
       ),
     ).toBe(true);
   });
+
+  // Roadmap #3 (query-param-proof edge matching): query params are common on
+  // one side of a to/from pair but not the other, and don't change
+  // direct:/seda: identity.
+  it('matches when the output has query params but the input does not', () => {
+    expect(
+      outputReferencesInput(output({ description: 'To[direct:x?block=false]' }), 'direct:x'),
+    ).toBe(true);
+  });
+
+  it('matches when the input has query params but the output does not', () => {
+    expect(
+      outputReferencesInput(output({ description: 'To[direct:x]' }), 'direct:x?bridgeErrorHandler=true'),
+    ).toBe(true);
+  });
+
+  it('matches when both sides have different query params', () => {
+    expect(
+      outputReferencesInput(
+        output({ description: 'To[direct:x?block=false]' }),
+        'direct:x?bridgeErrorHandler=true',
+      ),
+    ).toBe(true);
+  });
+
+  it('still does not match a different path even when query params are stripped', () => {
+    expect(
+      outputReferencesInput(output({ description: 'To[direct:x?block=false]' }), 'direct:y'),
+    ).toBe(false);
+  });
+
+  it('matches query params through the DynamicTo[toD[...]] unwrap', () => {
+    expect(
+      outputReferencesInput(
+        output({ description: 'DynamicTo[toD[direct:x?block=false]]' }),
+        'direct:x',
+      ),
+    ).toBe(true);
+  });
+
+  it('matches a RecipientList entry with query params, case-insensitively', () => {
+    expect(
+      outputReferencesInput(
+        output({
+          description: 'RECIPIENTLIST[recipientList[{direct:a?block=false,direct:b}]]',
+          delimiter: ',',
+        }),
+        'direct:a',
+      ),
+    ).toBe(true);
+  });
 });

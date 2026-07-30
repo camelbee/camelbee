@@ -31,7 +31,6 @@ import java.util.Optional;
 import org.apache.camel.Exchange;
 import org.apache.camel.spi.CamelEvent.ExchangeSendingEvent;
 import org.apache.camel.support.DefaultExchange;
-import org.apache.commons.lang3.StringUtils;
 import org.camelbee.debugger.model.exchange.Message;
 import org.camelbee.debugger.model.exchange.MessageEventType;
 import org.camelbee.debugger.model.exchange.MessageType;
@@ -111,7 +110,7 @@ public class ExchangeSendingEventTracer {
      which happens with the platform-http producer component
      */
     if (routeStack == null) {
-      routeStack = initializeRouteStack(exchange, endpointId);
+      routeStack = initializeRouteStack(exchange, endpointId, endpointUri);
     }
 
     Deque<String> clonedRouteStack;
@@ -169,9 +168,9 @@ public class ExchangeSendingEventTracer {
     return clonedRouteStack;
   }
 
-  private Deque<String> initializeRouteStack(Exchange exchange, String endpointId) {
+  private Deque<String> initializeRouteStack(Exchange exchange, String endpointId, String endpointUri) {
     //find the actual consumer routeId
-    final String actualCurrentRoute = getCallerRouteIdFromRouteContext(endpointId);
+    final String actualCurrentRoute = getCallerRouteIdFromRouteContext(endpointId, endpointUri);
 
     Deque<String> routeStack;
     routeStack = new ArrayDeque<>();
@@ -194,7 +193,7 @@ public class ExchangeSendingEventTracer {
     return routeStack;
   }
 
-  private String getCallerRouteIdFromRouteContext(String endpointId) {
+  private String getCallerRouteIdFromRouteContext(String endpointId, String endpointUri) {
 
     List<CamelRoute> routes = routeContextService.getCamelRoutes();
 
@@ -202,15 +201,20 @@ public class ExchangeSendingEventTracer {
         .filter(p -> p.getOutputs().stream().anyMatch(q -> q.getId().equals(endpointId)))
         .findFirst();
 
-    /*
-    there is no way to have an empty optional because
-    the endpointId should be output of one of the routes
-     */
     if (routeOptional.isPresent()) {
       return routeOptional.get().getId();
     }
 
-    return StringUtils.EMPTY;
+    /*
+     normally the endpointId should always be the output of one of the routes;
+     if it is not (e.g. a future Camel version assigns history-node ids differently
+     for some EIP), fall back to the endpoint URI instead of an empty string so the
+     message can still be matched to an edge by URI (see messageMatching.ts) instead
+     of being silently dropped.
+     */
+    LOGGER.warn("Could not determine caller route for endpointId '{}', falling back to endpoint URI '{}'",
+        endpointId, endpointUri);
+    return endpointUri;
   }
 
 }

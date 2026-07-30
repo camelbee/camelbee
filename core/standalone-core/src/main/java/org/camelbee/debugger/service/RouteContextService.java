@@ -63,6 +63,8 @@ public class RouteContextService {
 
   private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\{\\{(.*?)}}");
 
+  private static final Pattern QUERY_STRING_IN_BRACKETS_PATTERN = Pattern.compile("\\?[^\\]]*");
+
   /**
    * The logger.
    */
@@ -209,11 +211,26 @@ public class RouteContextService {
     }
   }
 
-  private void adjustRestInputRoutes(List<CamelRoute> restApiRoutes, List<CamelRoute> routes) {
+  void adjustRestInputRoutes(List<CamelRoute> restApiRoutes, List<CamelRoute> routes) {
 
-    restApiRoutes.stream().forEach(e -> e.getOutputs().forEach(p -> routes.stream().filter(r -> r.getInput().equals(p.getDescription())).forEach(s -> s.setRest(
-        true))
-    ));
+    restApiRoutes.stream().forEach(e -> e.getOutputs().forEach(p -> {
+      String targetInput = normalizeRouteInput(p.getDescription());
+      routes.stream().filter(r -> normalizeRouteInput(r.getInput()).equals(targetInput)).forEach(s -> s.setRest(true));
+    }));
+  }
+
+  /**
+   * Normalize a route's {@code From[...]} input string for REST-input matching: strip query
+   * strings (common on direct:/seda: inputs, e.g. {@code bridgeErrorHandler}) and lowercase, so a
+   * real route's input matches the query-param-free synthetic input built from an OpenAPI
+   * operationId. Recipe format is not case-guaranteed across Camel versions, hence the
+   * case-insensitive comparison.
+   */
+  static String normalizeRouteInput(String input) {
+    if (input == null) {
+      return null;
+    }
+    return QUERY_STRING_IN_BRACKETS_PATTERN.matcher(input).replaceAll("").toLowerCase();
   }
 
   private boolean checkRestOpenApiRouteDefinition(RouteDefinition routeDefinition, List<CamelRouteOutput> outputs) {
