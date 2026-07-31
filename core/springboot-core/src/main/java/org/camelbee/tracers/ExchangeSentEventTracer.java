@@ -118,7 +118,8 @@ public class ExchangeSentEventTracer {
     }
 
     return new Message(exchange.getExchangeId(), MessageEventType.SENT, responseSentBody, requestHeaders, callerRoute,
-        currentRoute, endpointId, messageType, errorMessage, timeTaken);
+        currentRoute, TracerUtils.resolveNodeId(exchange, endpointId), messageType, errorMessage,
+        timeTaken);
   }
 
 }

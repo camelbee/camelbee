@@ -16,6 +16,7 @@
 
 package org.camelbee.utils;
 
+import static org.camelbee.constants.CamelBeeConstants.CAMELBEE_NODE_ID;
 import static org.camelbee.constants.CamelBeeConstants.CAMEL_FAILED_EVENT_IDENTITY_HASHCODE;
 
 import org.apache.camel.Exchange;
@@ -27,6 +28,26 @@ public class TracerUtils {
 
   private TracerUtils() {
     // Private constructor
+  }
+
+  /**
+   * Resolves the id of the node that initiated a send.
+   *
+   * <p>Prefers Camel's own history node id and only falls back to the id stamped by
+   * {@code NodeIdInterceptStrategy}, so the reported value is unchanged wherever Camel already
+   * supplies one. The fallback covers the two cases Camel leaves null: sends performed inside an
+   * EIP (enrich, wireTap, recipientList, multicast), whose exchange copies do not carry the history
+   * node id, and redelivered attempts, for which the node advices do not run again.
+   *
+   * @param exchange      the exchange being traced.
+   * @param historyNodeId Camel's history node id, possibly null.
+   * @return the node id, or null when neither source has one.
+   */
+  public static String resolveNodeId(Exchange exchange, String historyNodeId) {
+    if (historyNodeId != null) {
+      return historyNodeId;
+    }
+    return exchange.getProperty(CAMELBEE_NODE_ID, String.class);
   }
 
   /**

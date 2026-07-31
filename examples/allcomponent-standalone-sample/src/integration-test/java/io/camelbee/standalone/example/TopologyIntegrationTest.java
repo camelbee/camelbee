@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.StreamSupport;
@@ -102,22 +103,38 @@ class TopologyIntegrationTest extends CamelBeeApplicationSupport {
   @Test
   @DisplayName("serializes every EIP output shape the UI parses")
   void serializesEveryEipOutputShape() {
-    Map<String, String> pipeline = outputDescriptionsById("musicianProcessorRoute");
+    Collection<String> pipeline = outputDescriptionsById("musicianProcessorRoute").values();
 
-    assertThat(pipeline).containsEntry("wireTap1", "WireTap[direct:invokeWireTap]");
-    assertThat(pipeline).containsEntry("toD1", "DynamicTo[toD[direct:invokeSeda]]");
-    assertThat(pipeline).containsEntry("enrich1", "Enrich[constant{direct:invokeEnrich}]");
-    assertThat(pipeline).containsEntry("enrich2", "Enrich[constant{direct:invokeEnrichDynamic}]");
-    assertThat(pipeline).containsEntry("pollEnrich1", "PollEnrich[constant{seda:southbound}]");
-    assertThat(pipeline).containsEntry("recipientList1",
-        "RecipientList[constant{direct:invokeMockA,direct:invokeMockB,direct:invokeFile}]");
-    assertThat(pipeline).containsEntry("routingSlip1",
+    assertThat(pipeline).contains(
+        "WireTap[direct:invokeWireTap]",
+        "DynamicTo[toD[direct:invokeSeda]]",
+        "Enrich[constant{direct:invokeEnrich}]",
+        "Enrich[constant{direct:invokeEnrichDynamic}]",
+        "PollEnrich[constant{seda:southbound}]",
+        "RecipientList[constant{direct:invokeMockA,direct:invokeMockB,direct:invokeFile}]",
         "RoutingSlip[constant{direct:invokeMockC,direct:invokeMockD}]");
 
     // poll() is a separate model type (PollDefinition, not ToDynamicDefinition) and is the one
     // output kind no other sample in this repository exercises.
-    assertThat(outputDescriptionsById("invokeSedaRoute"))
-        .containsEntry("poll1", "Poll[seda:southbound]");
+    assertThat(outputDescriptionsById("invokeSedaRoute").values()).contains("Poll[seda:southbound]");
+  }
+
+  @Test
+  @DisplayName("names each EIP output after the kind of node it is")
+  void namesOutputsAfterTheirNodeKind() {
+    assertThat(outputIdOf("musicianProcessorRoute", "WireTap[direct:invokeWireTap]")).startsWith("wireTap");
+    assertThat(outputIdOf("musicianProcessorRoute", "Enrich[constant{direct:invokeEnrich}]")).startsWith("enrich");
+    assertThat(outputIdOf("musicianProcessorRoute", "PollEnrich[constant{seda:southbound}]")).startsWith("pollEnrich");
+    assertThat(outputIdOf("musicianProcessorRoute",
+        "RecipientList[constant{direct:invokeMockA,direct:invokeMockB,direct:invokeFile}]"))
+        .startsWith("recipientList");
+    assertThat(outputIdOf("musicianProcessorRoute",
+        "RoutingSlip[constant{direct:invokeMockC,direct:invokeMockD}]")).startsWith("routingSlip");
+    assertThat(outputIdOf("invokeSedaRoute", "Poll[seda:southbound]")).startsWith("poll");
+
+    // the two enrich nodes are distinct, which is what lets their hops be told apart
+    assertThat(outputIdOf("musicianProcessorRoute", "Enrich[constant{direct:invokeEnrich}]"))
+        .isNotEqualTo(outputIdOf("musicianProcessorRoute", "Enrich[constant{direct:invokeEnrichDynamic}]"));
   }
 
   @Test
@@ -137,8 +154,8 @@ class TopologyIntegrationTest extends CamelBeeApplicationSupport {
   @Test
   @DisplayName("keeps an unresolvable toD expression verbatim")
   void keepsDynamicToExpressionVerbatim() {
-    assertThat(outputDescriptionsById("musicianProcessorRoute"))
-        .containsEntry("toD2", "DynamicTo[toD[direct:invokeMock${exchangeProperty.mockTarget}]]");
+    assertThat(outputDescriptionsById("musicianProcessorRoute").values())
+        .contains("DynamicTo[toD[direct:invokeMock${exchangeProperty.mockTarget}]]");
   }
 
   @Test
@@ -185,9 +202,13 @@ class TopologyIntegrationTest extends CamelBeeApplicationSupport {
   @Test
   @DisplayName("reports delimiters only where Camel actually stores them")
   void reportsDelimitersOnlyWhereStored() {
-    assertThat(output("musicianProcessorRoute", "recipientList1").get("delimiter").isNull()).isTrue();
-    assertThat(output("musicianProcessorRoute", "routingSlip1").get("delimiter").asText())
-        .isEqualTo(",");
+    String recipientList = outputIdOf("musicianProcessorRoute",
+        "RecipientList[constant{direct:invokeMockA,direct:invokeMockB,direct:invokeFile}]");
+    String routingSlip = outputIdOf("musicianProcessorRoute",
+        "RoutingSlip[constant{direct:invokeMockC,direct:invokeMockD}]");
+
+    assertThat(output("musicianProcessorRoute", recipientList).get("delimiter").isNull()).isTrue();
+    assertThat(output("musicianProcessorRoute", routingSlip).get("delimiter").asText()).isEqualTo(",");
   }
 
   /* ---------------------------------------------------------------- */
@@ -224,6 +245,24 @@ class TopologyIntegrationTest extends CamelBeeApplicationSupport {
       }
     }
     throw new AssertionError("no output '" + outputId + "' on route '" + routeId + "'");
+  }
+
+  /**
+   * Id of the output with the given description.
+   *
+   * <p>Auto-generated node ids ({@code wireTap1}, {@code enrich2}, ...) carry a counter that is
+   * JVM-wide, so it shifts depending on how many contexts were built before this one. Tests must
+   * therefore look outputs up by their description - which is the thing worth pinning anyway - and
+   * assert only the node-kind prefix of the id.
+   */
+  private static String outputIdOf(String routeId, String description) {
+    for (JsonNode output : route(routeId).get("outputs")) {
+      if (description.equals(output.get("description").asText())) {
+        return output.get("id").asText();
+      }
+    }
+    throw new AssertionError("no output described '" + description + "' on route '" + routeId
+        + "'; have " + outputDescriptionsById(routeId).values());
   }
 
   private static Map<String, String> outputDescriptionsById(String routeId) {

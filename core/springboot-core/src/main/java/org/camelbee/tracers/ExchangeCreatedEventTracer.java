@@ -30,6 +30,7 @@ import org.camelbee.debugger.model.exchange.Message;
 import org.camelbee.debugger.model.exchange.MessageEventType;
 import org.camelbee.debugger.model.exchange.MessageType;
 import org.camelbee.utils.ExchangeUtils;
+import org.camelbee.utils.TracerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -108,7 +109,7 @@ public class ExchangeCreatedEventTracer {
     final String endpointId = ((DefaultExchange) exchange).getExchangeExtension().getHistoryNodeId();
 
     return new Message(exchange.getExchangeId(), MessageEventType.CREATED, directRequestBody, requestHeaders, initialRoute,
-        currentRouteName, endpointId, MessageType.REQUEST, null);
+        currentRouteName, TracerUtils.resolveNodeId(exchange, endpointId), MessageType.REQUEST, null);
 
   }
 

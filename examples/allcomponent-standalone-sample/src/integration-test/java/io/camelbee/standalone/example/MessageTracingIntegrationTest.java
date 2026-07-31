@@ -190,6 +190,79 @@ class MessageTracingIntegrationTest extends CamelBeeApplicationSupport {
     assertThat(info.get("resetVersion").asLong()).isGreaterThan(resetVersionBefore);
   }
 
+  /**
+   * Every hop must name the node that sent it. Camel's own history node id is null for sends
+   * performed inside an EIP and for redelivered attempts, so this is what proves CamelBee's
+   * intercept strategy is installed and filling those in.
+   */
+  @Test
+  @DisplayName("reports the sending node for every traced hop")
+  void reportsTheSendingNodeForEveryHop() {
+    List<JsonNode> hops = where(message -> text(message, "routeId") != null && text(message, "endpoint") != null);
+
+    assertThat(hops).isNotEmpty();
+    assertThat(hops).allSatisfy(message -> assertThat(text(message, "endpointId"))
+        .as("%s %s -> %s", text(message, "messageType"), text(message, "routeId"),
+            text(message, "endpoint"))
+        .isNotNull());
+  }
+
+  /**
+   * The pipeline sends to {@code direct:invokeMockA} twice from the same route - once from the
+   * multicast, once from the recipientList. Nothing about the two hops differs except the node that
+   * performed them, so without a node id the UI cannot tell them apart and attributes both to
+   * whichever edge it happens to scan first.
+   */
+  @Test
+  @DisplayName("distinguishes two hops that differ only by the node that sent them")
+  void distinguishesHopsThatShareASourceAndTarget() {
+    List<String> nodes = where(message -> "direct://invokeMockA".equals(text(message, "endpoint")))
+        .stream()
+        .map(message -> text(message, "endpointId"))
+        .distinct()
+        .sorted()
+        .toList();
+
+    // one hop comes from a multicast child (a plain to<n> node), the other from the recipientList
+    assertThat(nodes).hasSize(2);
+    assertThat(nodes).anySatisfy(node -> assertThat(node).startsWith("to"));
+    assertThat(nodes).anySatisfy(node -> assertThat(node).startsWith("recipientList"));
+  }
+
+  @Test
+  @DisplayName("names the EIP node that performed each fan-out send")
+  void namesTheEipNodeForFanOutSends() {
+    // auto-generated ids carry a JVM-wide counter, so assert the node kind rather than the suffix
+    assertThat(nodeIdsFor("direct://invokeWireTap")).singleElement().asString().startsWith("wireTap");
+    assertThat(nodeIdsFor("direct://invokeEnrich")).singleElement().asString().startsWith("enrich");
+    assertThat(nodeIdsFor("direct://invokeEnrichDynamic")).singleElement().asString().startsWith("enrich");
+    assertThat(nodeIdsFor("direct://invokeFile")).singleElement().asString().startsWith("recipientList");
+
+    // and the two enrich hops are attributed to different nodes
+    assertThat(nodeIdsFor("direct://invokeEnrich"))
+        .isNotEqualTo(nodeIdsFor("direct://invokeEnrichDynamic"));
+  }
+
+  /**
+   * A redelivery re-invokes the processor without re-running Camel's node advices, so its history
+   * node id is null. All three attempts must still name the node that owns the send, otherwise the
+   * retries scatter across edges.
+   */
+  @Test
+  @DisplayName("names the same node on every attempt of a redelivered send")
+  void namesTheSameNodeOnEveryRedelivery() {
+    assertThat(nodeIdsFor(FLAKY_EDGE)).containsOnly("flakyEndpoint");
+  }
+
+  /** Distinct endpointId values traced for hops to the given endpoint. */
+  private static List<String> nodeIdsFor(String endpoint) {
+    return where(message -> endpoint.equals(text(message, "endpoint")))
+        .stream()
+        .map(message -> text(message, "endpointId"))
+        .distinct()
+        .toList();
+  }
+
   /* ---------------------------------------------------------------- */
   /*  helpers                                                          */
   /* ---------------------------------------------------------------- */

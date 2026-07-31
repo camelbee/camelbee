@@ -31,6 +31,7 @@ import org.camelbee.tracers.ExchangeCompletedEventTracer;
 import org.camelbee.tracers.ExchangeCreatedEventTracer;
 import org.camelbee.tracers.ExchangeSendingEventTracer;
 import org.camelbee.tracers.ExchangeSentEventTracer;
+import org.camelbee.tracers.NodeIdInterceptStrategy;
 import org.camelbee.tracers.TracerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,6 +109,9 @@ public final class CamelBee {
       camelContext.setStreamCaching(true);
       camelContext.setUseMDCLogging(true);
       camelContext.getCamelContextExtension().addContextPlugin(UnitOfWorkFactory.class, CamelBeeUnitOfWork::new);
+      // Must be added before the routes are reified, which is why it lives here and not with the
+      // event notifier below: intercept strategies are consulted while each processor is built.
+      camelContext.getCamelContextExtension().addInterceptStrategy(new NodeIdInterceptStrategy());
     } else {
       LOGGER.debug("CamelBee route configuration disabled via camelbee.route-configurer-enabled=false");
     }

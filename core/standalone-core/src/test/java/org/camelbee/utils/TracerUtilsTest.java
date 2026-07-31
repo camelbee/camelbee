@@ -24,6 +24,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.apache.camel.Exchange;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.support.DefaultExchange;
+import org.camelbee.constants.CamelBeeConstants;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -95,5 +98,28 @@ class TracerUtilsTest {
     // Assert
     assertEquals("Test error message", result);
     verify(exchange).setProperty(eq(CAMEL_FAILED_EVENT_IDENTITY_HASHCODE), anyInt());
+  }
+
+  @Test
+  void resolveNodeId_prefersCamelsOwnHistoryNodeId() {
+    Exchange exchange = new DefaultExchange(new DefaultCamelContext());
+    exchange.setProperty(CamelBeeConstants.CAMELBEE_NODE_ID, "stamped");
+
+    assertEquals("camelNode", TracerUtils.resolveNodeId(exchange, "camelNode"));
+  }
+
+  @Test
+  void resolveNodeId_fallsBackToTheStampedNodeId() {
+    Exchange exchange = new DefaultExchange(new DefaultCamelContext());
+    exchange.setProperty(CamelBeeConstants.CAMELBEE_NODE_ID, "stamped");
+
+    assertEquals("stamped", TracerUtils.resolveNodeId(exchange, null));
+  }
+
+  @Test
+  void resolveNodeId_isNullWhenNeitherSourceHasOne() {
+    Exchange exchange = new DefaultExchange(new DefaultCamelContext());
+
+    assertNull(TracerUtils.resolveNodeId(exchange, null));
   }
 }

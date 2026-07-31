@@ -29,8 +29,8 @@ export function MessagePanel({ edges }: MessagePanelProps) {
 
   const interactions = useMemo(() => {
     if (!edge) return [];
-    return buildInteractionsForEdge(slicedMessages, edge);
-  }, [edge, slicedMessages]);
+    return buildInteractionsForEdge(slicedMessages, edge, edges);
+  }, [edge, edges, slicedMessages]);
 
   // Reset interaction index when edge changes
   useEffect(() => {

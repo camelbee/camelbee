@@ -49,6 +49,13 @@ public final class CamelBeeConstants {
 
   public static final String LAST_DIRECT_ROUTE = "camelbee-last-direct-route";
 
+  /**
+   * Id of the route node currently processing the exchange, stamped by
+   * {@code NodeIdInterceptStrategy}. Used as the endpoint id when Camel's own history node id is
+   * absent, which it is for every EIP sub-send and every redelivered attempt.
+   */
+  public static final String CAMELBEE_NODE_ID = "camelbee-node-id";
+
   public static final String PREVIOUS_EXCHANGE_ID = "camelbee-previous-exchange-id";
 
 }

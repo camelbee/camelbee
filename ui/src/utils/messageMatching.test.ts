@@ -111,6 +111,80 @@ describe('matchMessageToEdge', () => {
   });
 });
 
+/**
+ * Pass precedence. The node id and the endpoint are each insufficient alone, so the matcher resolves
+ * in passes; these pin which pass wins when they disagree.
+ */
+describe('matchMessageToEdge — pass precedence', () => {
+  it('separates the edges of a fan-out node by endpoint', () => {
+    // one recipientList node targeting three routes produces three edges sharing an outputId
+    const toA = edge({ outputId: 'recipientList1', sourceInputUri: 'direct:main', targetInputUri: 'direct:a' }, 'eA');
+    const toB = edge({ outputId: 'recipientList1', sourceInputUri: 'direct:main', targetInputUri: 'direct:b' }, 'eB');
+    const toC = edge({ outputId: 'recipientList1', sourceInputUri: 'direct:main', targetInputUri: 'direct:c' }, 'eC');
+
+    const m = makeMessage({ endpointId: 'recipientList1', routeId: 'direct:main', endpoint: 'direct:b' });
+
+    // without the endpoint check this returns whichever edge is scanned first
+    expect(matchMessageToEdge(m, [toA, toB, toC])).toBe(toB);
+  });
+
+  it('still matches a fan-out edge across a query string on the producer side', () => {
+    const toA = edge({ outputId: 'rl1', sourceInputUri: 'direct:main', targetInputUri: 'direct:a' }, 'eA');
+    const toB = edge({ outputId: 'rl1', sourceInputUri: 'direct:main', targetInputUri: 'direct:b' }, 'eB');
+
+    const m = makeMessage({ endpointId: 'rl1', routeId: 'direct:main', endpoint: 'direct:b?block=true' });
+
+    expect(matchMessageToEdge(m, [toA, toB])).toBe(toB);
+  });
+
+  it('matches on node id plus source when the edge target is an unresolved expression', () => {
+    // toD("direct:invokeMock${exchangeProperty.target}") - the traced endpoint is the resolved
+    // value, so it can never equal the expression stored on the edge
+    const dynamic = edge({
+      outputId: 'toD2',
+      sourceInputUri: 'direct:main',
+      targetUri: 'direct:invokeMock${exchangeProperty.target}',
+    });
+    const m = makeMessage({ endpointId: 'toD2', routeId: 'direct:main', endpoint: 'direct:invokeMockD' });
+
+    expect(matchMessageToEdge(m, [dynamic])).toBe(dynamic);
+  });
+
+  it('prefers route plus endpoint over a node id that agrees with neither', () => {
+    // a node id can survive across a route boundary and name a node in another route entirely;
+    // route + endpoint is the better evidence at that point
+    const stale = edge({ outputId: 'toD1', sourceInputUri: 'direct:inner', targetInputUri: 'direct:seda' }, 'stale');
+    const real = edge({ outputId: 'to9', sourceInputUri: 'direct:outer', targetInputUri: 'direct:main' }, 'real');
+
+    const m = makeMessage({ endpointId: 'toD1', routeId: 'direct:outer', endpoint: 'direct:main' });
+
+    expect(matchMessageToEdge(m, [stale, real])).toBe(real);
+  });
+
+  it('falls back to the node id alone when nothing else agrees', () => {
+    // routingSlip/dynamicRouter continuations: the tracer names the previous callee as the source,
+    // so the source check fails, but the node id still identifies the EIP that owns the hop
+    const slip = edge({ outputId: 'routingSlip1', sourceInputUri: 'direct:main', targetInputUri: 'direct:d' });
+    const m = makeMessage({ endpointId: 'routingSlip1', routeId: 'direct:c', endpoint: 'direct:d' });
+
+    expect(matchMessageToEdge(m, [slip])).toBe(slip);
+  });
+
+  it('keeps error-handler edges ahead of every other pass', () => {
+    const handler = edge({
+      isErrorHandler: true,
+      outputId: 'errorHandler-main',
+      sourceRouteId: 'route1',
+      targetRouteId: 'direct:dlq',
+    }, 'handler');
+    const other = edge({ outputId: 'to1', sourceRouteId: 'route1', targetInputUri: 'direct:dlq' }, 'other');
+
+    const m = makeMessage({ endpointId: 'to1', routeId: 'route1', endpoint: 'direct:dlq' });
+
+    expect(matchMessageToEdge(m, [other, handler])).toBe(handler);
+  });
+});
+
 describe('buildInteractionsForEdge', () => {
   it('pairs request/response by exchangeId for messages on the edge', () => {
     const e = edge({ outputId: 'out-1' });
@@ -208,5 +282,32 @@ describe('buildInteractionsForEdge', () => {
     const bInteractions = interactions.filter((i) => i.exchangeId === 'B');
     expect(bInteractions).toHaveLength(1);
     expect(bInteractions[0]!.response?.messageBody).toBe('B-ok-1');
+  });
+  /**
+   * Two edges of a fan-out node share a source and a target, so each could match the other's
+   * messages in isolation. The interactions of an edge are therefore the messages the whole graph
+   * awards to it, not the messages it could conceivably claim on its own.
+   */
+  it('does not claim the messages of a sibling fan-out edge', () => {
+    const viaMulticast = edge({ outputId: 'to5', sourceInputUri: 'direct:main', targetInputUri: 'direct:a' }, 'mc');
+    const viaRecipientList = edge({ outputId: 'rl1', sourceInputUri: 'direct:main', targetInputUri: 'direct:a' }, 'rl');
+    const all = [viaMulticast, viaRecipientList];
+
+    const messages = [
+      makeMessage({ exchangeId: 'X', endpointId: 'to5', routeId: 'direct:main', endpoint: 'direct:a', messageType: 'REQUEST' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'to5', routeId: 'direct:main', endpoint: 'direct:a', messageType: 'RESPONSE' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'rl1', routeId: 'direct:main', endpoint: 'direct:a', messageType: 'REQUEST' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'rl1', routeId: 'direct:main', endpoint: 'direct:a', messageType: 'RESPONSE' }),
+    ];
+
+    expect(buildInteractionsForEdge(messages, viaMulticast, all)).toHaveLength(1);
+    expect(buildInteractionsForEdge(messages, viaRecipientList, all)).toHaveLength(1);
+  });
+
+  it('still works when called without the surrounding graph', () => {
+    const e = edge({ outputId: 'out-1' });
+    const messages = [makeMessage({ exchangeId: 'A', endpointId: 'out-1', messageType: 'REQUEST' })];
+
+    expect(buildInteractionsForEdge(messages, e)).toHaveLength(1);
   });
 });

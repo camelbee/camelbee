@@ -63,6 +63,32 @@ test.describe('message tracing', () => {
     await expect(page.getByText('2 / 3')).toBeVisible();
   });
 
+  /**
+   * The strongest end-to-end proof of node-id attribution. The pipeline sends to
+   * {@code direct:invokeMockA} twice from the same route - once from the multicast, once from the
+   * recipientList - so the graph holds two edges between the same pair of nodes. Nothing about the
+   * two hops differs except the node that performed them; without a node id on the traced messages
+   * the UI cannot tell them apart and both sets of messages pile onto whichever edge it scans first,
+   * leaving the other looking as though it never ran.
+   */
+  test('gives the multicast and recipientList hops their own messages', async ({ page }) => {
+    const bothEdges = page.locator(
+      '[data-testid^="rf__edge-edge-route-musicianProcessorRoute-route-invokeMockARoute-"]',
+    );
+    await expect(bothEdges).toHaveCount(2);
+
+    const edgeIds = await bothEdges.evaluateAll((els) =>
+      els.map((el) => el.getAttribute('data-id')!),
+    );
+
+    for (const edgeId of edgeIds) {
+      await clickEdge(page, edgeId);
+      // one request produces exactly one hop down each of the two paths
+      await expect(page.getByText('Messages (1)')).toBeVisible(ARRIVAL);
+      await page.getByRole('button', { name: 'Close message panel' }).click();
+    }
+  });
+
   test('closes the message panel', async ({ page }) => {
     await clickEdge(page, ENRICH_EDGE);
     await expect(page.getByText(/^Messages \(/)).toBeVisible(ARRIVAL);

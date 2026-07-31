@@ -19,6 +19,7 @@ package org.camelbee.config;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.spi.UnitOfWorkFactory;
 import org.camelbee.logging.CamelBeeUnitOfWork;
+import org.camelbee.tracers.NodeIdInterceptStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,8 +50,30 @@ public class CamelBeeRouteConfigurer {
       routeBuilder.getContext().setStreamCaching(true);
       routeBuilder.getContext().setUseMDCLogging(true);
       routeBuilder.getContext().getCamelContextExtension().addContextPlugin(UnitOfWorkFactory.class, CamelBeeUnitOfWork::new);
+      addNodeIdInterceptStrategy(routeBuilder);
     } else {
       LOGGER.debug("CamelBee route configuration disabled via camelbee.route-configurer-enabled=false");
+    }
+  }
+
+  /**
+   * Registers the node-id intercept strategy once per CamelContext.
+   *
+   * <p>It has to be added before the routes are reified - intercept strategies are consulted while
+   * each processor is built - which is why it lives here rather than alongside the event notifier,
+   * which is registered on startup after the routes already exist. This method is called by every
+   * route builder, so it guards against registering more than one.
+   *
+   * @param routeBuilder the route builder being configured.
+   */
+  private void addNodeIdInterceptStrategy(RouteBuilder routeBuilder) {
+    boolean alreadyRegistered = routeBuilder.getContext().getCamelContextExtension()
+        .getInterceptStrategies().stream()
+        .anyMatch(NodeIdInterceptStrategy.class::isInstance);
+
+    if (!alreadyRegistered) {
+      routeBuilder.getContext().getCamelContextExtension()
+          .addInterceptStrategy(new NodeIdInterceptStrategy());
     }
   }
 

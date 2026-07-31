@@ -140,7 +140,8 @@ public class ExchangeSendingEventTracer {
     String errorMessage = TracerUtils.handleError(exchange);
 
     return new Message(exchange.getExchangeId(), MessageEventType.SENDING, requestBody, requestHeaders, routeId,
-        currentRoute, endpointId, MessageType.REQUEST, errorMessage);
+        currentRoute, TracerUtils.resolveNodeId(exchange, endpointId), MessageType.REQUEST,
+        errorMessage);
   }
 
   private Deque<String> adjustStack(Exchange exchange, Deque<String> routeStack) {

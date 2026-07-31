@@ -108,7 +108,7 @@ public class ExchangeCompletedEventTracer {
     final String endpointId = ((DefaultExchange) exchange).getExchangeExtension().getHistoryNodeId();
 
     return new Message(exchange.getExchangeId(), MessageEventType.COMPLETED, responseCompletedBody, requestHeaders, callerRoute,
-        currentRoute, endpointId, messageType, errorMessage);
+        currentRoute, TracerUtils.resolveNodeId(exchange, endpointId), messageType, errorMessage);
 
   }
 
