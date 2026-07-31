@@ -119,6 +119,29 @@ test.describe('message tracing', () => {
     await expect(page.getByText('invokedMockCBody').first()).toBeVisible();
   });
 
+  /**
+   * Camel emits no event for a poll, so these two edges could never carry a message: the graph drew
+   * them and they stayed permanently blank, indistinguishable from a hop that was broken. They are
+   * now reconstructed from the node itself.
+   */
+  test('shows messages on the poll and pollEnrich edges', async ({ page }) => {
+    const pollEdges = page.locator(
+      '[data-testid^="rf__edge-"][data-id*="producer-seda_southbound"][data-id*="poll"]',
+    );
+    await expect(pollEdges).toHaveCount(2, ARRIVAL);
+
+    const edgeIds = await pollEdges.evaluateAll((els) => els.map((el) => el.getAttribute('data-id')!));
+
+    for (const edgeId of edgeIds) {
+      await clickEdge(page, edgeId);
+      // one request produces exactly one poll down each path
+      await expect(page.getByText('Messages (1)')).toBeVisible(ARRIVAL);
+      await expect(page.getByRole('heading', { name: 'Request' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Response' })).toBeVisible();
+      await page.getByRole('button', { name: 'Close message panel' }).click();
+    }
+  });
+
   test('closes the message panel', async ({ page }) => {
     await clickEdge(page, ENRICH_EDGE);
     await expect(page.getByText(/^Messages \(/)).toBeVisible(ARRIVAL);

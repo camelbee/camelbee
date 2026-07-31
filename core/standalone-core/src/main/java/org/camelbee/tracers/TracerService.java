@@ -18,8 +18,10 @@ package org.camelbee.tracers;
 
 import static org.camelbee.constants.CamelBeeConstants.DIRECT;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import org.apache.camel.Exchange;
 import org.apache.camel.spi.CamelEvent.ExchangeCompletedEvent;
 import org.apache.camel.spi.CamelEvent.ExchangeCreatedEvent;
 import org.apache.camel.spi.CamelEvent.ExchangeSendingEvent;
@@ -40,6 +42,9 @@ public class TracerService {
   private final ExchangeSendingEventTracer exchangeSendingEventTracer;
   private final ExchangeSentEventTracer exchangeSentEventTracer;
   private final ExchangeCompletedEventTracer exchangeCompletedEventTracer;
+
+  /** Stateless, and not part of the constructor so existing wiring is untouched. */
+  private final PollEventTracer pollEventTracer = new PollEventTracer();
 
   private final MessageService messageService;
   private final LoggingService loggingService;
@@ -183,6 +188,35 @@ public class TracerService {
       messageService.addMessage(message);
     }
 
+  }
+
+  /**
+   * Traces a poll()/pollEnrich() hop, which Camel emits no events for and which
+   * {@link PollInterceptStrategy} therefore reconstructs from the node itself.
+   *
+   * @param exchange    the exchange that performed the poll.
+   * @param nodeId      the id of the poll/pollEnrich node.
+   * @param callerRoute the route the exchange was in when it reached the node.
+   * @param requestBody the body as it was before the poll.
+   * @param timeTaken   how long the node took, in milliseconds.
+   */
+  public void tracePollEvent(Exchange exchange, String nodeId, String callerRoute,
+      String requestBody, long timeTaken) {
+
+    if (!isActive()) {
+      return;
+    }
+
+    List<Message> messages = pollEventTracer.traceEvent(exchange, nodeId, callerRoute, requestBody,
+        timeTaken);
+
+    if (loggingEnabled) {
+      messages.forEach(message -> loggingService.logMessage(message, "Polled:", false));
+    }
+
+    if (tracerEnabled && isTracingActivated()) {
+      messages.forEach(messageService::addMessage);
+    }
   }
 
   /**

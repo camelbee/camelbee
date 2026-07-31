@@ -32,6 +32,7 @@ import org.camelbee.tracers.ExchangeCreatedEventTracer;
 import org.camelbee.tracers.ExchangeSendingEventTracer;
 import org.camelbee.tracers.ExchangeSentEventTracer;
 import org.camelbee.tracers.NodeIdInterceptStrategy;
+import org.camelbee.tracers.PollInterceptStrategy;
 import org.camelbee.tracers.TracerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,6 +129,13 @@ public final class CamelBee {
     final TracerService tracerService = new TracerService(config.isLoggingEnabled(), config.isTracerEnabled(),
         config.getTracerMaxIdleTime(), createdTracer, sendingTracer, sentTracer, completedTracer, messageService,
         loggingService);
+
+    // poll()/pollEnrich() emit no Camel events, so the hop is reconstructed from the node itself.
+    // Like every intercept strategy this has to be added before the routes are reified; it is here
+    // rather than beside NodeIdInterceptStrategy only because it needs the tracerService.
+    if (config.isRouteConfigurerEnabled()) {
+      camelContext.getCamelContextExtension().addInterceptStrategy(new PollInterceptStrategy(tracerService));
+    }
 
     if (config.isNotifierEnabled()) {
       camelContext.getManagementStrategy().addEventNotifier(new CamelBeeEventNotifier(tracerService));

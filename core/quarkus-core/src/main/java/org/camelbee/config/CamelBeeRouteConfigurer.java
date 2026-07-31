@@ -17,10 +17,13 @@
 package org.camelbee.config;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.spi.UnitOfWorkFactory;
 import org.camelbee.logging.CamelBeeUnitOfWork;
 import org.camelbee.tracers.NodeIdInterceptStrategy;
+import org.camelbee.tracers.PollInterceptStrategy;
+import org.camelbee.tracers.TracerService;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +42,10 @@ public class CamelBeeRouteConfigurer {
   @ConfigProperty(name = "camelbee.route-configurer-enabled", defaultValue = "true")
   boolean routeConfigurerEnabled;
 
+  /** Needed by the poll tracing strategy, which records hops Camel emits no events for. */
+  @Inject
+  TracerService tracerService;
+
   /**
    * Configures a route for a CamelBee enabled Camel application.
    *
@@ -50,6 +57,7 @@ public class CamelBeeRouteConfigurer {
       routeBuilder.getContext().setUseMDCLogging(true);
       routeBuilder.getContext().getCamelContextExtension().addContextPlugin(UnitOfWorkFactory.class, CamelBeeUnitOfWork::new);
       addNodeIdInterceptStrategy(routeBuilder);
+      addPollInterceptStrategy(routeBuilder);
     } else {
       // Optional: log that route configuration is disabled
       LOGGER.debug("CamelBee route configuration disabled via camelbee.route-configurer-enabled=false");
@@ -74,6 +82,25 @@ public class CamelBeeRouteConfigurer {
     if (!alreadyRegistered) {
       routeBuilder.getContext().getCamelContextExtension()
           .addInterceptStrategy(new NodeIdInterceptStrategy());
+    }
+  }
+
+  /**
+   * Registers the poll tracing strategy once per CamelContext.
+   *
+   * <p>{@code poll()} and {@code pollEnrich()} emit no Camel events, so the hop is reconstructed from
+   * the node itself. Like every intercept strategy it has to be added before the routes are reified.
+   *
+   * @param routeBuilder the route builder being configured.
+   */
+  private void addPollInterceptStrategy(RouteBuilder routeBuilder) {
+    boolean alreadyRegistered = routeBuilder.getContext().getCamelContextExtension()
+        .getInterceptStrategies().stream()
+        .anyMatch(PollInterceptStrategy.class::isInstance);
+
+    if (!alreadyRegistered) {
+      routeBuilder.getContext().getCamelContextExtension()
+          .addInterceptStrategy(new PollInterceptStrategy(tracerService));
     }
   }
 

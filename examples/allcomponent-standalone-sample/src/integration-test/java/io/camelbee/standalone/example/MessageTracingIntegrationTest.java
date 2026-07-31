@@ -263,6 +263,52 @@ class MessageTracingIntegrationTest extends CamelBeeApplicationSupport {
         .toList();
   }
 
+  /**
+   * Camel emits no event for a poll - it is a receive, and PollProcessor/PollEnricher notify
+   * nothing - so these hops are reconstructed from the node itself. Before that they were the only
+   * edges in the graph that could never carry a message.
+   */
+  @Test
+  @DisplayName("traces the poll() and pollEnrich() hops Camel emits no events for")
+  void tracesPollHops() {
+    List<JsonNode> polls = where(message -> {
+      String id = text(message, "endpointId");
+      return id != null && id.startsWith("poll");
+    });
+
+    assertThat(polls).isNotEmpty();
+    assertThat(polls).allSatisfy(message -> assertThat(text(message, "endpoint")).isEqualTo("seda://southbound"));
+
+    // each hop is a request/response pair on one exchange, so the UI pairs them into one interaction
+    Map<String, List<JsonNode>> byNode = new LinkedHashMap<>();
+    polls.forEach(m -> byNode.computeIfAbsent(text(m, "endpointId"), k -> new ArrayList<>()).add(m));
+
+    assertThat(byNode.keySet()).anySatisfy(id -> assertThat(id).startsWith("poll"));
+    assertThat(byNode.keySet()).anySatisfy(id -> assertThat(id).startsWith("pollEnrich"));
+
+    assertThat(byNode).allSatisfy((nodeId, messages) -> {
+      assertThat(messageTypes(messages)).containsExactlyInAnyOrder("REQUEST", "RESPONSE");
+      assertThat(messages).allSatisfy(m -> assertThat(m.get("exchangeId").asText()).isEqualTo(messages.get(0).get("exchangeId").asText()));
+    });
+  }
+
+  /**
+   * The pollEnrich waits its full timeout when the queue is empty. Recording that hop rather than
+   * suppressing it is deliberate: an edge that appears only when a poll happens to succeed would
+   * flicker in and out depending on queue state.
+   */
+  @Test
+  @DisplayName("records how long a poll waited")
+  void recordsPollDuration() {
+    List<JsonNode> responses = where(message -> {
+      String id = text(message, "endpointId");
+      return id != null && id.startsWith("poll") && "RESPONSE".equals(text(message, "messageType"));
+    });
+
+    assertThat(responses).isNotEmpty();
+    assertThat(responses).allSatisfy(message -> assertThat(message.get("timeTaken").asLong()).isGreaterThanOrEqualTo(0));
+  }
+
   /* ---------------------------------------------------------------- */
   /*  helpers                                                          */
   /* ---------------------------------------------------------------- */

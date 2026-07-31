@@ -15,8 +15,10 @@
  */
 package org.camelbee.config;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import org.apache.camel.CamelContext;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.RoutesBuilder;
@@ -30,6 +32,8 @@ import org.camelbee.tracers.ExchangeCompletedEventTracer;
 import org.camelbee.tracers.ExchangeCreatedEventTracer;
 import org.camelbee.tracers.ExchangeSendingEventTracer;
 import org.camelbee.tracers.ExchangeSentEventTracer;
+import org.camelbee.tracers.NodeIdInterceptStrategy;
+import org.camelbee.tracers.PollInterceptStrategy;
 import org.camelbee.tracers.TracerService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +42,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.TestPropertySource;
 
 @CamelSpringBootTest
+@TestPropertySource(properties = "camelbee.tracer-enabled=true")
 @SpringBootApplication
 @Import({TracerService.class,
     MessageService.class,
@@ -56,6 +62,15 @@ class CamelBeeRouteConfigurerTest {
 
   @Autowired
   ProducerTemplate producerTemplate;
+
+  @Autowired
+  CamelContext camelContext;
+
+  @Autowired
+  TracerService tracerService;
+
+  @Autowired
+  MessageService messageService;
 
   @EndpointInject("mock:test")
   MockEndpoint mockEndpoint;
@@ -78,7 +93,13 @@ class CamelBeeRouteConfigurerTest {
 
           camelBeeRouteConfigurer.configureRoute(this);
 
-          from("direct:test").to("mock:test");
+          from("direct:test")
+              // an enrich, because Camel supplies no history node id for a send performed inside an
+              // EIP - a node id on that hop can only have come from NodeIdInterceptStrategy
+              .enrich("direct:enrichTarget")
+              .to("mock:test");
+
+          from("direct:enrichTarget").to("mock:enriched");
         }
       };
     }
@@ -94,6 +115,38 @@ class CamelBeeRouteConfigurerTest {
     mockEndpoint.setExpectedMessageCount(1);
     producerTemplate.sendBody("direct:test", "testMessage");
     mockEndpoint.assertIsSatisfied();
+  }
+
+  /**
+   * The other tests here prove the configurer wires up without exploding. This one proves it has the
+   * intended effect in a real Spring context: both intercept strategies are registered by
+   * {@code configureRoute} and the node id reaches the message service.
+   *
+   * <p>Registration is runtime specific - standalone does it in {@code CamelBee.attach()}, these two
+   * in the configurer - and it is the one part of the tracing chain the shared unit tests cannot
+   * cover, because they add the strategies to a hand-built context themselves.
+   */
+  @Test
+  void shouldTraceEipHopsThroughTheConfiguredRoute() {
+    tracerService.activateTracing(true);
+    messageService.reset();
+
+    producerTemplate.sendBody("direct:test", "testMessage");
+
+    assertThat(messageService.getMessageList())
+        .as("enrich hop names the node that performed it")
+        .anySatisfy(message -> {
+          assertThat(message.getEndpoint()).isEqualTo("direct://enrichTarget");
+          assertThat(message.getEndpointId()).startsWith("enrich");
+        });
+
+    // PollInterceptStrategy cannot be exercised here without a pollable component on the test
+    // classpath, so assert directly that configureRoute registered it. Its behaviour is covered by
+    // PollTracingTest.
+    assertThat(camelContext.getCamelContextExtension().getInterceptStrategies())
+        .as("both strategies are registered by configureRoute")
+        .anySatisfy(strategy -> assertThat(strategy).isInstanceOf(NodeIdInterceptStrategy.class))
+        .anySatisfy(strategy -> assertThat(strategy).isInstanceOf(PollInterceptStrategy.class));
   }
 
 }
