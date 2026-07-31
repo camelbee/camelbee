@@ -13,7 +13,7 @@ function mockPlugin() {
     name: 'mock-api',
     configureServer(server: import('vite').ViteDevServer) {
       server.middlewares.use((req, res, next) => {
-        const mockDir = path.resolve(__dirname, 'mock');
+        const mockDir = path.resolve(import.meta.dirname, 'mock');
 
         if (req.url?.startsWith('/camelbee/routes')) {
           res.setHeader('Content-Type', 'application/json');
@@ -78,7 +78,7 @@ export default defineConfig({
   base: '/camelbee/',
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src'),
+      '@': path.resolve(import.meta.dirname, 'src'),
     },
   },
   build: {
