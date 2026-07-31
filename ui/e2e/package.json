@@ -1,0 +1,17 @@
+{
+  "name": "camelbee-ui-e2e",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Standalone Playwright end-to-end tests for the embedded CamelBee UI. Kept separate from the ui build so 'mvn clean install' (vitest only) is unaffected.",
+  "scripts": {
+    "setup": "playwright install chromium",
+    "build": "mvn -q -f ../.. -DskipTests install -pl ui,core/standalone-core,starters/camelbee-standalone-starter,examples/allcomponent-standalone-sample",
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "e2e": "npm run build && npm run test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1"
+  }
+}

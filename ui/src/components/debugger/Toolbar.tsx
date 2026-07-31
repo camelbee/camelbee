@@ -9,9 +9,11 @@ import { HealthPanel } from '@/components/HealthPanel';
 interface ToolbarProps {
   context: CamelBeeContext | undefined;
   health?: HealthResponse;
+  /** Hops seen in traffic that the static topology did not declare; see DebuggerPage. */
+  dynamicHopCount?: number;
 }
 
-export function Toolbar({ context, health }: ToolbarProps) {
+export function Toolbar({ context, health, dynamicHopCount = 0 }: ToolbarProps) {
   const isTracing = useDebuggerStore((s) => s.isTracing);
   const setTracing = useDebuggerStore((s) => s.setTracing);
   const setFilterText = useDebuggerStore((s) => s.setFilterText);
@@ -84,6 +86,17 @@ export function Toolbar({ context, health }: ToolbarProps) {
           className="rounded bg-amber-500/20 px-2 py-1 text-[11px] font-medium text-amber-700 dark:text-amber-400"
         >
           ⚠ Message cap reached
+        </span>
+      )}
+
+      {/* Hops the static topology did not predict, drawn from traced traffic instead */}
+      {dynamicHopCount > 0 && (
+        <span
+          role="status"
+          title="Hops seen in traffic that the route model did not declare. They are drawn from the traced messages, so nothing is missing - but the graph and the route definitions disagree here, usually a dynamic endpoint or an EIP hop the tracer attributes to a different route."
+          className="rounded bg-orange-500/20 px-2 py-1 text-[11px] font-medium text-orange-700 dark:text-orange-400"
+        >
+          {dynamicHopCount} dynamic {dynamicHopCount === 1 ? 'hop' : 'hops'}
         </span>
       )}
 

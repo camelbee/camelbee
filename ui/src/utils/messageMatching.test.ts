@@ -67,6 +67,44 @@ describe('matchMessageToEdge', () => {
     expect(matchMessageToEdge(m, [e])).toBe(e);
   });
 
+  /**
+   * Roadmap #3, message side. The producer sends to `direct:x?block=true` while the consumer's
+   * input is `direct:x`, so neither exact equality nor the query-reordering comparison matches.
+   * This only bites when endpointId is absent — which is every redelivered attempt, since Camel
+   * reports the node id on the first send only.
+   */
+  it('matches across a query string on the producer side when endpointId is absent', () => {
+    const m = makeMessage({
+      endpointId: null,
+      routeId: 'direct://invokeFlaky',
+      endpoint: 'direct://flakyTarget?block=true',
+    });
+    const e = edge({
+      outputId: 'flakyEndpoint',
+      sourceRouteId: 'invokeFlakyRoute',
+      sourceInputUri: 'direct:invokeFlaky',
+      targetRouteId: 'flakyTargetRoute',
+      targetInputUri: 'direct:flakyTarget',
+    });
+    expect(matchMessageToEdge(m, [e])).toBe(e);
+  });
+
+  it('ignores case when comparing query-stripped endpoints', () => {
+    const m = makeMessage({
+      endpointId: null,
+      routeId: 'route1',
+      endpoint: 'DIRECT://Target?block=true',
+    });
+    const e = edge({ outputId: 'other', sourceRouteId: 'route1', targetInputUri: 'direct:target' });
+    expect(matchMessageToEdge(m, [e])).toBe(e);
+  });
+
+  it('does not match a different endpoint just because query strings are stripped', () => {
+    const m = makeMessage({ endpointId: null, routeId: 'route1', endpoint: 'direct:other?block=true' });
+    const e = edge({ outputId: 'x', sourceRouteId: 'route1', targetInputUri: 'direct:target' });
+    expect(matchMessageToEdge(m, [e])).toBeNull();
+  });
+
   it('returns null when nothing matches', () => {
     const m = makeMessage({ endpointId: 'nope', routeId: 'routeX', endpoint: 'kafka:none' });
     expect(matchMessageToEdge(m, [edge({ sourceRouteId: 'route1', targetUri: 'kafka:orders' })])).toBeNull();

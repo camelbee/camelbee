@@ -39,7 +39,7 @@ function stripWrapper(s: string, prefix: string): string {
  * and are common on one side of a to/from pair but not the other
  * (roadmap #3).
  */
-function stripQuery(uri: string): string {
+export function stripQuery(uri: string): string {
   const idx = uri.indexOf('?');
   return idx === -1 ? uri : uri.substring(0, idx);
 }
@@ -50,9 +50,12 @@ function stripQuery(uri: string): string {
  */
 export function extractStaticEndpointsFromOutput(
   output: CamelRouteOutput,
+  includeInternal = false,
 ): string[] | null {
   const desc = output.description;
   if (!desc) return null;
+
+  const isInternalUri = (uri: string) => !includeInternal && isInternal(uri);
 
   const lower = desc.toLowerCase();
 
@@ -64,7 +67,7 @@ export function extractStaticEndpointsFromOutput(
       if (uri.toLowerCase().startsWith('tod[') && uri.endsWith(']')) {
         uri = uri.substring(4, uri.length - 1);
       }
-      return isInternal(uri) ? null : [uri];
+      return isInternalUri(uri) ? null : [uri];
     }
   }
 
@@ -73,7 +76,7 @@ export function extractStaticEndpointsFromOutput(
     if (lower.startsWith(prefix.toLowerCase())) {
       const inner = extractBetweenBraces(desc);
       if (!inner) return null;
-      return isInternal(inner) ? null : [inner];
+      return isInternalUri(inner) ? null : [inner];
     }
   }
 
@@ -84,7 +87,7 @@ export function extractStaticEndpointsFromOutput(
       if (!inner) return null;
       const delimiter = output.delimiter ?? ',';
       const parts = inner.split(delimiter).map((s) => s.trim()).filter(Boolean);
-      const external = parts.filter((p) => !isInternal(p));
+      const external = parts.filter((p) => !isInternalUri(p));
       return external.length > 0 ? external : null;
     }
   }

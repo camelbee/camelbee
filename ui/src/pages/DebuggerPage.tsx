@@ -62,6 +62,17 @@ export function DebuggerPage() {
     [staticEdges, dynamicEdges],
   );
 
+  /**
+   * Hops observed in traffic that the static topology did not predict. RouteGraph synthesizes an
+   * edge for each of them so their messages are still reachable, which means nothing is lost - but
+   * it also means a topology or matching gap leaves no trace. Surfacing the count makes it visible:
+   * a non-zero value says the route model and the tracer disagree about how the routes connect.
+   *
+   * This is deliberately the already-tracked dynamic edge count rather than a re-match of every
+   * message against every edge, which would be an O(messages x edges) scan on each poll.
+   */
+  const dynamicHopCount = dynamicEdges.length;
+
   if (isLoading) {
     return (
       <div className="flex flex-1 items-center justify-center">
@@ -82,7 +93,7 @@ export function DebuggerPage() {
 
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden">
-      <Toolbar context={context} health={health ?? undefined} />
+      <Toolbar context={context} health={health ?? undefined} dynamicHopCount={dynamicHopCount} />
 
       <div className="flex flex-1 overflow-hidden">
         <div className="flex-1">

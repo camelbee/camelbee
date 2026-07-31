@@ -10,9 +10,15 @@ export interface Message {
   exchangeEventType: MessageEventType;
   messageBody: string | null;
   headers: string | null;
-  routeId: string;
-  endpoint: string;
-  endpointId: string;
+  /**
+   * These three are nullable on the wire. `routeId`/`endpoint` are absent on the CREATED and
+   * COMPLETED markers that bracket an exchange (they describe the exchange, not a hop), and
+   * `endpointId` is only present when Camel exposes a history node id for the send — never for
+   * a redelivered attempt, and not for sends performed inside wireTap/enrich/recipientList.
+   */
+  routeId: string | null;
+  endpoint: string | null;
+  endpointId: string | null;
   messageType: MessageType;
   exception: string | null;
   timeStamp: string;

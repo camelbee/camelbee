@@ -99,3 +99,71 @@ describe('buildRouteGraph — route descriptions', () => {
     expect(node.data.errorHandler).toBe('direct:dlq');
   });
 });
+
+/**
+ * An internal endpoint that no route consumes still has to appear. `to("seda:x")` drained only by
+ * `poll()`/`pollEnrich()` has no `From[seda:x]` to link to, so before this it produced neither a
+ * node nor an edge — and every message traced on that hop was silently unattributable.
+ */
+describe('buildRouteGraph — unconsumed internal endpoints', () => {
+  function contextWithOutput(description: string, extraRoutes: CamelBeeContext['routes'] = []) {
+    return {
+      ...context,
+      routes: [
+        {
+          id: 'producerRoute',
+          input: 'From[direct:producer]',
+          outputs: [
+            { id: 'sedaOut', description, delimiter: null, type: 'org.apache.camel.model.ToDefinition', outputs: null },
+          ],
+          rest: false,
+          errorHandler: null,
+        },
+        ...extraRoutes,
+      ],
+    } as unknown as CamelBeeContext;
+  }
+
+  it('renders a producer node for a seda: endpoint that no route consumes', () => {
+    const { nodes, edges } = buildRouteGraph(contextWithOutput('to[seda:southbound]'));
+
+    const producer = nodes.find((n) => n.id === 'producer-seda_southbound');
+    expect(producer).toBeDefined();
+    expect(producer!.data.kind).toBe('producer');
+    expect(producer!.data.componentType).toBe('seda');
+
+    expect(edges.some((e) => e.source === 'route-producerRoute' && e.target === 'producer-seda_southbound'))
+      .toBe(true);
+  });
+
+  it('still links to the route instead of a producer node when one does consume it', () => {
+    const consumer = {
+      id: 'consumerRoute',
+      input: 'From[seda:southbound]',
+      outputs: [],
+      rest: false,
+      errorHandler: null,
+    } as unknown as CamelBeeContext['routes'][number];
+
+    const { nodes, edges } = buildRouteGraph(contextWithOutput('to[seda:southbound]', [consumer]));
+
+    expect(nodes.find((n) => n.id === 'producer-seda_southbound')).toBeUndefined();
+    expect(edges.some((e) => e.source === 'route-producerRoute' && e.target === 'route-consumerRoute'))
+      .toBe(true);
+  });
+
+  it('does not duplicate a direct: target that a route already consumes', () => {
+    const consumer = {
+      id: 'targetRoute',
+      input: 'From[direct:target]',
+      outputs: [],
+      rest: false,
+      errorHandler: null,
+    } as unknown as CamelBeeContext['routes'][number];
+
+    const { nodes } = buildRouteGraph(contextWithOutput('to[direct:target?block=true]', [consumer]));
+
+    // query string on the producer side must not defeat the "is this a route?" check
+    expect(nodes.find((n) => n.id === 'producer-direct_target')).toBeUndefined();
+  });
+});

@@ -66,3 +66,20 @@ describe('Toolbar', () => {
     expect(screen.queryByText('⚠ Message cap reached')).not.toBeInTheDocument();
   });
 });
+
+describe('Toolbar — dynamic hops', () => {
+  it('shows nothing when the static topology covered every hop', () => {
+    renderWithProviders(<Toolbar context={context} dynamicHopCount={0} />);
+    expect(screen.queryByText(/dynamic hop/)).not.toBeInTheDocument();
+  });
+
+  it('reports hops that had to be drawn from traffic', () => {
+    renderWithProviders(<Toolbar context={context} dynamicHopCount={6} />);
+    expect(screen.getByText('6 dynamic hops')).toBeInTheDocument();
+  });
+
+  it('uses the singular for one hop', () => {
+    renderWithProviders(<Toolbar context={context} dynamicHopCount={1} />);
+    expect(screen.getByText('1 dynamic hop')).toBeInTheDocument();
+  });
+});

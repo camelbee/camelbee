@@ -1,5 +1,6 @@
 import type { Message } from '@/types';
 import type { MessageEdge } from './routeGraph';
+import { stripQuery } from './endpointParser';
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                           */
@@ -38,6 +39,20 @@ function compareEndpointDefinitionsEqual(a: string, b: string): boolean {
     if (mapB.get(k) !== v) return false;
   }
   return true;
+}
+
+/**
+ * True when the message's endpoint matches any of the edge's target URIs once query strings are
+ * stripped from both sides and case is ignored.
+ */
+function targetBaseMatches(
+  msgEndpoint: string,
+  ...targets: (string | null | undefined)[]
+): boolean {
+  const msgBase = stripQuery(msgEndpoint).toLowerCase();
+  return targets.some(
+    (target) => !!target && stripQuery(target).toLowerCase() === msgBase,
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -115,7 +130,14 @@ export function matchMessageToEdge(
       (targetRouteId !== null &&
         compareEndpointDefinitionsEqual(targetRouteId, msgEndpoint)) ||
       (targetInputUri !== null &&
-        compareEndpointDefinitionsEqual(targetInputUri, msgEndpoint));
+        compareEndpointDefinitionsEqual(targetInputUri, msgEndpoint)) ||
+      // Query-stripped comparison (roadmap #3, message side). The producer's URI carries behavioral
+      // params the consumer's input never has - to[direct:x?block=true] against From[direct:x] - so
+      // the exact and reordering comparisons above both fail. This fallback only matters when
+      // endpointId is absent, which is exactly what happens on every redelivered attempt: Camel
+      // reports the node id on the first send only, so without this every retry after the first
+      // disappears from the message panel.
+      targetBaseMatches(msgEndpoint, targetUri, targetRouteId, targetInputUri);
 
     if (endpointMatches) {
       return edge;

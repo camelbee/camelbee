@@ -6,6 +6,7 @@ import {
   extractComponentType,
   extractStaticEndpointsFromOutput,
   outputReferencesInput,
+  stripQuery,
 } from './endpointParser';
 
 /* ------------------------------------------------------------------ */
@@ -181,6 +182,16 @@ export function buildRouteGraph(context: CamelBeeContext): {
     routeById.set(r.id, r);
   }
 
+  /** Every route input URI, query-stripped and lowercased, for "is this endpoint a route?" checks. */
+  const routeInputUris = new Set(
+    context.routes.map((r) => stripQuery(extractInputUri(r.input)).toLowerCase()),
+  );
+
+  /** True when some route consumes this URI, i.e. step 1 has already drawn an edge to it. */
+  function isConsumedByRoute(uri: string): boolean {
+    return routeInputUris.has(stripQuery(uri).toLowerCase());
+  }
+
   /* -- Node / Edge creation helpers -- */
 
   function addRouteNode(
@@ -305,10 +316,15 @@ export function buildRouteGraph(context: CamelBeeContext): {
         }
       }
 
-      // Step 2: Extract external endpoints
-      const externalEndpoints = extractStaticEndpointsFromOutput(output);
-      if (externalEndpoints) {
-        for (const uri of externalEndpoints) {
+      // Step 2: Everything the output targets that is NOT a route drawn by step 1 becomes a
+      // producer node. That covers external endpoints (kafka:, http:, mock:, log:, file:) and
+      // also internal direct:/seda: endpoints that no route consumes - a to("seda:x") drained
+      // only by poll()/pollEnrich() has no From[seda:x] to link to, and would otherwise vanish
+      // from the graph along with every message traced on it.
+      const targets = extractStaticEndpointsFromOutput(output, true);
+      if (targets) {
+        for (const uri of targets) {
+          if (isConsumedByRoute(uri)) continue;
           const producerNodeId = addProducerNode(uri);
           addEdge(sourceNodeId, producerNodeId, output, route.id, undefined, uri);
         }
