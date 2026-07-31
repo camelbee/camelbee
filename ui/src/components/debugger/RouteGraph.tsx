@@ -98,6 +98,20 @@ export function RouteGraph({ context, onDynamicEdgeAdded }: RouteGraphProps) {
   /** Strip double slashes for comparison (tracer uses direct:// but routes use direct:) */
   const stripSlashes = (s: string) => s.replace(/\/\//g, '');
 
+  /**
+   * Node id -> the route that declares it. Lets a runtime-discovered hop be attributed to the route
+   * that owns the node which sent it, rather than to the endpoint the tracer last recorded.
+   */
+  const routeIdByNodeId = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const route of context.routes) {
+      for (const output of route.outputs ?? []) {
+        if (output.id) map.set(output.id, route.id);
+      }
+    }
+    return map;
+  }, [context]);
+
   const createDynamicEdge = useCallback(
     (msg: Message): MEdge | null => {
       if (!msg.routeId || !msg.endpoint || !context) return null;
@@ -105,18 +119,28 @@ export function RouteGraph({ context, onDynamicEdgeAdded }: RouteGraphProps) {
       const msgRouteId = stripSlashes(msg.routeId);
       const msgEndpoint = stripSlashes(msg.endpoint);
 
-      // Find the source route node by routeId or input URI
-      let sourceNodeId: string | null = null;
-      let sourceRouteId: string | null = null;
-      for (const route of context.routes) {
-        const inputUri = extractInputUri(route.input);
-        if (route.id === msgRouteId || stripSlashes(inputUri) === msgRouteId) {
-          sourceNodeId = makeNodeId(route.id);
-          sourceRouteId = route.id;
-          break;
+      // Find the route that owns this hop.
+      //
+      // Prefer the route that declares the node which performed the send. The tracer's routeId is
+      // the endpoint it most recently sent to, which is not the same thing: a routingSlip or
+      // dynamicRouter sends its next target from inside the previous target's continuation, so
+      // routeId still names that previous callee. Trusting it draws the arrow from the wrong node -
+      // a dynamicRouter hop appears to originate from whichever route ran just before it.
+      let sourceRouteId: string | null = msg.endpointId
+        ? (routeIdByNodeId.get(msg.endpointId) ?? null)
+        : null;
+
+      if (!sourceRouteId) {
+        for (const route of context.routes) {
+          const inputUri = extractInputUri(route.input);
+          if (route.id === msgRouteId || stripSlashes(inputUri) === msgRouteId) {
+            sourceRouteId = route.id;
+            break;
+          }
         }
       }
-      if (!sourceNodeId || !sourceRouteId) return null;
+      if (!sourceRouteId) return null;
+      const sourceNodeId = makeNodeId(sourceRouteId);
 
       // Find or create target node
       let targetNodeId: string | null = null;
@@ -213,7 +237,11 @@ export function RouteGraph({ context, onDynamicEdgeAdded }: RouteGraphProps) {
         target: targetNodeId,
         type: 'messageEdge',
         data: {
-          outputId: syntheticOutput.id,
+          // Carry the node that performed the send, so this edge is matched the same way a static
+          // one is. Without it the edge would rely on the tracer's routeId agreeing with its source
+          // - which is exactly the drift this edge is being sourced around, leaving it with no
+          // messages at all.
+          outputId: msg.endpointId ?? syntheticOutput.id,
           sourceRouteId,
           sourceInputUri: sourceInputUriVal,
           targetRouteId,
@@ -236,7 +264,7 @@ export function RouteGraph({ context, onDynamicEdgeAdded }: RouteGraphProps) {
 
       return newEdge;
     },
-    [context, nodes, setNodes, setEdges, onDynamicEdgeAdded],
+    [context, routeIdByNodeId, nodes, setNodes, setEdges, onDynamicEdgeAdded],
   );
 
   useEffect(() => {

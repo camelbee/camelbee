@@ -37,7 +37,9 @@ class RouteContextServiceTest {
             .enrich("mock:enrich")
             .pollEnrich("mock:pollenrich")
             .recipientList(constant("mock:r1,mock:r2"))
-            .routingSlip(constant("mock:slip"));
+            .routingSlip(constant("mock:slip"))
+            // header is absent at runtime, so the router stops immediately
+            .dynamicRouter(header("nextEndpoint"));
 
         from("direct:second").routeId("secondRoute")
             .to("mock:second-out");
@@ -104,7 +106,7 @@ class RouteContextServiceTest {
         .orElseThrow();
 
     // Pass order is fixed by extractOutputs: To, ToDynamic(+WireTap),
-    // Enrich, PollEnrich, RecipientList, RoutingSlip.
+    // Enrich, PollEnrich, RecipientList, RoutingSlip, DynamicRouter.
     assertThat(main.getOutputs())
         .extracting(CamelRouteOutput::getDescription)
         .containsExactly(
@@ -118,7 +120,10 @@ class RouteContextServiceTest {
             "Enrich[constant{mock:enrich}]",
             "PollEnrich[constant{mock:pollenrich}]",
             "RecipientList[constant{mock:r1,mock:r2}]",
-            "RoutingSlip[constant{mock:slip}]");
+            "RoutingSlip[constant{mock:slip}]",
+            // A dynamicRouter draws no static edge - its targets are computed per exchange - but is
+            // collected so the traced messages' node id can be resolved back to this route.
+            "DynamicRouter[header{nextEndpoint}]");
 
     // wireTap is collected by the ToDynamicDefinition pass (WireTapDefinition
     // is its subclass). A dedicated WireTapDefinition pass must NEVER be
@@ -250,5 +255,34 @@ class RouteContextServiceTest {
     service.adjustRestInputRoutes(List.of(restRoute), List.of(unrelatedRoute));
 
     assertThat(unrelatedRoute.getRest()).isFalse();
+  }
+
+  /**
+   * A dynamicRouter picks its targets at runtime, so it contributes no static edge. It is still
+   * collected because the traced messages carry its node id, and that is what lets the UI attribute
+   * those runtime hops to the route that owns the router rather than to whichever route happened to
+   * be called just before it.
+   */
+  @Test
+  void getCamelRoutes_extractsDynamicRouterOutputs() {
+    CamelRoute main = service.getCamelRoutes().stream()
+        .filter(r -> "mainRoute".equals(r.getId()))
+        .findFirst()
+        .orElseThrow();
+
+    CamelRouteOutput dynamicRouter = main.getOutputs().stream()
+        .filter(o -> o.getType().equals("org.apache.camel.model.DynamicRouterDefinition"))
+        .findFirst()
+        .orElseThrow(() -> new AssertionError("no dynamicRouter output; have "
+            + main.getOutputs().stream().map(CamelRouteOutput::getType).toList()));
+
+    assertThat(dynamicRouter.getId()).startsWith("dynamicRouter");
+    assertThat(dynamicRouter.getDescription()).startsWith("DynamicRouter[");
+
+    // collected exactly once - DynamicRouterDefinition extends ExpressionNode, so no earlier pass
+    // picks it up as well
+    assertThat(main.getOutputs())
+        .filteredOn(o -> o.getType().equals("org.apache.camel.model.DynamicRouterDefinition"))
+        .hasSize(1);
   }
 }

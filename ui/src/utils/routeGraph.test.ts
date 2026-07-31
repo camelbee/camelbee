@@ -167,3 +167,50 @@ describe('buildRouteGraph — unconsumed internal endpoints', () => {
     expect(nodes.find((n) => n.id === 'producer-direct_target')).toBeUndefined();
   });
 });
+
+/**
+ * A dynamicRouter is reported by the backend so that traced messages carrying its node id can be
+ * resolved back to the route that owns it. It must not draw anything: its targets are chosen per
+ * exchange, so any node or edge derived from it statically would be an invention.
+ */
+describe('buildRouteGraph — dynamicRouter outputs', () => {
+  const context = {
+    ...routesFixture,
+    routes: [
+      {
+        id: 'ownerRoute',
+        input: 'From[direct:owner]',
+        outputs: [
+          {
+            id: 'to1',
+            description: 'to[mock:real]',
+            delimiter: null,
+            type: 'org.apache.camel.model.ToDefinition',
+            outputs: null,
+          },
+          {
+            id: 'dynamicRouter1',
+            description: 'DynamicRouter[bean[method:computeEndpoint]]',
+            delimiter: ',',
+            type: 'org.apache.camel.model.DynamicRouterDefinition',
+            outputs: null,
+          },
+        ],
+        rest: false,
+        errorHandler: null,
+      },
+    ],
+  } as unknown as CamelBeeContext;
+
+  it('draws no node and no edge for the router itself', () => {
+    const { nodes, edges } = buildRouteGraph(context);
+
+    // the route and its one real producer, nothing else
+    expect(nodes.map((n) => n.id).sort()).toEqual(['producer-mock_real', 'route-ownerRoute']);
+    expect(edges).toHaveLength(1);
+    expect(edges[0]!.data!.outputId).toBe('to1');
+
+    expect(edges.some((e) => e.data!.outputId === 'dynamicRouter1')).toBe(false);
+    expect(nodes.some((n) => n.id.toLowerCase().includes('dynamicrouter'))).toBe(false);
+  });
+});

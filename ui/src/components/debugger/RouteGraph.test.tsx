@@ -101,4 +101,77 @@ describe('RouteGraph', () => {
     render(<RouteGraph context={context} onDynamicEdgeAdded={onDynamicEdgeAdded} />);
     expect(onDynamicEdgeAdded).toHaveBeenCalled();
   });
+  /**
+   * A routingSlip or dynamicRouter sends its next target from inside the previous target's
+   * continuation, so the tracer's routeId still names that previous callee. Trusting it draws the
+   * hop from the wrong node - the arrow appears to come from whichever route ran just before.
+   *
+   * A dynamicRouter is the case that matters: it is collected as an output but contributes no
+   * static edge, because its targets are only known per exchange. So its hops always arrive here,
+   * and the node id is the only thing that says which route they belong to.
+   */
+  describe('dynamic edge source', () => {
+    const dynamicRouterContext = {
+      name: 'ctx',
+      routes: [
+        {
+          id: 'ownerRoute',
+          input: 'From[direct:owner]',
+          outputs: [
+            {
+              id: 'dynamicRouter1',
+              description: 'DynamicRouter[header{next}]',
+              delimiter: null,
+              type: 'org.apache.camel.model.DynamicRouterDefinition',
+              outputs: null,
+            },
+          ],
+          rest: false,
+          errorHandler: null,
+        },
+        { id: 'previousCallee', input: 'From[direct:previous]', outputs: [], rest: false, errorHandler: null },
+      ],
+    } as unknown as CamelBeeContext;
+
+    it('uses the route that owns the node, not the route the tracer reported', () => {
+      const hop = makeMessage({
+        exchangeEventType: 'SENDING',
+        messageType: 'REQUEST',
+        endpointId: 'dynamicRouter1',
+        // the drift: the tracer names the previously called route
+        routeId: 'direct:previous',
+        endpoint: 'kafka:computed-at-runtime',
+      });
+
+      const onDynamicEdgeAdded = vi.fn();
+      act(() => {
+        useDebuggerStore.getState().appendMessages([hop], 1, 0);
+      });
+      render(<RouteGraph context={dynamicRouterContext} onDynamicEdgeAdded={onDynamicEdgeAdded} />);
+
+      expect(onDynamicEdgeAdded).toHaveBeenCalled();
+      const created = onDynamicEdgeAdded.mock.calls[0]![0];
+      expect(created.data.sourceRouteId).toBe('ownerRoute');
+      expect(created.source).toBe('route-ownerRoute');
+    });
+
+    it('falls back to the reported routeId when the node id is not in the topology', () => {
+      const hop = makeMessage({
+        exchangeEventType: 'SENDING',
+        messageType: 'REQUEST',
+        endpointId: 'not-a-node-here',
+        routeId: 'direct:previous',
+        endpoint: 'kafka:computed-at-runtime',
+      });
+
+      const onDynamicEdgeAdded = vi.fn();
+      act(() => {
+        useDebuggerStore.getState().appendMessages([hop], 1, 0);
+      });
+      render(<RouteGraph context={dynamicRouterContext} onDynamicEdgeAdded={onDynamicEdgeAdded} />);
+
+      expect(onDynamicEdgeAdded).toHaveBeenCalled();
+      expect(onDynamicEdgeAdded.mock.calls[0]![0].data.sourceRouteId).toBe('previousCallee');
+    });
+  });
 });

@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Route;
 import org.apache.camel.builder.DeadLetterChannelBuilder;
+import org.apache.camel.model.DynamicRouterDefinition;
 import org.apache.camel.model.EnrichDefinition;
 import org.apache.camel.model.ModelCamelContext;
 import org.apache.camel.model.PollDefinition;
@@ -159,6 +160,17 @@ public class RouteContextService {
             p.getDelimiter(), p.getClass().getTypeName(), null, p.getDescriptionText())));
 
     ProcessorDefinitionHelper.filterTypeInOutputs(outputss, RoutingSlipDefinition.class).stream()
+        .forEach(p -> outputs.add(new CamelRouteOutput(p.getId(), updateWithSystemProperties(p.toString()),
+            p.getUriDelimiter(), p.getClass().getTypeName(), null, p.getDescriptionText())));
+
+    /*
+     A dynamicRouter computes its targets at runtime, so it contributes no static edge - the UI
+     draws its hops from the traced messages instead. It is still collected because the traced
+     messages carry this node's id, and that is what lets the UI attribute those runtime hops to
+     the route that owns the router rather than to whichever route was called just before.
+     DynamicRouterDefinition extends ExpressionNode, so no pass above already collects it.
+     */
+    ProcessorDefinitionHelper.filterTypeInOutputs(outputss, DynamicRouterDefinition.class).stream()
         .forEach(p -> outputs.add(new CamelRouteOutput(p.getId(), updateWithSystemProperties(p.toString()),
             p.getUriDelimiter(), p.getClass().getTypeName(), null, p.getDescriptionText())));
 

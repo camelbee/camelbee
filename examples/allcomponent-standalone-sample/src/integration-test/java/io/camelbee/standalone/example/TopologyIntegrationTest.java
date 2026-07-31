@@ -211,6 +211,25 @@ class TopologyIntegrationTest extends CamelBeeApplicationSupport {
     assertThat(output("musicianProcessorRoute", routingSlip).get("delimiter").asText()).isEqualTo(",");
   }
 
+  /**
+   * A dynamicRouter resolves its targets per exchange, so it contributes no endpoint the topology
+   * could draw. It is still reported, because the traced messages carry its node id and that is the
+   * only thing tying those runtime hops back to the route that owns the router.
+   */
+  @Test
+  @DisplayName("reports the dynamicRouter node even though it has no static target")
+  void reportsTheDynamicRouterNode() {
+    String description = outputDescriptionsById("musicianProcessorRoute").values().stream()
+        .filter(d -> d.startsWith("DynamicRouter["))
+        .findFirst()
+        .orElseThrow(() -> new AssertionError("no DynamicRouter output on musicianProcessorRoute"));
+
+    assertThat(outputIdOf("musicianProcessorRoute", description)).startsWith("dynamicRouter");
+
+    // it names a bean, not an endpoint - there is nothing here for the graph to draw
+    assertThat(description).doesNotContain("direct:").doesNotContain("mock:");
+  }
+
   /* ---------------------------------------------------------------- */
   /*  helpers                                                          */
   /* ---------------------------------------------------------------- */

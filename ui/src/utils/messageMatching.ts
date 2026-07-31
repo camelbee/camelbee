@@ -139,22 +139,12 @@ export function matchMessageToEdge(
         return edge;
       }
     }
-
-    // Pass 3 - the node id AND the source route agree. Covers a target the route model could not
-    // resolve statically, such as toD("direct:x${exchangeProperty.y}"), where the traced endpoint is
-    // the resolved value and can never equal the unresolved expression on the edge.
-    for (let i = edges.length - 1; i >= 0; i--) {
-      const edge = edges[i]!;
-      if (edge.data?.outputId === endpointId && edgeHasSource(edge, msgRouteId)) {
-        return edge;
-      }
-    }
   }
 
-  // Pass 4 - the source route AND the endpoint agree, ignoring the node id. Deliberately ahead of
-  // the node-id-only pass: a node id that agrees with neither the endpoint nor the source is stale
-  // rather than informative - it can survive across a route boundary - so route plus endpoint is
-  // the better evidence at that point.
+  // Pass 3 - the source route AND the endpoint agree, ignoring the node id. Ahead of the passes
+  // below because a node id on its own says nothing about which of that node's several targets a
+  // hop went to: a dynamicRouter visiting two endpoints stamps both with the same id, and matching
+  // on it alone would pile both onto whichever of them has an edge.
   for (let i = edges.length - 1; i >= 0; i--) {
     const edge = edges[i]!;
     if (!edge.data) continue;
@@ -163,10 +153,20 @@ export function matchMessageToEdge(
     }
   }
 
-  // Pass 5 - the node id alone, last resort. Reached when the tracer attributes the hop to a
-  // different route than the one that owns the node, which happens for routingSlip and
-  // dynamicRouter continuations.
   if (endpointId) {
+    // Pass 4 - the node id AND the source route agree, but the endpoint does not. Covers a target
+    // the route model could not resolve statically, such as toD("direct:x${exchangeProperty.y}"),
+    // where the traced endpoint is the resolved value and the edge holds the expression.
+    for (let i = edges.length - 1; i >= 0; i--) {
+      const edge = edges[i]!;
+      if (edge.data?.outputId === endpointId && edgeHasSource(edge, msgRouteId)) {
+        return edge;
+      }
+    }
+
+    // Pass 5 - the node id alone, last resort. Reached when the tracer attributes the hop to a
+    // different route than the one owning the node, which happens for routingSlip and dynamicRouter
+    // continuations.
     for (let i = edges.length - 1; i >= 0; i--) {
       const edge = edges[i]!;
       if (edge.data?.outputId === endpointId) {
