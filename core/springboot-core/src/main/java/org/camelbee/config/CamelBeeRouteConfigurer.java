@@ -42,7 +42,13 @@ public class CamelBeeRouteConfigurer {
   @Value("${camelbee.route-configurer-enabled:true}")
   private boolean routeConfigurerEnabled;
 
-  /** Needed by the poll tracing strategy, which records hops Camel emits no events for. */
+  /**
+   * Needed by the poll tracing strategy, which records hops Camel emits no events for.
+   *
+   * <p>Required: a CamelBee application always has the tracer graph. Sliced test contexts that
+   * import this configurer on its own - {@code @SpringBootTest(classes = ...)}, which component
+   * scans nothing - have to import {@link CamelBeeTracingConfiguration} alongside it.
+   */
   @Autowired
   private TracerService tracerService;
 
