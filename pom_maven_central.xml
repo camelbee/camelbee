@@ -44,6 +44,7 @@
     <module>core</module>
     <module>security</module>
     <module>starters</module>
+    <module>core/quarkus-core/pom-camelk.xml</module>
   </modules>
 
   <distributionManagement>

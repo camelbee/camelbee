@@ -5,6 +5,7 @@ pom_maven_central.xml
 
 _reference
 target/
+target-camelk/
 !**/src/main/**/target/
 !**/src/test/**/target/
 .gradle

@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2023 Rahmi Ege Karaosmanoglu
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!--
+  Builds CamelBee's Quarkus core against the Camel Quarkus version that the Apache Camel K
+  runtime uses, so the jar can be consumed from a Camel K integration modeline.
+
+  Camel K pins its own runtime; it does not follow the Camel Quarkus release that the main
+  build (see pom.xml) targets. The values below are not guesses - read them off a live
+  operator and change them when your operator's catalog reports something else:
+
+      kubectl get camelcatalog -o jsonpath='{.items[0].spec.runtime.metadata}'
+
+  On Camel K 2.10.1 that reports:
+      camel-k-runtime 3.15.3 / camel-quarkus 3.15.3 / camel 4.8.5 / quarkus 3.15.4
+
+  Three deliberate differences from pom.xml:
+
+  1. Requires the JDK 21 flavour of the operator (apache/camel-k:<version>-21-jdk). The
+     default operator image builds and runs Integrations on a JDK 17 base, which cannot load
+     classes compiled for 21 - and the core needs 21 (ExchangeUtils uses pattern matching in
+     switch). See installation/advanced/jdk-version.html in the Camel K docs, and the
+     README's operator step.
+  2. No 'provided' scopes. The integration resolves this jar's transitive dependencies from
+     the modeline, and a provided dependency is not transitive - the REST/Jackson stack has
+     to come along or the CamelBee endpoints are missing at runtime.
+  3. No camel-quarkus-cxf-soap. It is 'provided' in pom.xml because the core does not
+     reference CXF at all; making it transitive here would pull the whole SOAP stack into
+     every integration, inflating the in-cluster build and the resulting image.
+
+  Build (from core/quarkus-core):
+      mvn -f pom-camelk.xml clean install
+
+  Output lands in target-camelk/ so it never clobbers the main build's target/.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>io.camelbee</groupId>
+	<artifactId>camelbee-quarkus-core-camelk</artifactId>
+	<name>CamelBee Quarkus Core (Camel K runtime)</name>
+	<packaging>jar</packaging>
+	<version>3.3.1</version>
+
+	<description>CamelBee Quarkus core built against the Camel Quarkus version used by the Apache
+		Camel K runtime, for consumption from a Camel K integration modeline. Same sources and
+		version as camelbee-quarkus-core, different Camel baseline.</description>
+	<url>https://github.com/egekaraosmanoglu/camelbee</url>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<id>egekaraosmanoglu</id>
+			<name>Rahmi Ege Karaosmanoglu</name>
+			<email>egekaraosmanoglu@gmail.com</email>
+		</developer>
+	</developers>
+
+	<scm>
+		<url>https://github.com/egekaraosmanoglu/camelbee</url>
+		<connection>scm:git:https://github.com/egekaraosmanoglu/camelbee.git</connection>
+		<developerConnection>scm:git:git@github.com:egekaraosmanoglu/camelbee.git</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
+
+	<properties>
+		<!-- Match the operator's catalog exactly; see the header comment. -->
+		<camel-quarkus.version>3.15.3</camel-quarkus.version>
+		<quarkus.version>3.15.4</quarkus.version>
+
+		<!-- Requires the -21-jdk operator image; see the header comment. -->
+		<maven.compiler.release>21</maven.compiler.release>
+
+		<commons-lang3.version>3.17.0</commons-lang3.version>
+		<assertj-core.version>3.27.7</assertj-core.version>
+		<mockito-junit-jupiter.version>5.14.2</mockito-junit-jupiter.version>
+
+		<!--
+		  Must match the Jandex that Quarkus 3.15.4 bundles (3.2.3). The main build's 3.6.0
+		  writes index format v13, and that reader only supports up to v12 - the integration
+		  then dies during augmentation with org.jboss.jandex.UnsupportedVersion.
+		-->
+		<jandex-maven-plugin.version>3.2.3</jandex-maven-plugin.version>
+		<maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+		<maven-resources-plugin.version>3.4.0</maven-resources-plugin.version>
+		<maven-surefire-plugin.version>3.2.1</maven-surefire-plugin.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- Camel K composes these two directly rather than using the io.quarkus.platform
+			     aggregate BOM, which is why the two versions differ. -->
+			<dependency>
+				<groupId>io.quarkus</groupId>
+				<artifactId>quarkus-bom</artifactId>
+				<version>${quarkus.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel.quarkus</groupId>
+				<artifactId>camel-quarkus-bom</artifactId>
+				<version>${camel-quarkus.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.apache.camel.quarkus</groupId>
+			<artifactId>camel-quarkus-microprofile-health</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.camel.quarkus</groupId>
+			<artifactId>camel-quarkus-rest</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.camel.quarkus</groupId>
+			<artifactId>camel-quarkus-direct</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.camel.quarkus</groupId>
+			<artifactId>camel-quarkus-log</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.camel.quarkus</groupId>
+			<artifactId>camel-quarkus-jackson</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-resteasy-jackson</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.camel.quarkus</groupId>
+			<artifactId>camel-quarkus-bean</artifactId>
+		</dependency>
+
+		<!-- Used by MdcContext, ExchangeUtils, UuidResolver and ExchangeSendingEventTracer -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${commons-lang3.version}</version>
+		</dependency>
+
+		<!-- Used by RouteContextService to parse route YAML -->
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-junit5</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.camel.quarkus</groupId>
+			<artifactId>camel-quarkus-junit5</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
+			<version>${mockito-junit-jupiter.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>${assertj-core.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<!-- Keep this variant's output away from the main build's target/. -->
+		<directory>${project.basedir}/target-camelk</directory>
+
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven-surefire-plugin.version}</version>
+				<configuration>
+					<failIfNoTests>false</failIfNoTests>
+					<systemProperties>
+						<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+					</systemProperties>
+					<!--
+					  These two pin Camel 4.21 behaviour, so they fail here by design - the whole
+					  point of this pom is to build against Camel 4.8.5. Everything else passes
+					  unchanged, so the exclusions are kept to individual methods rather than the
+					  class. The 4.8.5 differences they catch:
+
+					    - recipes: 'To[mock:out]' / 'DynamicTo[mock:dynamic]'
+					      vs 4.21's 'to[mock:out]' / 'DynamicTo[toD[mock:dynamic]]'.
+					      Harmless for the UI: endpointParser.ts matches case-insensitively and
+					      treats the inner toD[] wrapper as optional.
+					    - descriptions: .description() after a node sets the ROUTE description on
+					      4.8.5 instead of the node's, so route/node description text is wrong in
+					      the UI on Camel K. Cosmetic, but real - do not assume it works there.
+
+					  If either stops failing, Camel K's runtime has moved; re-check and remove.
+					-->
+					<!-- Method-level filters are only honoured by <test>, not <excludes>. -->
+					<test>!RouteContextServiceTest#getCamelRoutes_characterization_exactOutputSerialization,
+						!RouteContextServiceTest#getCamelRoutes_populatesRouteAndNodeDescriptions</test>
+				</configuration>
+			</plugin>
+
+			<!-- Build a Jandex index so Quarkus/Arc auto-discovers CamelBee's CDI beans when this
+			     jar is used as a dependency (e.g. in a Camel K integration) WITHOUT requiring the
+			     consumer to add quarkus.index-dependency configuration. -->
+			<plugin>
+				<groupId>io.smallrye</groupId>
+				<artifactId>jandex-maven-plugin</artifactId>
+				<version>${jandex-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>make-index</id>
+						<goals>
+							<goal>jandex</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>${maven-resources-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>copy-ui-dist</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.outputDirectory}/META-INF/resources/camelbee</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/../../ui/dist</directory>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<!--
+	  No distributionManagement on purpose: central-publishing-maven-plugin (extensions=true)
+	  replaces the deploy step and uploads through the Central Portal API using publishingServerId,
+	  so the legacy s01.oss.sonatype.org staging URLs are never used.
+	-->
+	<profiles>
+		<!--
+		  Mirrors the sonatype-release profile in pom_maven_central.xml, which lists this file as
+		  a module - Maven accepts a module that points at a POM file, not just a directory - so
+		  the normal release command covers this artifact too. No separate deploy step.
+
+		  It needs its own copy of the profile (rather than inheriting) because this pom has no
+		  parent: it must stay standalone to use a different Camel Quarkus BOM than the reactor.
+
+		  Because it is release-only and NOT in the everyday pom.xml, nothing builds it during
+		  normal development. Build it once before releasing so a failure surfaces early:
+
+		      mvn -f pom-camelk.xml clean install
+
+		  Keep the version in step with the other artifacts even though the Camel baseline
+		  differs (see the header comment).
+		-->
+		<profile>
+			<id>sonatype-release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.sonatype.central</groupId>
+						<artifactId>central-publishing-maven-plugin</artifactId>
+						<version>0.8.0</version>
+						<extensions>true</extensions>
+						<configuration>
+							<publishingServerId>central</publishingServerId>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>3.3.0</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>3.4.1</version>
+						<configuration>
+							<additionalJOptions>
+								<additionalJOption>-Xdoclint:none</additionalJOption>
+							</additionalJOptions>
+						</configuration>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>3.1.0</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+						<!-- The executable defaults to 'gpg' on PATH; the plugin's parameter is
+						     'executable', not 'gpgExecutable' as in pom_maven_central.xml. -->
+						<configuration>
+							<useAgent>true</useAgent>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

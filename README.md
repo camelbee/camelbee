@@ -76,7 +76,7 @@ camelbee/
 |   |   |-- README.md
 |   |-- allcomponent-standalone-sample/  # Standalone (camel-main) example project
 |   |   |-- README.md
-|   |-- camelk-sample/                   # Camel K integration sample (kamel CLI, not a Maven module)
+|   |-- allcomponent-camelk-sample/      # Camel K integration sample (kamel CLI, not a Maven module)
 |   |   |-- README.md
 |-- parent/                              # Parent POM with shared build config
 |-- security/
@@ -108,7 +108,7 @@ camelbee/
   - `allcomponent-quarkus-sample`: Quarkus example project which uses `camelbee-quarkus-starter` as parent.
   - `allcomponent-springboot-sample`: Spring Boot example project which uses `camelbee-springboot-starter` as parent.
   - `allcomponent-standalone-sample`: Standalone example project which uses `camelbee-standalone-starter` as parent.
-  - `camelk-sample`: Camel K integration sample run with the `kamel` CLI — Camel K runs on the Camel Quarkus runtime, so `camelbee-quarkus-core` works there unchanged (no separate module needed).
+  - `allcomponent-camelk-sample`: Camel K integration sample run with the `kamel` CLI. Camel K runs on the Camel Quarkus runtime but pins an older Camel, so it uses `camelbee-quarkus-core-camelk` (same sources, built by `core/quarkus-core/pom-camelk.xml`). Same infra-free topology as the standalone sample, in a single integration file.
 
 Each subproject has its own README file for detailed information specific to that project.
 
@@ -260,20 +260,23 @@ camel.server.port = 8080
 
 **For Camel K:**
 
-Camel K runs integrations on the **Camel Quarkus** runtime, so `camelbee-quarkus-core` works on Camel K unchanged — no separate module or local build needed. Declare everything in your integration file's modeline (the core's CDI beans are auto-discovered because the jar ships a Jandex index):
+Camel K runs integrations on the **Camel Quarkus** runtime, but pins an older Camel than this project's main build (Camel 4.8.5 vs 4.21). Use `camelbee-quarkus-core-camelk` — the same sources built against Camel K's baseline. Declare everything in your integration file's modeline (the core's CDI beans are auto-discovered because the jar ships a Jandex index):
 
 ```java
-// camel-k: dependency=mvn:io.camelbee:camelbee-quarkus-core:3.3.1
-// camel-k: dependency=mvn:org.apache.camel.quarkus:camel-quarkus-rest
-// camel-k: dependency=mvn:org.apache.camel.quarkus:camel-quarkus-jackson
-// camel-k: dependency=mvn:io.quarkus:quarkus-resteasy-jackson
+// camel-k: dependency=mvn:io.camelbee:camelbee-quarkus-core-camelk:3.3.1
+// camel-k: dependency=camel:direct
+// camel-k: dependency=camel:log
 // camel-k: build-property=camelbee.context-enabled=true
 // camel-k: build-property=camelbee.tracer-enabled=true
 // camel-k: property=camelbee.tracer-enabled=true
 // camel-k: trait=service.enabled=true
 ```
 
-Run it with `kamel run YourRoute.java`, then expose the HTTP port (e.g. `kubectl port-forward svc/your-route 8080:80`) and open `http://localhost:8080/camelbee`. See the [Camel K sample](examples/camelk-sample/README.md) for a complete working integration, including how to use the starter instead of the core.
+The REST/Jackson stack comes transitively with this core, so it does not need declaring. Declare every component you use explicitly, though: Camel K's auto-detection reads URIs at the `from(...)`/`to(...)` call site and misses any built from a constant, which then fails at runtime rather than at build time.
+
+Camel K also needs the **JDK 21 flavour of the operator** (`apache/camel-k:<version>-21-jdk`); the default JDK 17 image cannot load these classes.
+
+Run it with `kamel run YourRoute.java`, then expose the HTTP port (e.g. `kubectl port-forward svc/your-route 8080:80`) and open `http://localhost:8080/camelbee`. See the [Camel K sample](examples/allcomponent-camelk-sample/README.md) for a complete, cluster-verified integration and a full local setup walkthrough.
 
 ### Option 2: Use a CamelBee Starter as Parent (New projects only)
 
@@ -509,7 +512,7 @@ Once your application is running, the CamelBee UI is available at: `http://local
 - **Quarkus:** [CamelBee Quarkus Core README](https://github.com/camelbee/camelbee/blob/main/core/quarkus-core/README.md)
 - **Spring Boot:** [CamelBee SpringBoot Core README](https://github.com/camelbee/camelbee/blob/main/core/springboot-core/README.md)
 - **Standalone:** [CamelBee Standalone Core README](https://github.com/camelbee/camelbee/blob/main/core/standalone-core/README.md)
-- **Camel K:** [CamelBee Camel K Sample README](https://github.com/camelbee/camelbee/blob/main/examples/camelk-sample/README.md)
+- **Camel K:** [CamelBee Camel K Sample README](https://github.com/camelbee/camelbee/blob/main/examples/allcomponent-camelk-sample/README.md)
 - **Security (JWT validation routes):** [CamelBee Security README](https://github.com/camelbee/camelbee/blob/main/security/README.md)
 - **Embedded UI development:** [CamelBee UI README](https://github.com/camelbee/camelbee/blob/main/ui/README.md)
 

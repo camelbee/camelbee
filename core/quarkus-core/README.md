@@ -197,4 +197,4 @@ camelbee/
 - [CamelBee User Guide](../../docs/camelbee_userguide.md) — a tour of the UI's pages and features
 - Using Spring Boot? See the [Spring Boot Core README](../springboot-core/README.md)
 - Using plain Camel (`camel-main`)? See the [Standalone Core README](../standalone-core/README.md)
-- Running on Camel K? The Quarkus core works there unchanged — see the [Camel K sample](../../examples/camelk-sample/README.md)
+- Running on Camel K? Camel K pins an older Camel than this build, so use `camelbee-quarkus-core-camelk` — the same sources built by [`pom-camelk.xml`](./pom-camelk.xml) — and see the [Camel K sample](../../examples/allcomponent-camelk-sample/README.md)

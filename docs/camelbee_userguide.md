@@ -26,7 +26,7 @@ To enable your Camel microservices to work with CamelBee, follow the setup instr
 - **Spring Boot:** [CamelBee SpringBoot Core README](https://github.com/camelbee/camelbee/tree/main/core/springboot-core)
 - **Quarkus:** [CamelBee Quarkus Core README](https://github.com/camelbee/camelbee/tree/main/core/quarkus-core)
 - **Standalone (plain Camel / `camel-main`):** [CamelBee Standalone Core README](https://github.com/camelbee/camelbee/tree/main/core/standalone-core)
-- **Camel K:** runs on the Camel Quarkus runtime, so the Quarkus core works unchanged — see the [Camel K Sample README](https://github.com/camelbee/camelbee/tree/main/examples/camelk-sample)
+- **Camel K:** runs on the Camel Quarkus runtime, but pins an older Camel — use `camelbee-quarkus-core-camelk` and see the [Camel K Sample README](https://github.com/camelbee/camelbee/tree/main/examples/allcomponent-camelk-sample)
 
 For working examples, see the [camelbee-examples](https://github.com/camelbee/camelbee-examples) repository.
 
@@ -149,3 +149,21 @@ Available settings:
 | **Max Characters in a Text Field** | Maximum characters displayed in message text fields (1000–30000) | 10000 |
 
 Settings are persisted in the browser's local storage and applied immediately.
+
+### Health and Metrics URLs per runtime
+
+The defaults match the Spring Boot sample, which maps the endpoints to the server root. **On any
+other runtime you have to change them**, or the Health panel and Metrics page stay empty with 404s
+in the browser console:
+
+| Runtime | Health URL | Metrics URL |
+|---------|------------|-------------|
+| Spring Boot | `/health` | `/metrics` |
+| Quarkus (incl. Camel K) | `/q/health` | `/q/metrics` |
+| Standalone | `/observe/health` | `/observe/metrics` |
+
+The Metrics page reads the **Prometheus exposition format**, so on Spring Boot point it at the
+`prometheus` endpoint (the sample maps it to `/metrics`), not `/actuator/metrics`, which returns
+JSON. The endpoint also has to exist: Quarkus needs the
+`quarkus-micrometer-registry-prometheus` extension, and standalone needs micrometer on the
+classpath.
