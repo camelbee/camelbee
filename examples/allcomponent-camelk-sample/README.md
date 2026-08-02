@@ -100,10 +100,13 @@ The **starters are not usable on Camel K**: `camelbee-quarkus-starter` pulls the
   matching in `switch`), so on a stock operator the integration dies with
   `UnsupportedClassVersionError`. See
   [the Camel K JDK docs](https://camel.apache.org/camel-k/2.10.x/installation/advanced/jdk-version.html).
-- The operator builds integrations **in-cluster**, so `camelbee-quarkus-core-camelk:3.3.1` must be
-  resolvable from a Maven repository it can reach. If it is not yet on Maven Central, build and
-  serve it yourself — see [Serving the core from your machine](#serving-the-core-from-your-machine).
-  A `mvn install`-ed jar in `~/.m2` is **not** enough on its own.
+- **An operator whose runtime matches the published core.** `camelbee-quarkus-core-camelk:3.3.1` is
+  on Maven Central, built against the runtime Camel K 2.10.1 ships (`camel-quarkus 3.15.3` /
+  Camel 4.8.5), so the operator resolves it in-cluster with nothing for you to build or host. On an
+  operator with a *different* runtime you have to rebuild the core against it and make your build
+  reachable — see [Rebuilding the core for a different Camel K
+  runtime](#rebuilding-the-core-for-a-different-camel-k-runtime). Note that the operator builds
+  in-cluster, so a `mvn install`-ed jar sitting in your `~/.m2` is never enough on its own.
 
 ## Running it locally
 
@@ -256,7 +259,47 @@ Failures actually hit while validating this sample, and what each means:
   modeline; see [How it works](#how-it-works).
 - **Image push failures** — the registry address in step 2 is wrong or not reachable in-cluster.
 
-### 6. Clean up
+### 6. Deploy a new version, or come back later
+
+**Steps 0–2 are one-time.** The tooling, the cluster and the operator survive restarts; only the
+integration is redeployed as you work.
+
+*Changed `MusicianRoute.java`:* run the same command again. `kamel run` updates the existing
+integration in place (it prints `Integration "musician-route" updated`). A route-only edit reuses
+the cached IntegrationKit and is quick; changing the modeline's dependencies or build properties
+forces a new kit and takes minutes again.
+
+```sh
+kamel run MusicianRoute.java            # add --maven-repository ... if you serve the core yourself
+```
+
+*Rebuilt `camelbee-quarkus-core-camelk` without bumping its version:* the operator has already
+cached that exact coordinate and will happily reuse the old jar, so clear its Maven cache in
+between — this is the step that catches people out:
+
+```sh
+mvn -f ../../core/quarkus-core/pom-camelk.xml clean install
+# re-publish into the served repository (steps 2-3 of "Serving the core from your machine")
+kubectl exec deploy/camel-k-operator -- rm -rf /etc/maven/m2/io/camelbee
+kamel delete musician-route
+kamel run MusicianRoute.java --maven-repository "http://host.minikube.internal:8000@id=local-m2"
+```
+
+*After `minikube stop`:* the node is a Docker container, so it does not come back on its own. Start
+Docker, then:
+
+```sh
+minikube start                                    # no flags needed - resumes the same node
+kubectl get pod -w                                # wait for the pods to be Ready
+kubectl port-forward svc/musician-route 8080:80   # for the UI
+```
+
+That is all. The operator, the IntegrationPlatform, the cached kits and the pushed images all
+survive, so nothing rebuilds and the integration pod restarts by itself within a minute or two.
+You do **not** need the local Maven repository server running to resume — that is only consulted
+when a new kit has to be built, i.e. after you rebuild the core or change modeline dependencies.
+
+### 7. Clean up
 
 ```sh
 kamel delete musician-route
@@ -272,9 +315,15 @@ minikube delete
 
 ## Serving the core from your machine
 
-Only needed when `camelbee-quarkus-core-camelk:3.3.1` is not on a repository your operator can
-reach — for example while testing a local change to it. Build it, publish it into a throwaway
-repository *with checksums*, serve that over HTTP, and point `kamel run` at it:
+**Not needed for the normal case** — the published core resolves from Maven Central by itself. This
+is for the two cases where the operator cannot use it: your operator runs a different Camel K
+runtime (so the core has to be
+[rebuilt](#rebuilding-the-core-for-a-different-camel-k-runtime) first), or you are testing a local
+change to the core.
+
+The operator builds in-cluster and cannot see your `~/.m2`, and a local repository has no checksums
+so it cannot be served as-is. Publish into a throwaway repository *with* checksums, serve that over
+HTTP, and point `kamel run` at it:
 
 ```sh
 # 1. build the Camel K variant (from core/quarkus-core)
@@ -354,12 +403,22 @@ For a guide to the UI's pages and features, see the
 
 ## Rebuilding the core for a different Camel K runtime
 
-If your operator reports a runtime other than the one
-[`pom-camelk.xml`](../../core/quarkus-core/pom-camelk.xml) targets, edit the two version properties
-at the top of that file to match your `camelcatalog` output and rebuild. Its header comment explains
-each deliberate difference from the main `pom.xml`, including the Jandex pin. Then either publish
-the result to a repository the operator can reach, or serve it as shown
-[above](#serving-the-core-from-your-machine).
+The published `camelbee-quarkus-core-camelk` is built against one runtime — the one Camel K 2.10.1
+ships. Check yours:
+
+```sh
+kubectl get camelcatalog -o jsonpath='{.items[0].spec.runtime.metadata}'
+```
+
+If it reports something other than `camel-quarkus 3.15.3` / `quarkus 3.15.4`, the published jar is
+built against the wrong baseline and you need your own. Edit the two version properties at the top
+of [`pom-camelk.xml`](../../core/quarkus-core/pom-camelk.xml) to match, then rebuild. Watch the
+Jandex pin in particular: it has to match the Jandex your runtime's Quarkus bundles, or the
+integration fails during augmentation with `UnsupportedVersion`. The file's header comment explains
+that and every other deliberate difference from the main `pom.xml`.
+
+Then make your build reachable by the operator — either publish it to a repository your cluster can
+see, or [serve it from your machine](#serving-the-core-from-your-machine).
 
 There is no `kamel run --runtime-version` that avoids this: Camel K's runtime releases lag Camel,
 and no published `camel-k-runtime` targets Camel 4.21.

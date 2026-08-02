@@ -47,12 +47,16 @@ export function RouteGraph({ context, onDynamicEdgeAdded }: RouteGraphProps) {
   // Keep a ref to the current graph edges for message matching
   const graphEdgesRef = useRef(graph.edges);
 
-  // When context changes, rebuild
+  // Rebuild from the static topology when it changes, and when the messages are cleared: the
+  // dynamic edges/nodes synthesized below describe hops seen in traffic, so once that traffic is
+  // gone they are stale. This also discards any manual node repositioning, which is acceptable
+  // for an explicit clear.
+  const clearGeneration = useDebuggerStore((s) => s.clearGeneration);
   useEffect(() => {
     setNodes(graph.nodes);
     setEdges(graph.edges);
     graphEdgesRef.current = graph.edges;
-  }, [graph, setNodes, setEdges]);
+  }, [graph, clearGeneration, setNodes, setEdges]);
 
   // Edge click → select edge for message panel
   const selectEdge = useDebuggerStore((s) => s.selectEdge);

@@ -23,6 +23,14 @@ interface DebuggerState {
   /** True once the server-side tracer-max-messages-count cap has been hit (roadmap #12). */
   capReached: boolean;
 
+  /**
+   * Bumped by {@link clearMessages}. Dynamic graph state (the edges and nodes RouteGraph
+   * synthesizes for hops the static topology did not predict) is derived from the messages, but
+   * lives in component state rather than here - it is React Flow state that the graph mutates.
+   * Watching this lets those components drop it when the messages it came from are gone.
+   */
+  clearGeneration: number;
+
   /* Actions */
   appendMessages: (
     newMessages: Message[],
@@ -69,6 +77,7 @@ export const useDebuggerStore = create<DebuggerState>((set, get) => ({
   isTracing: false,
   selectedEdgeId: null,
   capReached: false,
+  clearGeneration: 0,
 
   appendMessages: (newMessages, newAddVersion, newResetVersion, newCapReached = false) => {
     const state = get();
@@ -140,7 +149,8 @@ export const useDebuggerStore = create<DebuggerState>((set, get) => ({
   selectEdge: (edgeId) => set({ selectedEdgeId: edgeId }),
 
   clearMessages: () =>
-    set({
+    set((state) => ({
+      clearGeneration: state.clearGeneration + 1,
       messages: [],
       filteredMessages: [],
       lastIndex: 0,
@@ -150,5 +160,5 @@ export const useDebuggerStore = create<DebuggerState>((set, get) => ({
       resetVersion: -1,
       selectedEdgeId: null,
       capReached: false,
-    }),
+    })),
 }));

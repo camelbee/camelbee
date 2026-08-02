@@ -19,6 +19,7 @@ export function DebuggerPage() {
   const addVersion = useDebuggerStore((s) => s.addVersion);
   const resetVersion = useDebuggerStore((s) => s.resetVersion);
   const appendMessages = useDebuggerStore((s) => s.appendMessages);
+  const clearGeneration = useDebuggerStore((s) => s.clearGeneration);
 
   const messagesQuery = useMessages(lastIndex, addVersion, resetVersion, isTracing);
 
@@ -51,10 +52,12 @@ export function DebuggerPage() {
     });
   }, []);
 
-  // Reset dynamic edges when context changes
+  // Reset dynamic edges when the topology changes, and when the messages they were derived from
+  // are cleared - otherwise the "N dynamic hops" badge keeps counting hops that no longer have
+  // any messages behind them. RouteGraph drops the matching edges/nodes on the same signal.
   useEffect(() => {
     setDynamicEdges([]);
-  }, [context]);
+  }, [context, clearGeneration]);
 
   // Merge static + dynamic edges for MessagePanel
   const allEdges = useMemo(
