@@ -35,6 +35,32 @@ export async function triggerPipeline(request: APIRequestContext) {
 }
 
 /**
+ * Points the UI at the observability endpoints this runtime actually serves.
+ *
+ * The shipped defaults are `/health` and `/metrics`, which no runtime serves as-is - each user is
+ * expected to set them for theirs (Quarkus `/q/metrics`, Spring Boot `/actuator/prometheus`,
+ * standalone `/observe/metrics`). Going through the settings form rather than seeding localStorage
+ * keeps the store, the form and the queries in the assertion.
+ */
+export async function useStandaloneObservabilityUrls(page: Page) {
+  await page.getByRole('link', { name: 'SETTINGS' }).click();
+
+  const healthInput = page.getByRole('textbox').first();
+  await expect(healthInput).toHaveValue('/health');
+  await healthInput.fill('/observe/health');
+
+  const metricsInput = page.getByRole('textbox').nth(1);
+  await expect(metricsInput).toHaveValue('/metrics');
+  await metricsInput.fill('/observe/metrics');
+}
+
+/** Opens the metrics page and waits for the route topology to be laid out. */
+export async function openMetrics(page: Page) {
+  await page.getByRole('link', { name: 'METRICS' }).click();
+  await expect(page.locator('.react-flow__node').first()).toBeVisible({ timeout: 30_000 });
+}
+
+/**
  * Clicks a React Flow edge and waits for the message panel to open.
  *
  * The click has to land on the wide invisible interaction path, not the visible stroke: React Flow's
