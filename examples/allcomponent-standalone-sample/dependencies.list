@@ -6,7 +6,7 @@ The following files have been resolved:
    com.fasterxml.jackson.core:jackson-databind:jar:2.22.0:compile -- module com.fasterxml.jackson.databind
    com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:jar:2.22.0:compile -- module com.fasterxml.jackson.dataformat.yaml
    com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar:2.22.1:compile -- module com.fasterxml.jackson.datatype.jsr310
-   com.fasterxml.woodstox:woodstox-core:jar:7.2.0:compile -- module com.ctc.wstx
+   com.fasterxml.woodstox:woodstox-core:jar:7.2.1:compile -- module com.ctc.wstx
    com.github.docker-java:docker-java-api:jar:3.7.1:test -- module com.github.dockerjava.api [auto]
    com.github.docker-java:docker-java-transport-zerodep:jar:3.7.1:test -- module com.github.dockerjava.transport.zerodep [auto]
    com.github.docker-java:docker-java-transport:jar:3.7.1:test -- module com.github.dockerjava.transport [auto]
@@ -111,7 +111,7 @@ The following files have been resolved:
    org.apache.camel:camel-yaml-io:jar:4.21.0:compile -- module camel.yaml.io (auto)
    org.apache.commons:commons-compress:jar:1.28.0:test -- module org.apache.commons.compress
    org.apache.commons:commons-lang3:jar:3.20.0:compile -- module org.apache.commons.lang3
-   org.apache.cxf:cxf-core:jar:4.2.2:compile -- module org.apache.cxf.core [auto]
+   org.apache.cxf:cxf-core:jar:4.2.3:compile -- module org.apache.cxf.core [auto]
    org.apache.httpcomponents.client5:httpclient5:jar:5.6.1:compile -- module org.apache.httpcomponents.client5.httpclient5 [auto]
    org.apache.httpcomponents.core5:httpcore5-h2:jar:5.4.3:compile -- module org.apache.httpcomponents.core5.httpcore5.h2 [auto]
    org.apache.httpcomponents.core5:httpcore5:jar:5.4.3:compile -- module org.apache.httpcomponents.core5.httpcore5 [auto]

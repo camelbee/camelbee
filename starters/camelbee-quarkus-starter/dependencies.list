@@ -54,56 +54,56 @@ The following files have been resolved:
    io.prometheus:simpleclient_tracer_otel:jar:0.16.0:compile -- module simpleclient.tracer.otel (auto)
    io.prometheus:simpleclient_tracer_otel_agent:jar:0.16.0:compile -- module simpleclient.tracer.otel.agent (auto)
    io.quarkiverse.loggingjson:quarkus-logging-json:jar:3.5.0:compile -- module quarkus.logging.json (auto)
-   io.quarkus.arc:arc:jar:3.38.0:compile -- module io.quarkus.arc
+   io.quarkus.arc:arc:jar:3.38.1:compile -- module io.quarkus.arc
    io.quarkus.gizmo:gizmo2:jar:2.1.1:test -- module io.quarkus.gizmo2
    io.quarkus.gizmo:gizmo:jar:1.10.1:test -- module io.quarkus.gizmo
    io.quarkus.security:quarkus-security:jar:2.3.2:compile -- module io.quarkus.security.api [auto]
-   io.quarkus:quarkus-arc:jar:3.38.0:compile -- module quarkus.arc (auto)
-   io.quarkus:quarkus-bootstrap-app-model:jar:3.38.0:test -- module quarkus.bootstrap.app.model (auto)
-   io.quarkus:quarkus-bootstrap-core:jar:3.38.0:test -- module quarkus.bootstrap.core (auto)
-   io.quarkus:quarkus-bootstrap-gradle-resolver:jar:3.38.0:test -- module quarkus.bootstrap.gradle.resolver (auto)
-   io.quarkus:quarkus-bootstrap-json:jar:3.38.0:test -- module quarkus.bootstrap.json (auto)
-   io.quarkus:quarkus-bootstrap-maven-resolver:jar:3.38.0:test -- module quarkus.bootstrap.maven.resolver (auto)
-   io.quarkus:quarkus-bootstrap-maven4-resolver:jar:3.38.0:test -- module quarkus.bootstrap.maven4.resolver (auto)
-   io.quarkus:quarkus-bootstrap-runner:jar:3.38.0:compile -- module io.quarkus.bootstrap.runner
-   io.quarkus:quarkus-builder:jar:3.38.0:test -- module quarkus.builder (auto)
-   io.quarkus:quarkus-class-change-agent:jar:3.38.0:test -- module io.quarkus.changeagent
-   io.quarkus:quarkus-classloader-commons:jar:3.38.0:compile -- module io.quarkus.commons.classloading
-   io.quarkus:quarkus-config-yaml:jar:3.38.0:compile -- module quarkus.config.yaml (auto)
-   io.quarkus:quarkus-core-deployment:jar:3.38.0:test -- module quarkus.core.deployment (auto)
-   io.quarkus:quarkus-core:jar:3.38.0:compile -- module io.quarkus.core [auto]
-   io.quarkus:quarkus-credentials:jar:3.38.0:compile -- module quarkus.credentials (auto)
-   io.quarkus:quarkus-development-mode-spi:jar:3.38.0:compile -- module io.quarkus.dev.spi
+   io.quarkus:quarkus-arc:jar:3.38.1:compile -- module quarkus.arc (auto)
+   io.quarkus:quarkus-bootstrap-app-model:jar:3.38.1:test -- module quarkus.bootstrap.app.model (auto)
+   io.quarkus:quarkus-bootstrap-core:jar:3.38.1:test -- module quarkus.bootstrap.core (auto)
+   io.quarkus:quarkus-bootstrap-gradle-resolver:jar:3.38.1:test -- module quarkus.bootstrap.gradle.resolver (auto)
+   io.quarkus:quarkus-bootstrap-json:jar:3.38.1:test -- module quarkus.bootstrap.json (auto)
+   io.quarkus:quarkus-bootstrap-maven-resolver:jar:3.38.1:test -- module quarkus.bootstrap.maven.resolver (auto)
+   io.quarkus:quarkus-bootstrap-maven4-resolver:jar:3.38.1:test -- module quarkus.bootstrap.maven4.resolver (auto)
+   io.quarkus:quarkus-bootstrap-runner:jar:3.38.1:compile -- module io.quarkus.bootstrap.runner
+   io.quarkus:quarkus-builder:jar:3.38.1:test -- module quarkus.builder (auto)
+   io.quarkus:quarkus-class-change-agent:jar:3.38.1:test -- module io.quarkus.changeagent
+   io.quarkus:quarkus-classloader-commons:jar:3.38.1:compile -- module io.quarkus.commons.classloading
+   io.quarkus:quarkus-config-yaml:jar:3.38.1:compile -- module quarkus.config.yaml (auto)
+   io.quarkus:quarkus-core-deployment:jar:3.38.1:test -- module quarkus.core.deployment (auto)
+   io.quarkus:quarkus-core:jar:3.38.1:compile -- module io.quarkus.core [auto]
+   io.quarkus:quarkus-credentials:jar:3.38.1:compile -- module quarkus.credentials (auto)
+   io.quarkus:quarkus-development-mode-spi:jar:3.38.1:compile -- module io.quarkus.dev.spi
    io.quarkus:quarkus-fs-util:jar:1.4.2:compile -- module io.quarkus.fs.util
-   io.quarkus:quarkus-hibernate-validator-spi:jar:3.38.0:test -- module quarkus.hibernate.validator.spi (auto)
-   io.quarkus:quarkus-hibernate-validator:jar:3.38.0:compile -- module quarkus.hibernate.validator (auto)
-   io.quarkus:quarkus-ide-launcher:jar:3.38.0:compile -- module io.quarkus.launcher [auto]
-   io.quarkus:quarkus-jackson:jar:3.38.0:compile -- module quarkus.jackson (auto)
-   io.quarkus:quarkus-jacoco:jar:3.38.0:test -- module quarkus.jacoco (auto)
-   io.quarkus:quarkus-jaxp:jar:3.38.0:compile -- module quarkus.jaxp (auto)
-   io.quarkus:quarkus-jsonp:jar:3.38.0:compile -- module quarkus.jsonp (auto)
-   io.quarkus:quarkus-junit-common:jar:3.38.0:test -- module quarkus.junit.common (auto)
-   io.quarkus:quarkus-junit-config:jar:3.38.0:test -- module quarkus.junit.config (auto)
-   io.quarkus:quarkus-junit:jar:3.38.0:test -- module quarkus.junit (auto)
-   io.quarkus:quarkus-micrometer-registry-prometheus:jar:3.38.0:compile -- module quarkus.micrometer.registry.prometheus (auto)
-   io.quarkus:quarkus-micrometer:jar:3.38.0:compile -- module quarkus.micrometer (auto)
-   io.quarkus:quarkus-mutiny:jar:3.38.0:compile -- module quarkus.mutiny (auto)
-   io.quarkus:quarkus-netty:jar:3.38.0:compile -- module quarkus.netty (auto)
-   io.quarkus:quarkus-security-runtime-spi:jar:3.38.0:compile -- module quarkus.security.runtime.spi (auto)
-   io.quarkus:quarkus-smallrye-context-propagation:jar:3.38.0:compile -- module quarkus.smallrye.context.propagation (auto)
-   io.quarkus:quarkus-smallrye-health:jar:3.38.0:compile -- module quarkus.smallrye.health (auto)
-   io.quarkus:quarkus-test-common:jar:3.38.0:test -- module quarkus.test.common (auto)
-   io.quarkus:quarkus-tls-registry-spi:jar:3.38.0:compile -- module quarkus.tls.registry.spi (auto)
-   io.quarkus:quarkus-tls-registry:jar:3.38.0:compile -- module quarkus.tls.registry (auto)
-   io.quarkus:quarkus-value-registry:jar:3.38.0:compile -- module quarkus.value.registry (auto)
-   io.quarkus:quarkus-vertx-http:jar:3.38.0:compile -- module quarkus.vertx.http (auto)
-   io.quarkus:quarkus-vertx-latebound-mdc-provider:jar:3.38.0:compile -- module quarkus.vertx.latebound.mdc.provider (auto)
-   io.quarkus:quarkus-vertx:jar:3.38.0:compile -- module quarkus.vertx (auto)
-   io.quarkus:quarkus-virtual-threads:jar:3.38.0:compile -- module quarkus.virtual.threads (auto)
-   io.rest-assured:json-path:jar:6.0.0:test -- module json.path (auto)
-   io.rest-assured:rest-assured-common:jar:6.0.0:test -- module rest.assured.common (auto)
-   io.rest-assured:rest-assured:jar:6.0.0:test -- module rest.assured (auto)
-   io.rest-assured:xml-path:jar:6.0.0:test -- module xml.path (auto)
+   io.quarkus:quarkus-hibernate-validator-spi:jar:3.38.1:test -- module quarkus.hibernate.validator.spi (auto)
+   io.quarkus:quarkus-hibernate-validator:jar:3.38.1:compile -- module quarkus.hibernate.validator (auto)
+   io.quarkus:quarkus-ide-launcher:jar:3.38.1:compile -- module io.quarkus.launcher [auto]
+   io.quarkus:quarkus-jackson:jar:3.38.1:compile -- module quarkus.jackson (auto)
+   io.quarkus:quarkus-jacoco:jar:3.38.1:test -- module quarkus.jacoco (auto)
+   io.quarkus:quarkus-jaxp:jar:3.38.1:compile -- module quarkus.jaxp (auto)
+   io.quarkus:quarkus-jsonp:jar:3.38.1:compile -- module quarkus.jsonp (auto)
+   io.quarkus:quarkus-junit-common:jar:3.38.1:test -- module quarkus.junit.common (auto)
+   io.quarkus:quarkus-junit-config:jar:3.38.1:test -- module quarkus.junit.config (auto)
+   io.quarkus:quarkus-junit:jar:3.38.1:test -- module quarkus.junit (auto)
+   io.quarkus:quarkus-micrometer-registry-prometheus:jar:3.38.1:compile -- module quarkus.micrometer.registry.prometheus (auto)
+   io.quarkus:quarkus-micrometer:jar:3.38.1:compile -- module quarkus.micrometer (auto)
+   io.quarkus:quarkus-mutiny:jar:3.38.1:compile -- module quarkus.mutiny (auto)
+   io.quarkus:quarkus-netty:jar:3.38.1:compile -- module quarkus.netty (auto)
+   io.quarkus:quarkus-security-runtime-spi:jar:3.38.1:compile -- module quarkus.security.runtime.spi (auto)
+   io.quarkus:quarkus-smallrye-context-propagation:jar:3.38.1:compile -- module quarkus.smallrye.context.propagation (auto)
+   io.quarkus:quarkus-smallrye-health:jar:3.38.1:compile -- module quarkus.smallrye.health (auto)
+   io.quarkus:quarkus-test-common:jar:3.38.1:test -- module quarkus.test.common (auto)
+   io.quarkus:quarkus-tls-registry-spi:jar:3.38.1:compile -- module quarkus.tls.registry.spi (auto)
+   io.quarkus:quarkus-tls-registry:jar:3.38.1:compile -- module quarkus.tls.registry (auto)
+   io.quarkus:quarkus-value-registry:jar:3.38.1:compile -- module quarkus.value.registry (auto)
+   io.quarkus:quarkus-vertx-http:jar:3.38.1:compile -- module quarkus.vertx.http (auto)
+   io.quarkus:quarkus-vertx-latebound-mdc-provider:jar:3.38.1:compile -- module quarkus.vertx.latebound.mdc.provider (auto)
+   io.quarkus:quarkus-vertx:jar:3.38.1:compile -- module quarkus.vertx (auto)
+   io.quarkus:quarkus-virtual-threads:jar:3.38.1:compile -- module quarkus.virtual.threads (auto)
+   io.rest-assured:json-path:jar:6.0.1:test -- module json.path (auto)
+   io.rest-assured:rest-assured-common:jar:6.0.1:test -- module rest.assured.common (auto)
+   io.rest-assured:rest-assured:jar:6.0.1:test -- module rest.assured (auto)
+   io.rest-assured:xml-path:jar:6.0.1:test -- module xml.path (auto)
    io.smallrye.beanbag:smallrye-beanbag-maven:jar:1.6.1:test -- module io.smallrye.beanbag.maven [auto]
    io.smallrye.beanbag:smallrye-beanbag-sisu:jar:1.6.1:test -- module io.smallrye.beanbag.sisu
    io.smallrye.beanbag:smallrye-beanbag:jar:1.6.1:test -- module io.smallrye.beanbag
@@ -171,12 +171,12 @@ The following files have been resolved:
    net.bytebuddy:byte-buddy-agent:jar:1.18.8:test -- module net.bytebuddy.agent
    net.bytebuddy:byte-buddy:jar:1.18.8:test -- module net.bytebuddy
    net.java.dev.jna:jna:jar:5.8.0:test -- module com.sun.jna [auto]
-   org.aesh:aesh:jar:3.16.4:test -- module org.aesh.aesh [auto]
-   org.aesh:readline-api:jar:3.16.2:test -- module org.aesh.readline.api [auto]
-   org.aesh:readline:jar:3.16.2:test -- module org.aesh.readline [auto]
-   org.aesh:terminal-api:jar:3.16.2:test -- module org.aesh.terminal.api [auto]
-   org.aesh:terminal-detect:jar:3.16.2:test -- module org.aesh.terminal.detect [auto]
-   org.aesh:terminal-tty:jar:3.16.2:test -- module org.aesh.terminal.tty [auto]
+   org.aesh:aesh:jar:3.16.6:test -- module org.aesh.aesh [auto]
+   org.aesh:readline-api:jar:3.16.3:test -- module org.aesh.readline.api [auto]
+   org.aesh:readline:jar:3.16.3:test -- module org.aesh.readline [auto]
+   org.aesh:terminal-api:jar:3.16.3:test -- module org.aesh.terminal.api [auto]
+   org.aesh:terminal-detect:jar:3.16.3:test -- module org.aesh.terminal.detect [auto]
+   org.aesh:terminal-tty:jar:3.16.3:test -- module org.aesh.terminal.tty [auto]
    org.apache.camel.quarkus:camel-quarkus-bean-validator:jar:3.38.0:compile -- module camel.quarkus.bean.validator (auto)
    org.apache.camel.quarkus:camel-quarkus-bean:jar:3.38.0:compile -- module camel.quarkus.bean (auto)
    org.apache.camel.quarkus:camel-quarkus-core:jar:3.38.0:compile -- module camel.quarkus.core (auto)
@@ -245,7 +245,7 @@ The following files have been resolved:
    org.apache.camel:camel-xslt:jar:4.21.0:test -- module camel.xslt (auto)
    org.apache.commons:commons-compress:jar:1.28.0:test -- module org.apache.commons.compress
    org.apache.commons:commons-lang3:jar:3.20.0:compile -- module org.apache.commons.lang3
-   org.apache.cxf:cxf-core:jar:4.2.2:compile -- module org.apache.cxf.core [auto]
+   org.apache.cxf:cxf-core:jar:4.2.3:compile -- module org.apache.cxf.core [auto]
    org.apache.groovy:groovy-json:jar:5.0.7:test -- module org.apache.groovy.json [auto]
    org.apache.groovy:groovy-xml:jar:5.0.7:test -- module org.apache.groovy.xml [auto]
    org.apache.groovy:groovy:jar:5.0.7:test -- module org.apache.groovy [auto]
@@ -260,14 +260,10 @@ The following files have been resolved:
    org.apache.maven.resolver:maven-resolver-impl:jar:1.9.27:test -- module org.apache.maven.resolver.impl [auto]
    org.apache.maven.resolver:maven-resolver-named-locks:jar:1.9.27:test -- module org.apache.maven.resolver.named.locks [auto]
    org.apache.maven.resolver:maven-resolver-spi:jar:1.9.27:test -- module org.apache.maven.resolver.spi [auto]
-   org.apache.maven.resolver:maven-resolver-transport-http:jar:1.9.25:test -- module org.apache.maven.resolver.transport.http [auto]
-   org.apache.maven.resolver:maven-resolver-transport-wagon:jar:1.9.27:test -- module org.apache.maven.resolver.transport.wagon [auto]
+   org.apache.maven.resolver:maven-resolver-transport-file:jar:1.9.27:test -- module org.apache.maven.resolver.transport.file [auto]
+   org.apache.maven.resolver:maven-resolver-transport-http:jar:1.9.27:test -- module org.apache.maven.resolver.transport.http [auto]
    org.apache.maven.resolver:maven-resolver-util:jar:1.9.27:test -- module org.apache.maven.resolver.util [auto]
    org.apache.maven.shared:maven-shared-utils:jar:3.4.2:test -- module maven.shared.utils (auto)
-   org.apache.maven.wagon:wagon-file:jar:3.5.3:test -- module wagon.file (auto)
-   org.apache.maven.wagon:wagon-http-shared:jar:3.5.3:test -- module wagon.http.shared (auto)
-   org.apache.maven.wagon:wagon-http:jar:3.5.3:test -- module wagon.http (auto)
-   org.apache.maven.wagon:wagon-provider-api:jar:3.5.3:test -- module wagon.provider.api (auto)
    org.apache.maven:maven-api-meta:jar:4.0.0-alpha-7:test -- module maven.api.meta (auto)
    org.apache.maven:maven-api-xml:jar:4.0.0-alpha-7:test -- module maven.api.xml (auto)
    org.apache.maven:maven-artifact:jar:3.9.16:test -- module maven.artifact (auto)
@@ -310,7 +306,7 @@ The following files have been resolved:
    org.graalvm.sdk:word:jar:23.1.2:test -- module org.graalvm.word
    org.hamcrest:hamcrest:jar:2.2:test -- module org.hamcrest [auto]
    org.hdrhistogram:HdrHistogram:jar:2.2.2:compile -- module HdrHistogram (auto)
-   org.hibernate.validator:hibernate-validator:jar:9.1.2.Final:compile -- module org.hibernate.validator
+   org.hibernate.validator:hibernate-validator:jar:9.1.3.Final:compile -- module org.hibernate.validator
    org.jacoco:org.jacoco.agent:jar:0.8.15:test -- module org.jacoco.agent [auto]
    org.jacoco:org.jacoco.agent:jar:runtime:0.8.15:test -- module org.jacoco.agent.rt [auto]
    org.jacoco:org.jacoco.core:jar:0.8.15:test -- module org.jacoco.core [auto]
