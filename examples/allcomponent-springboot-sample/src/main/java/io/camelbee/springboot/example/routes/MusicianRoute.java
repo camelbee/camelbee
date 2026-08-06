@@ -16,6 +16,7 @@
 
 package io.camelbee.springboot.example.routes;
 
+import io.camelbee.springboot.example.bean.FlakyProcessor;
 import io.camelbee.springboot.example.constants.Constants;
 import io.camelbee.springboot.example.exception.ExceptionHandler;
 import io.camelbee.springboot.example.model.jpa.SongEntity;
@@ -58,7 +59,13 @@ public class MusicianRoute extends RouteBuilder {
     from("direct:getMusician").routeId("getMusicianRoute")
         .to(MUSICIAN_PROCESSOR_ROUTE);
 
+    /*
+     The file consumer hands over a GenericFile body, which Jackson cannot serialize (it walks into
+     GenericFile#getBinding and fails). The pipeline marshals to json in invokeHttpBinRoute, so read
+     the file content out here - every other consumer already feeds the pipeline a serializable body.
+     */
     from("file://inputdir/?delete=true").routeId("fileListenerRoute")
+        .convertBodyTo(String.class)
         .to(MUSICIAN_PROCESSOR_ROUTE);
 
     from("timer://foo?fixedRate=true&period=500000").routeId("timerRoute")
@@ -106,7 +113,10 @@ public class MusicianRoute extends RouteBuilder {
         .dynamicRouter(method(this, "computeEndpoint"))
         .removeHeaders("*")
         .toD("direct:invokeRabbitMq")
-        .pollEnrich("jms:queue:camelbee-southhbound-queue", 20000, (original, resource) -> resource)
+        // invokeJmsRoute put a message on this queue a few steps up, so the timeout is only a
+        // safety net - keep it short, every exchange in the pipeline waits on it
+        .pollEnrich("jms:queue:camelbee-southhbound-queue", 1000, (original, resource) -> resource)
+        .to("direct:invokeFlaky").id("flakyBridgeEndpoint")
         .to("direct:invokeHttpBinError");
 
     from("direct:invokeHttpBin").routeId("invokeHttpBinRoute")
@@ -157,6 +167,20 @@ public class MusicianRoute extends RouteBuilder {
         .convertBodyTo(String.class)
         .to("file://outputdir")
         .id("fileEndpoint");
+
+    /*
+     Transient failure: the caller's dead-letter channel redelivers this send twice before it
+     succeeds, so a single exchange produces three request/response pairs on the same edge in the
+     CamelBee UI. Self-contained on purpose - it does not need one of the real backends to be down.
+     */
+    from("direct:invokeFlaky").routeId("invokeFlakyRoute")
+        .to("direct:flakyTarget?block=true").id("flakyEndpoint");
+
+    from("direct:flakyTarget").routeId("flakyTargetRoute")
+        // no error handler here, so the failure propagates to the caller and IT redelivers the send
+        .errorHandler(noErrorHandler())
+        .bean(FlakyProcessor.class, "maybeFail")
+        .to("mock:flaky").id("flakyMockEndpoint");
 
     from("direct:invokeMockA").routeId("invokeMockARoute")
         .setBody(constant("invokedMockABody"))

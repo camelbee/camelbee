@@ -47,6 +47,11 @@ services:
       ARTEMIS_USER: artemis
       ARTEMIS_PASSWORD: artemis
       ANONYMOUS_LOGIN: true
+    volumes:
+      # The entrypoint copies every file in etc-override into the broker's etc/ directory right
+      # after it creates the instance. See artemis/broker.properties for why the disk limit is
+      # raised.
+      - ./artemis:/var/lib/artemis-instance/etc-override:ro
     ports:
       - 8161:8161
       - 9404:9404
