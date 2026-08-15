@@ -43,7 +43,9 @@ public class CamelBeeRouteConfigurer {
   private boolean routeConfigurerEnabled;
 
   /**
-   * Needed by the poll tracing strategy, which records hops Camel emits no events for.
+   * Needed by both intercept strategies: the poll tracing strategy, which records hops Camel emits
+   * no events for, and the node-id strategy, which checks {@link TracerService#isActive()} before
+   * doing any per-node work.
    *
    * <p>Required: a CamelBee application always has the tracer graph. Sliced test contexts that
    * import this configurer on its own - {@code @SpringBootTest(classes = ...)}, which component
@@ -87,7 +89,7 @@ public class CamelBeeRouteConfigurer {
 
     if (!alreadyRegistered) {
       routeBuilder.getContext().getCamelContextExtension()
-          .addInterceptStrategy(new NodeIdInterceptStrategy());
+          .addInterceptStrategy(new NodeIdInterceptStrategy(tracerService));
     }
   }
 

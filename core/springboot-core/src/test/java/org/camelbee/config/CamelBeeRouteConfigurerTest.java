@@ -25,6 +25,7 @@ import org.apache.camel.RoutesBuilder;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.spring.junit6.CamelSpringBootTest;
+import org.camelbee.debugger.controller.ContextController;
 import org.camelbee.debugger.service.MessageService;
 import org.camelbee.debugger.service.RouteContextService;
 import org.camelbee.logging.LoggingService;
@@ -54,7 +55,10 @@ import org.springframework.test.context.TestPropertySource;
     ExchangeSendingEventTracer.class,
     ExchangeSentEventTracer.class,
     ExchangeCompletedEventTracer.class,
-    RouteContextService.class
+    RouteContextService.class,
+    // Conditional beans still honour their own @ConditionalOnProperty when imported this way - see
+    // shouldNotRegisterContextControllerWhenContextEnabledIsUnset.
+    ContextController.class
 })
 @Configuration
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -74,6 +78,14 @@ class CamelBeeRouteConfigurerTest {
 
   @EndpointInject("mock:test")
   MockEndpoint mockEndpoint;
+
+  /**
+   * required = false rather than a plain {@code @Autowired ContextController} so a missing bean is
+   * an assertion, not a context startup failure - see
+   * {@link #shouldNotRegisterContextControllerWhenContextEnabledIsUnset}.
+   */
+  @Autowired(required = false)
+  ContextController contextController;
 
   @Configuration
   static class TestConfig {
@@ -147,6 +159,21 @@ class CamelBeeRouteConfigurerTest {
         .as("both strategies are registered by configureRoute")
         .anySatisfy(strategy -> assertThat(strategy).isInstanceOf(NodeIdInterceptStrategy.class))
         .anySatisfy(strategy -> assertThat(strategy).isInstanceOf(PollInterceptStrategy.class));
+  }
+
+  /**
+   * {@code camelbee.context-enabled} is never set here - only {@code tracer-enabled} is, via
+   * {@code @TestPropertySource} above - so this proves its actual default under a real Spring
+   * context: fails closed, same as {@code camelbee.tracer-enabled} - a consumer who forgets to set
+   * it gets no CamelBee endpoints at all rather than an unintentionally exposed one.
+   * {@code @ConditionalOnProperty}'s own default ({@code matchIfMissing = false}) is what makes this
+   * true; a future edit accidentally adding {@code matchIfMissing = true} to
+   * {@link ContextController} would silently flip this for every consumer that doesn't set the
+   * property, and this is the one test that would catch it.
+   */
+  @Test
+  void shouldNotRegisterContextControllerWhenContextEnabledIsUnset() {
+    assertThat(contextController).isNull();
   }
 
 }

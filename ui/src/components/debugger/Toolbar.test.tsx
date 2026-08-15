@@ -67,19 +67,8 @@ describe('Toolbar', () => {
   });
 });
 
-describe('Toolbar — dynamic hops', () => {
-  it('shows nothing when the static topology covered every hop', () => {
-    renderWithProviders(<Toolbar context={context} dynamicHopCount={0} />);
-    expect(screen.queryByText(/dynamic hop/)).not.toBeInTheDocument();
-  });
-
-  it('reports hops that had to be drawn from traffic', () => {
-    renderWithProviders(<Toolbar context={context} dynamicHopCount={6} />);
-    expect(screen.getByText('6 dynamic hops')).toBeInTheDocument();
-  });
-
-  it('uses the singular for one hop', () => {
-    renderWithProviders(<Toolbar context={context} dynamicHopCount={1} />);
-    expect(screen.getByText('1 dynamic hop')).toBeInTheDocument();
-  });
-});
+// The "N dynamic hops" toolbar badge was removed 2026-08-15 - it treated "an EIP that's
+// inherently impossible to know statically" (e.g. dynamicRouter) the same as "the tracer got
+// something wrong", so it fired on every route using such an EIP and taught users to ignore it.
+// The dynamically-created node/edge/message flow itself is unaffected - see RouteGraph.test.tsx
+// and DebuggerPage's dynamicEdges tracking, which MessagePanel still relies on.

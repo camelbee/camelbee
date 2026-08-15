@@ -23,6 +23,8 @@ export interface RouteNodeData {
   description?: string;
   /** Full input URI, for the hover tooltip. */
   inputUri?: string;
+  /** Full, untruncated URI for a producer (external endpoint) node - the label is truncated. */
+  fullUri?: string;
   /** Error-handler target input URI, for the hover tooltip. */
   errorHandler?: string;
   isRest?: boolean;
@@ -50,6 +52,12 @@ export interface MessageEdgeData {
   /** Average/max elapsed ms across SENT messages on this edge (roadmap #9). */
   avgTimeTaken?: number;
   maxTimeTaken?: number;
+  /**
+   * Number of individual REQUEST attempts on this edge, set only when it exceeds messageCount -
+   * i.e. a redelivery retried the same exchange (roadmap #18). messageCount stays a distinct-
+   * exchange/throughput count; this is the separate "there were retries here" signal.
+   */
+  retryCount?: number;
   [key: string]: unknown;
 }
 
@@ -149,17 +157,18 @@ function truncateLabel(label: string, max = 32): string {
 
 /**
  * Build a human-readable label for a route node.
- * Roadmap #1+15: prefer the route's <description> when present (id/URI fallback).
+ *
+ * Roadmap #1+15 originally preferred the route's `<description>` here, with the id only on
+ * hover. Reverted (2026-08-15, user decision): a truncated description reads as an awkward
+ * prose fragment in a dense graph, and is harder to scan / cross-reference against the route id
+ * used in the Java source than the id itself. The id is now always the label; the description
+ * (when present) still shows in full on hover (see `buildTooltip` in RouteNode.tsx).
  */
 function routeLabel(route: CamelRoute): string {
-  if (route.routeDescription) {
-    return route.rest
-      ? `REST ${truncateLabel(route.routeDescription)}`
-      : truncateLabel(route.routeDescription);
-  }
   const inputUri = extractInputUri(route.input);
   if (route.rest) return `REST ${route.id}`;
-  // If route ID is auto-generated (e.g. "route1", "route2"), use the input URI
+  // If route ID is auto-generated (e.g. "route1", "route2"), use the input URI instead - it's
+  // more identifying than a meaningless generated id.
   if (/^route\d+$/i.test(route.id)) return truncateLabel(inputUri);
   return truncateLabel(route.id);
 }
@@ -238,6 +247,7 @@ export function buildRouteGraph(context: CamelBeeContext): {
         label: truncateLabel(uri),
         componentType: extractComponentType(uri),
         kind: 'producer',
+        fullUri: uri,
       },
     });
     return nodeId;

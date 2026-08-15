@@ -31,6 +31,9 @@ import org.apache.camel.spi.CamelEvent;
 import org.apache.camel.support.DefaultExchange;
 import org.apache.camel.support.EventNotifierSupport;
 import org.camelbee.constants.CamelBeeConstants;
+import org.camelbee.debugger.service.MessageService;
+import org.camelbee.debugger.service.RouteContextService;
+import org.camelbee.logging.LoggingService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -41,7 +44,20 @@ import org.mockito.Mockito;
  */
 class NodeIdInterceptStrategyTest {
 
-  private final NodeIdInterceptStrategy strategy = new NodeIdInterceptStrategy();
+  private final NodeIdInterceptStrategy strategy = new NodeIdInterceptStrategy(tracerService(true));
+
+  /** loggingEnabled alone is enough to make {@link TracerService#isActive()} true or false. */
+  private static TracerService tracerService(boolean active) {
+    MessageService messageService = new MessageService(1000);
+    RouteContextService routeContextService = Mockito.mock(RouteContextService.class);
+    return new TracerService(active, false, 60000,
+        new ExchangeCreatedEventTracer(),
+        new ExchangeSendingEventTracer(messageService, routeContextService),
+        new ExchangeSentEventTracer(),
+        new ExchangeCompletedEventTracer(),
+        messageService,
+        new LoggingService());
+  }
 
   @Test
   void stampsTheNodeIdWhileTheNodeRunsAndRestoresItAfterwards() throws Exception {
@@ -78,6 +94,27 @@ class NodeIdInterceptStrategyTest {
       wrapped.process(exchange);
 
       assertThat(exchange.getProperty(CamelBeeConstants.CAMELBEE_NODE_ID)).isEqualTo("outer");
+    }
+  }
+
+  @Test
+  void doesNothingWhenNeitherLoggingNorTracingIsActive() throws Exception {
+    NamedNode node = Mockito.mock(NamedNode.class);
+    Mockito.when(node.getId()).thenReturn("to1");
+
+    NodeIdInterceptStrategy inactiveStrategy = new NodeIdInterceptStrategy(tracerService(false));
+    List<String> seenDuringProcessing = new ArrayList<>();
+    Processor target = exchange -> seenDuringProcessing.add(exchange.getProperty(CamelBeeConstants.CAMELBEE_NODE_ID, String.class));
+
+    try (CamelContext context = new DefaultCamelContext()) {
+      Processor wrapped = inactiveStrategy.wrapProcessorInInterceptors(context, node, target, null);
+      Exchange exchange = new DefaultExchange(context);
+
+      wrapped.process(exchange);
+
+      // the target still runs (the strategy must not affect routing), but sees no node id at all -
+      // nothing would have read it anyway with both logging and tracing off
+      assertThat(seenDuringProcessing).containsExactly((String) null);
     }
   }
 

@@ -19,6 +19,7 @@ package org.camelbee.debugger.service;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
@@ -106,10 +107,13 @@ public class MessageService {
     List<Message> messages = new ArrayList<>();
 
     if (this.addVersion.get() != addVersion || this.resetVersion.get() != resetVersion) {
-      List<Message> allMessages = getMessageList();
+      // messageList is a CopyOnWriteArrayList; subList() returns a live view that throws
+      // ConcurrentModificationException if addMessage() mutates the list while it's in use.
+      // toArray() is an atomic snapshot, so slice that instead.
+      Message[] snapshot = getMessageList().toArray(new Message[0]);
 
-      if (fromIndex >= 0 && fromIndex < allMessages.size()) {
-        messages = new ArrayList<>(allMessages.subList(fromIndex, allMessages.size()));
+      if (fromIndex >= 0 && fromIndex < snapshot.length) {
+        messages = new ArrayList<>(Arrays.asList(snapshot).subList(fromIndex, snapshot.length));
       }
     }
 

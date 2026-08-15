@@ -49,8 +49,19 @@ import org.camelbee.constants.CamelBeeConstants;
  * <p>Note this does not fix every case: a {@code routingSlip} or {@code dynamicRouter} continuation
  * hop is sent after the previous callee route has run, so the property still names that callee's last
  * node. Those remain resolved by URI matching in the UI.
+ *
+ * <p>The id is only consumed by the event tracers, which are themselves no-ops unless
+ * {@link TracerService#isActive()} - so this strategy checks the same flag before touching the
+ * exchange at all: with both logging and tracing off, every node in every route would otherwise pay
+ * for a property read and write that has no reader.
  */
 public class NodeIdInterceptStrategy implements InterceptStrategy {
+
+  private final TracerService tracerService;
+
+  public NodeIdInterceptStrategy(TracerService tracerService) {
+    this.tracerService = tracerService;
+  }
 
   @Override
   public Processor wrapProcessorInInterceptors(CamelContext camelContext, NamedNode definition,
@@ -67,6 +78,10 @@ public class NodeIdInterceptStrategy implements InterceptStrategy {
 
       @Override
       public boolean process(Exchange exchange, AsyncCallback callback) {
+        if (!tracerService.isActive()) {
+          return processor.process(exchange, callback);
+        }
+
         final Object enclosing = exchange.getProperty(CamelBeeConstants.CAMELBEE_NODE_ID);
         exchange.setProperty(CamelBeeConstants.CAMELBEE_NODE_ID, nodeId);
 

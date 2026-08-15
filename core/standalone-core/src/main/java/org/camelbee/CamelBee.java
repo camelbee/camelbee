@@ -110,9 +110,6 @@ public final class CamelBee {
       camelContext.setStreamCaching(true);
       camelContext.setUseMDCLogging(true);
       camelContext.getCamelContextExtension().addContextPlugin(UnitOfWorkFactory.class, CamelBeeUnitOfWork::new);
-      // Must be added before the routes are reified, which is why it lives here and not with the
-      // event notifier below: intercept strategies are consulted while each processor is built.
-      camelContext.getCamelContextExtension().addInterceptStrategy(new NodeIdInterceptStrategy());
     } else {
       LOGGER.debug("CamelBee route configuration disabled via camelbee.route-configurer-enabled=false");
     }
@@ -130,10 +127,13 @@ public final class CamelBee {
         config.getTracerMaxIdleTime(), createdTracer, sendingTracer, sentTracer, completedTracer, messageService,
         loggingService);
 
-    // poll()/pollEnrich() emit no Camel events, so the hop is reconstructed from the node itself.
-    // Like every intercept strategy this has to be added before the routes are reified; it is here
-    // rather than beside NodeIdInterceptStrategy only because it needs the tracerService.
+    // Both intercept strategies must be added before the routes are reified, which is why they live
+    // here rather than beside setStreamCaching/setUseMDCLogging above - they need tracerService, which
+    // doesn't exist yet at that point. NodeIdInterceptStrategy uses it to skip its per-node property
+    // work once isActive() is false; PollInterceptStrategy uses it to trace poll()/pollEnrich() hops,
+    // which Camel emits no events for.
     if (config.isRouteConfigurerEnabled()) {
+      camelContext.getCamelContextExtension().addInterceptStrategy(new NodeIdInterceptStrategy(tracerService));
       camelContext.getCamelContextExtension().addInterceptStrategy(new PollInterceptStrategy(tracerService));
     }
 

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { MessageEdge, MessageEdgeData } from './routeGraph';
-import { matchMessageToEdge, buildInteractionsForEdge } from './messageMatching';
+import { matchMessageToEdge, buildInteractionsForEdge, computeEdgeStats } from './messageMatching';
 import { makeMessage } from '@/test/factories';
 
 function edge(data: Partial<MessageEdgeData>, id = 'e1'): MessageEdge {
@@ -309,5 +309,96 @@ describe('buildInteractionsForEdge', () => {
     const messages = [makeMessage({ exchangeId: 'A', endpointId: 'out-1', messageType: 'REQUEST' })];
 
     expect(buildInteractionsForEdge(messages, e)).toHaveLength(1);
+  });
+});
+
+describe('computeEdgeStats', () => {
+  /**
+   * The bug this whole suite guards: mock:C and mock:D in the sample route are each targeted by
+   * TWO different EIPs (a routingSlip AND a dynamicRouter/toD), so the SAME exchange legitimately
+   * sends two clean REQUESTs to the SAME edge with no failure at all. A naive "requestCount >
+   * exchangeCount" heuristic flags that as a retry; it must not be.
+   */
+  it('does not flag a clean multi-hit edge (same exchange, two EIPs, no error) as a retry', () => {
+    const e = edge({ outputId: 'out-1' });
+    const messages = [
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'REQUEST' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'RESPONSE' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'REQUEST' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'RESPONSE' }),
+    ];
+
+    const stats = computeEdgeStats(messages, [e]);
+
+    expect(stats.get('e1')).toMatchObject({ messageCount: 1, hasError: false, retryCount: undefined });
+  });
+
+  it('flags a genuine redelivery (same exchange, a failure then a retry) with the attempt count', () => {
+    const e = edge({ outputId: 'out-1' });
+    const messages = [
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'REQUEST' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'ERROR_RESPONSE' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'REQUEST' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'ERROR_RESPONSE' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'REQUEST' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'RESPONSE' }),
+    ];
+
+    const stats = computeEdgeStats(messages, [e]);
+
+    expect(stats.get('e1')).toMatchObject({ messageCount: 1, hasError: true, retryCount: 3 });
+  });
+
+  it('does not flag a single clean REQUEST as a retry', () => {
+    const e = edge({ outputId: 'out-1' });
+    const messages = [
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'REQUEST' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'RESPONSE' }),
+    ];
+
+    expect(computeEdgeStats(messages, [e]).get('e1')?.retryCount).toBeUndefined();
+  });
+
+  it('ignores an error on a DIFFERENT exchange when deciding whether another exchange retried', () => {
+    const e = edge({ outputId: 'out-1' });
+    const messages = [
+      // Exchange A: one clean hit.
+      makeMessage({ exchangeId: 'A', endpointId: 'out-1', messageType: 'REQUEST' }),
+      makeMessage({ exchangeId: 'A', endpointId: 'out-1', messageType: 'RESPONSE' }),
+      // Exchange B: fails once, no retry attempted (e.g. exhausted redeliveries).
+      makeMessage({ exchangeId: 'B', endpointId: 'out-1', messageType: 'REQUEST' }),
+      makeMessage({ exchangeId: 'B', endpointId: 'out-1', messageType: 'ERROR_RESPONSE' }),
+    ];
+
+    const stats = computeEdgeStats(messages, [e]);
+
+    expect(stats.get('e1')).toMatchObject({ messageCount: 2, hasError: true, retryCount: undefined });
+  });
+
+  it('computes avg/max timing only from SENT messages with a positive timeTaken', () => {
+    const e = edge({ outputId: 'out-1' });
+    const messages = [
+      makeMessage({
+        exchangeId: 'A',
+        endpointId: 'out-1',
+        messageType: 'RESPONSE',
+        exchangeEventType: 'SENT',
+        timeTaken: 20,
+      }),
+      makeMessage({
+        exchangeId: 'B',
+        endpointId: 'out-1',
+        messageType: 'RESPONSE',
+        exchangeEventType: 'SENT',
+        timeTaken: 60,
+      }),
+    ];
+
+    expect(computeEdgeStats(messages, [e]).get('e1')).toMatchObject({ avgTimeTaken: 40, maxTimeTaken: 60 });
+  });
+
+  it('returns no entry for an edge nothing matched', () => {
+    const e = edge({ outputId: 'out-1' });
+    expect(computeEdgeStats([], [e]).get('e1')).toBeUndefined();
   });
 });

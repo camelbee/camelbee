@@ -46,8 +46,8 @@ describe('buildRouteGraph', () => {
   });
 });
 
-// Roadmap #1+15 (route descriptions): description as node label, id fallback,
-// plus metadata for the RouteNode hover tooltip.
+// Roadmap #1+15 (route descriptions): id as node label (see routeLabel's doc comment for why
+// description was reverted from the label, 2026-08-15), description carried as tooltip metadata.
 describe('buildRouteGraph — route descriptions', () => {
   function contextWith(route: Partial<CamelBeeContext['routes'][number]>): CamelBeeContext {
     return {
@@ -65,28 +65,29 @@ describe('buildRouteGraph — route descriptions', () => {
     };
   }
 
-  it('uses routeDescription as the label when present', () => {
+  it('uses the route id as the label even when routeDescription is present, but still carries the description for the tooltip', () => {
     const { nodes } = buildRouteGraph(
       contextWith({ routeDescription: 'Handles widget requests' }),
     );
     const node = nodes.find((n) => n.data.routeId === 'widgetRoute')!;
-    expect(node.data.label).toBe('Handles widget requests');
+    expect(node.data.label).toBe('widgetRoute');
     expect(node.data.description).toBe('Handles widget requests');
   });
 
-  it('falls back to the route id when routeDescription is absent', () => {
+  it('has no description metadata when routeDescription is absent', () => {
     const { nodes } = buildRouteGraph(contextWith({}));
     const node = nodes.find((n) => n.data.routeId === 'widgetRoute')!;
     expect(node.data.label).toBe('widgetRoute');
     expect(node.data.description).toBeUndefined();
   });
 
-  it('prefixes REST when both rest and routeDescription are set', () => {
+  it('prefixes REST on the id label regardless of routeDescription', () => {
     const { nodes } = buildRouteGraph(
       contextWith({ rest: true, routeDescription: 'Order API' }),
     );
     const node = nodes.find((n) => n.data.routeId === 'widgetRoute')!;
-    expect(node.data.label).toBe('REST Order API');
+    expect(node.data.label).toBe('REST widgetRoute');
+    expect(node.data.description).toBe('Order API');
     expect(node.data.isRest).toBe(true);
   });
 
@@ -131,6 +132,10 @@ describe('buildRouteGraph — unconsumed internal endpoints', () => {
     expect(producer).toBeDefined();
     expect(producer!.data.kind).toBe('producer');
     expect(producer!.data.componentType).toBe('seda');
+    // The label is truncated for display; fullUri is what the tooltip shows on hover, so a long
+    // endpoint URI (e.g. http://host:port/long/path) isn't just re-shown truncated (bug found
+    // 2026-08-15 - the tooltip fell back to the already-truncated label with no full-URI field).
+    expect(producer!.data.fullUri).toBe('seda:southbound');
 
     expect(edges.some((e) => e.source === 'route-producerRoute' && e.target === 'producer-seda_southbound'))
       .toBe(true);

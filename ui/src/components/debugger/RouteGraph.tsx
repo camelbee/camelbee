@@ -23,7 +23,7 @@ import {
   type ActiveFlow,
 } from '@/utils/routeGraph';
 import { extractInputUri, extractComponentType } from '@/utils/endpointParser';
-import { matchMessageToEdge } from '@/utils/messageMatching';
+import { matchMessageToEdge, computeEdgeStats } from '@/utils/messageMatching';
 import { useDebuggerStore } from '@/store/debuggerStore';
 import { useIsDark } from '@/hooks/useTheme';
 import { RouteNode } from './RouteNode';
@@ -204,6 +204,7 @@ export function RouteGraph({ context, onDynamicEdgeAdded }: RouteGraphProps) {
               label: truncateLabel(producerUri),
               componentType,
               kind: 'producer',
+              fullUri: producerUri,
             },
           };
           const sourceNode = nodes.find((n) => n.id === sourceNodeId);
@@ -274,36 +275,16 @@ export function RouteGraph({ context, onDynamicEdgeAdded }: RouteGraphProps) {
   useEffect(() => {
     const sliced = filteredMessages.slice(0, timelineIndex);
 
-    // Build counts from the full slice
-    const counts = new Map<
-      string,
-      { exchanges: Set<string>; hasError: boolean; totalTimeTaken: number; timeTakenCount: number; maxTimeTaken: number }
-    >();
+    // First pass: make sure every message in the slice has a matching edge, creating dynamic
+    // ones as needed (this mutates graphEdgesRef.current / React state, so it can't be pure).
     for (const msg of sliced) {
-      let matched = matchMessageToEdge(msg, graphEdgesRef.current);
-      // If no static edge matched, try to create a dynamic one
-      if (!matched) {
-        matched = createDynamicEdge(msg);
-      }
-      if (matched) {
-        const entry = counts.get(matched.id) ?? {
-          exchanges: new Set(),
-          hasError: false,
-          totalTimeTaken: 0,
-          timeTakenCount: 0,
-          maxTimeTaken: 0,
-        };
-        entry.exchanges.add(msg.exchangeId);
-        if (msg.messageType === 'ERROR_RESPONSE') entry.hasError = true;
-        // Only SENT events carry a real elapsed time (roadmap #9).
-        if (msg.exchangeEventType === 'SENT' && msg.timeTaken > 0) {
-          entry.totalTimeTaken += msg.timeTaken;
-          entry.timeTakenCount += 1;
-          entry.maxTimeTaken = Math.max(entry.maxTimeTaken, msg.timeTaken);
-        }
-        counts.set(matched.id, entry);
+      if (!matchMessageToEdge(msg, graphEdgesRef.current)) {
+        createDynamicEdge(msg);
       }
     }
+
+    // Second pass: pure stats computation now that every message's edge exists.
+    const statsByEdge = computeEdgeStats(sliced, graphEdgesRef.current);
 
     // Detect new messages for flow animation (only when timeline actually changed)
     const newFlows = new Map<string, ActiveFlow[]>();
@@ -332,21 +313,18 @@ export function RouteGraph({ context, onDynamicEdgeAdded }: RouteGraphProps) {
 
     updateEdgeData((currentEdges) =>
       currentEdges.map((e) => {
-        const stats = counts.get(e.id);
-        const count = stats?.exchanges.size ?? 0;
-        const hasTiming = (stats?.timeTakenCount ?? 0) > 0;
+        const stats = statsByEdge.get(e.id);
         return {
           ...e,
           data: {
             ...e.data!,
-            messageCount: count,
+            messageCount: stats?.messageCount ?? 0,
             hasError: stats?.hasError ?? false,
-            animated: count > 0,
+            animated: (stats?.messageCount ?? 0) > 0,
             activeFlows: newFlows.get(e.id) ?? [],
-            avgTimeTaken: hasTiming
-              ? Math.round(stats!.totalTimeTaken / stats!.timeTakenCount)
-              : undefined,
-            maxTimeTaken: hasTiming ? stats!.maxTimeTaken : undefined,
+            avgTimeTaken: stats?.avgTimeTaken,
+            maxTimeTaken: stats?.maxTimeTaken,
+            retryCount: stats?.retryCount,
           },
         };
       }),

@@ -124,11 +124,13 @@ public class ExchangeSendingEventTracer {
 
     exchange.setProperty(CURRENT_ROUTE_NAME, currentRoute);
 
-    if (currentRouteProperty.startsWith(DIRECT)) {
+    final boolean currentRoutePropertyIsDirect = currentRouteProperty != null && currentRouteProperty.startsWith(DIRECT);
+
+    if (currentRoutePropertyIsDirect) {
       exchange.setProperty(LAST_DIRECT_ROUTE, currentRouteProperty);
     }
     String routeId = null;
-    if (endpointId == null && !currentRouteProperty.startsWith(DIRECT) && !currentRoute.startsWith(DIRECT)) {
+    if (endpointId == null && !currentRoutePropertyIsDirect && !currentRoute.startsWith(DIRECT)) {
       //dynamicRouter with 2 times producer endpoint next to each other like mock:D,mock:C
       //change Caller route find the previous directRouteName
       routeId = exchange.getProperty(LAST_DIRECT_ROUTE, String.class);
@@ -137,7 +139,7 @@ public class ExchangeSendingEventTracer {
     }
 
     // if custom error is thrown then we need to handle that one as well.
-    String errorMessage = TracerUtils.handleError(exchange);
+    String errorMessage = TracerUtils.handleError(exchange, currentRoute);
 
     return new Message(exchange.getExchangeId(), MessageEventType.SENDING, requestBody, requestHeaders, routeId,
         currentRoute, TracerUtils.resolveNodeId(exchange, endpointId), MessageType.REQUEST,

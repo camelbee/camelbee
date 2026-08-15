@@ -51,14 +51,16 @@ public final class CamelBeeConfig {
 
   /**
    * Builds the configuration from the given CamelContext's resolved properties, applying the
-   * same defaults as the Quarkus/Spring Boot cores.
+   * same defaults as the Quarkus/Spring Boot cores: everything that exposes the debug surface
+   * (topology, tracing) fails closed - off unless explicitly turned on - so an application that
+   * forgets to set {@code camelbee.*} in a given environment doesn't silently expose it there.
    *
    * @param camelContext the CamelContext whose PropertiesComponent supplies the values.
    * @return the resolved configuration.
    */
   public static CamelBeeConfig from(CamelContext camelContext) {
     return new CamelBeeConfig(
-        resolveBoolean(camelContext, "camelbee.context-enabled", true),
+        resolveBoolean(camelContext, "camelbee.context-enabled", false),
         resolveBoolean(camelContext, "camelbee.tracer-enabled", false),
         resolveBoolean(camelContext, "camelbee.logging-enabled", false),
         resolveBoolean(camelContext, "camelbee.notifier-enabled", true),

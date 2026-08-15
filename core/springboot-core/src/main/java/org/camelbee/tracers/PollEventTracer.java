@@ -79,7 +79,7 @@ public class PollEventTracer {
 
     final String responseBody = ExchangeUtils.readBodyAsString(exchange, false);
     final String headers = ExchangeUtils.getHeaders(exchange);
-    final String errorMessage = TracerUtils.handleError(exchange);
+    final String errorMessage = TracerUtils.handleError(exchange, polledEndpoint);
 
     Message request = new Message(exchange.getExchangeId(), MessageEventType.SENDING, requestBody,
         headers, callerRoute, polledEndpoint, nodeId, MessageType.REQUEST, null);

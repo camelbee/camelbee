@@ -21,7 +21,8 @@ test.describe('route topology', () => {
       'route-invokeEnrichRoute', 'route-invokeEnrichDynamicRoute',
       'route-invokeSedaRoute', 'route-invokeFileRoute',
       'route-invokeFlakyRoute', 'route-flakyTargetRoute',
-      'route-invokeAlwaysFailsRoute', 'route-boomRoute', 'route-deadLetterRoute',
+      'route-invokeAlwaysFailsRoute', 'route-boomRoute',
+      'route-invokeAlwaysFailsDlqRoute', 'route-boomDlqRoute', 'route-deadLetterRoute',
       'route-invokeMockARoute', 'route-invokeMockBRoute',
       'route-invokeMockCRoute', 'route-invokeMockDRoute',
     ];
@@ -104,16 +105,18 @@ test.describe('route topology', () => {
   });
 
   test('links every route that inherits the dead-letter channel to it', async ({ page }) => {
-    for (const routeId of ['musicianProcessorRoute', 'invokeFlakyRoute', 'timerRoute']) {
+    for (const routeId of ['musicianProcessorRoute', 'invokeFlakyRoute', 'timerRoute', 'invokeAlwaysFailsDlqRoute']) {
       await expect(
         page.getByTestId(edge(`edge-route-${routeId}-route-deadLetterRoute-errorHandler-${routeId}`)),
       ).toBeAttached();
     }
 
     // routes that opted out with noErrorHandler() have no such edge
-    await expect(
-      page.getByTestId(edge('edge-route-flakyTargetRoute-route-deadLetterRoute-errorHandler-flakyTargetRoute')),
-    ).toHaveCount(0);
+    for (const routeId of ['flakyTargetRoute', 'boomDlqRoute']) {
+      await expect(
+        page.getByTestId(edge(`edge-route-${routeId}-route-deadLetterRoute-errorHandler-${routeId}`)),
+      ).toHaveCount(0);
+    }
   });
 
   test('shows the runtime the UI is attached to', async ({ page }) => {
@@ -122,8 +125,16 @@ test.describe('route topology', () => {
     await expect(page.getByText(/^Camel \d+\./)).toBeVisible();
   });
 
-  test('labels a route with its description when it has one', async ({ page }) => {
-    await expect(page.getByTestId(node('route-invokeSedaRoute')))
-      .toContainText('Drains the internal queue');
+  /**
+   * A truncated description read as an awkward prose fragment and was harder to scan against the
+   * route id used in the Java source than the id itself, so the node label always shows the id -
+   * the description (when present) moves to the hover tooltip instead (see RouteNode.tsx).
+   */
+  test('labels a route with its id even when it has a description, which moves to the tooltip', async ({ page }) => {
+    const routeNode = page.getByTestId(node('route-invokeSedaRoute'));
+    await expect(routeNode).toContainText('invokeSedaRoute');
+    await expect(routeNode).not.toContainText('Drains the internal queue');
+    // the title attribute lives on RouteNode's own wrapper div, a child of React Flow's node div
+    await expect(routeNode.locator('[title]')).toHaveAttribute('title', /Drains the internal queue/);
   });
 });

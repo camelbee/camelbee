@@ -21,6 +21,7 @@ import io.camelbee.standalone.example.bean.MusicianProcessor;
 import io.camelbee.standalone.example.constants.Constants;
 import io.camelbee.standalone.example.model.Musician;
 import java.util.Map;
+import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 
 /**
@@ -38,7 +39,10 @@ import org.apache.camel.builder.RouteBuilder;
  * <li>{@code toD} with both a static and an expression-driven URI</li>
  * <li>producer {@code .id(...)} values, which are the primary message-to-edge matching key</li>
  * <li>route and output {@code .description(...)} text</li>
- * <li>a dead-letter channel plus redelivery, so both retried and failed exchanges are traced</li>
+ * <li>a dead-letter channel plus redelivery: a send that fails then recovers ({@code invokeFlaky}),
+ * and separately a send that fails permanently and exhausts redelivery, actually reaching the
+ * dead-letter channel itself ({@code invokeAlwaysFailsDlq}) - two distinct tracing shapes, since
+ * the first never touches {@code direct:deadLetter} at all</li>
  * <li>a genuinely remote (http) producer, pointed at this application's own REST port so it
  * still needs no external infrastructure</li>
  * </ul>
@@ -129,7 +133,25 @@ public class MusicianRoute extends RouteBuilder {
         .to("direct:invokeFlaky").id("flakyBridgeEndpoint")
         .pollEnrich(SOUTHBOUND_QUEUE, 200, (original, resource) -> original)
         .to("direct:invokeAlwaysFails")
-        .to("log:result");
+        .to("log:result")
+        // Required, not cosmetic: invokeFlaky's CamelRedeliveryCounter/CamelRedelivered headers
+        // (exhausted at 2 by the time it succeeds) survive on the exchange otherwise. Camel's
+        // error handler reads them as this exchange's redelivery state for ANY later failure, not
+        // just flaky's own - without clearing them here, invokeAlwaysFailsDlq's first failure
+        // below is treated as already at max redeliveries and skips straight to the dead-letter
+        // channel with zero actual retries, silently defeating maximumRedeliveries(2) for it.
+        // Exchange.EXCEPTION_CAUGHT is a separate leak: it's an exchange PROPERTY (not a header,
+        // so removeHeaders never touches it), set by invokeAlwaysFails's doCatch when it caught
+        // boomRoute's earlier, unrelated failure. Left in place, the tracer's identity-based
+        // dedup (TracerUtils.handleError) matches this new route's first failure against that
+        // stale, already-reported exception and silently drops it as an ERROR_RESPONSE.
+        .removeHeaders("*")
+        .removeProperty(Exchange.EXCEPTION_CAUGHT)
+        // Deliberately the LAST step: once DeadLetterChannel exhausts redeliveries and routes the
+        // exchange to the dead-letter endpoint, it marks the exchange handled AND stops further
+        // processing in the route that failed (standard Camel semantics, not a bug) - any step
+        // placed after this one would never run.
+        .to("direct:invokeAlwaysFailsDlq").id("dlqBridgeEndpoint");
 
     // Remote producer: calls this application's own REST port, so the topology gets a real
     // http hop (and a real remote exchange) with nothing external to install. The {{...}}
@@ -191,6 +213,25 @@ public class MusicianRoute extends RouteBuilder {
     from("direct:boom").routeId("boomRoute")
         .errorHandler(noErrorHandler())
         .throwException(new IllegalStateException("simulated permanent failure"));
+
+    // Permanent failure via the GLOBAL error handler (no local override, unlike invokeAlwaysFails
+    // above): exhausts the 2 configured redeliveries and lands in the dead-letter channel - the
+    // one tracing shape invokeFlaky (always recovers by attempt 3) and invokeAlwaysFails (caught
+    // locally, never reaches the dead-letter channel at all) don't exercise.
+    from("direct:invokeAlwaysFailsDlq").routeId("invokeAlwaysFailsDlqRoute")
+        .description("Always fails, exhausts redelivery - lands in the dead-letter channel")
+        .to("direct:boomDlq").id("boomDlqEndpoint");
+
+    from("direct:boomDlq").routeId("boomDlqRoute")
+        // no error handler here either, so the failure propagates to the caller and IT redelivers.
+        // A fresh exception per attempt, not throwException(new ...) - that expression is
+        // evaluated once at route-build time, so every redelivery would throw the exact same
+        // instance and the tracer's identity-based dedup (see TracerUtils.handleError) would
+        // mistake each retry's failure for an already-reported one.
+        .errorHandler(noErrorHandler())
+        .process(exchange -> {
+          throw new IllegalStateException("simulated dead-letter failure");
+        });
 
     from("direct:deadLetter").routeId("deadLetterRoute")
         .description("Dead-letter channel target")

@@ -37,6 +37,7 @@ import org.camelbee.constants.CamelBeeConstants;
 import org.camelbee.debugger.model.exchange.MessageListInfo;
 import org.camelbee.debugger.model.exchange.MessageListWithInfo;
 import org.camelbee.debugger.model.route.CamelRoute;
+import org.camelbee.debugger.model.route.CamelRouteOutput;
 import org.camelbee.debugger.service.MessageService;
 import org.camelbee.debugger.service.RouteContextService;
 import org.camelbee.tracers.TracerService;
@@ -113,6 +114,34 @@ class CamelBeeHttpEndpointsTest {
     assertTrue(json.contains("route1"), json);
     assertTrue(json.contains("4.20.0"), json);
     assertTrue(json.contains("Test Vendor - 21.0.1"), json);
+  }
+
+  /**
+   * The single {@code getRoutes} test above already covers {@code outputs=null}; this one proves
+   * the opposite edge - a nested output (an EIP like {@code choice} carrying its own child outputs)
+   * survives Jackson serialization, not just the flat top-level fields.
+   */
+  @Test
+  void getRoutesShouldSerializeNestedOutputs() {
+    List<CamelRouteOutput> nestedOutputs = List.of(
+        new CamelRouteOutput("nested1", "Nested Output 1", ",", "log", null));
+    List<CamelRouteOutput> outputs = List.of(
+        new CamelRouteOutput("output1", "First Output", "|", "direct", nestedOutputs));
+    List<CamelRoute> routes = List.of(
+        new CamelRoute("route1", "direct:start1", outputs, false, "direct:err1"));
+    when(routeContextService.getCamelRoutes()).thenReturn(routes);
+    when(camelContext.getName()).thenReturn("TestContext");
+    when(camelContext.getVersion()).thenReturn("4.20.0");
+    stubResponseChain();
+
+    endpoints.getRoutes(routingContext);
+
+    ArgumentCaptor<String> body = ArgumentCaptor.forClass(String.class);
+    verify(response).end(body.capture());
+    String json = body.getValue();
+    assertTrue(json.contains("output1"), json);
+    assertTrue(json.contains("nested1"), json);
+    assertTrue(json.contains("Nested Output 1"), json);
   }
 
   @Test

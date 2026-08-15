@@ -82,6 +82,73 @@ describe('RouteGraph', () => {
     expect(() => render(<RouteGraph context={context} />)).not.toThrow();
   });
 
+  // Roadmap #18 (redelivery): a genuine retry (a REQUEST followed by an ERROR_RESPONSE, then
+  // more attempts on the same exchangeId/edge) should compute a retryCount without throwing.
+  // (MessageEdge.test.tsx covers the badge's exact text - see the timing test above for why:
+  // ReactFlow doesn't render edges in jsdom without real node measurement.)
+  it('processes a redelivered edge (same exchangeId, a failed then successful attempt) without throwing', () => {
+    const targetEndpoint = staticEdge.data!.targetUri ?? staticEdge.data!.targetInputUri ?? 'x';
+    const attempt1Req = makeMessage({
+      exchangeId: 'redelivered-1',
+      exchangeEventType: 'SENDING',
+      messageType: 'REQUEST',
+      endpointId: staticEdge.data!.outputId,
+      routeId: staticEdge.data!.sourceRouteId,
+      endpoint: targetEndpoint,
+      timeStamp: '1',
+    });
+    const attempt1Err = makeMessage({
+      exchangeId: 'redelivered-1',
+      exchangeEventType: 'SENT',
+      messageType: 'ERROR_RESPONSE',
+      endpointId: staticEdge.data!.outputId,
+      routeId: staticEdge.data!.sourceRouteId,
+      endpoint: targetEndpoint,
+      exception: 'transient failure',
+      timeStamp: '2',
+    });
+    const attempt2Req = makeMessage({
+      exchangeId: 'redelivered-1',
+      exchangeEventType: 'SENDING',
+      messageType: 'REQUEST',
+      endpointId: staticEdge.data!.outputId,
+      routeId: staticEdge.data!.sourceRouteId,
+      endpoint: targetEndpoint,
+      timeStamp: '3',
+    });
+
+    act(() => {
+      useDebuggerStore.getState().appendMessages([attempt1Req, attempt1Err, attempt2Req], 1, 0);
+    });
+
+    expect(() => render(<RouteGraph context={context} />)).not.toThrow();
+  });
+
+  // The bug this guards: mock:C and mock:D in the sample route are each targeted by TWO
+  // different EIPs (e.g. a routingSlip AND a dynamicRouter both targeting the same endpoint) -
+  // the same exchange legitimately sends two REQUESTs on the same edge with no failure at all.
+  // That must NOT be mistaken for a redelivery retry.
+  it('does not flag a clean multi-hit edge (same exchange, no error) as a retry', () => {
+    const targetEndpoint = staticEdge.data!.targetUri ?? staticEdge.data!.targetInputUri ?? 'x';
+    const hits = [1, 2].map((n) =>
+      makeMessage({
+        exchangeId: 'clean-multi-hit',
+        exchangeEventType: 'SENDING',
+        messageType: 'REQUEST',
+        endpointId: staticEdge.data!.outputId,
+        routeId: staticEdge.data!.sourceRouteId,
+        endpoint: targetEndpoint,
+        timeStamp: String(n),
+      }),
+    );
+
+    act(() => {
+      useDebuggerStore.getState().appendMessages(hits, 1, 0);
+    });
+
+    expect(() => render(<RouteGraph context={context} />)).not.toThrow();
+  });
+
   it('creates a dynamic edge for a message with no static match', () => {
     const sourceRoute = context.routes[0]!;
     const dynamic = makeMessage({

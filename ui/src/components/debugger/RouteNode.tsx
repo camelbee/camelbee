@@ -15,6 +15,9 @@ function buildTooltip(data: RouteNodeData): string {
   if (data.routeId) lines.push(`Route: ${data.routeId}`);
   if (data.description) lines.push(`Description: ${data.description}`);
   if (data.inputUri) lines.push(`Input: ${data.inputUri}`);
+  // Producer (external endpoint) nodes have no route/description - their label is truncated,
+  // so the full URI is the one thing worth showing on hover.
+  if (data.fullUri) lines.push(`Endpoint: ${data.fullUri}`);
   if (data.errorHandler) lines.push(`Error handler: ${data.errorHandler}`);
   if (data.isRest) lines.push('REST endpoint');
   return lines.length > 0 ? lines.join('\n') : data.label;
@@ -36,23 +39,20 @@ function RouteNodeInner({ data, selected }: Props) {
           ? '⚠'
           : '';
 
-  // Consumer/producer nodes get a solid technology-colored background
-  // Internal nodes stay neutral (white/dark)
-  let bgClass: string;
-  if (selected) {
-    bgClass = 'bg-blue-100 ring-1 ring-blue-500 dark:bg-blue-900/40';
-  } else if (isEndpoint) {
-    bgClass = `${colors.nodeBg} text-white`;
-  } else {
-    bgClass = 'bg-white dark:bg-gray-800';
-  }
+  // Consumer/producer nodes get a solid technology-colored background; internal nodes stay
+  // neutral (white/dark). Selection is shown as a ring layered on top of that background,
+  // never by replacing it - swapping to a fixed light background broke text contrast on
+  // endpoint nodes, whose white text is only readable against their own dark/colored bg.
+  const bgClass = isEndpoint ? `${colors.nodeBg} text-white` : 'bg-white dark:bg-gray-800';
+  const selectionRing = selected ? 'ring-2 ring-blue-500 dark:ring-blue-400' : '';
 
   return (
     <>
       <Handle type="target" position={Position.Left} className="!bg-gray-400 dark:!bg-gray-500" />
       <div
-        className={`flex items-center gap-2 rounded-lg border-l-4 px-3 py-2 shadow-md ${colors.border} ${bgClass}`}
+        className={`flex items-center gap-2 rounded-lg border-l-4 px-3 py-2 shadow-md ${colors.border} ${bgClass} ${selectionRing}`}
         style={{ width: 220, minHeight: 60 }}
+        title={buildTooltip(data)}
       >
         {kindIcon && (
           <span className="text-sm leading-none">{kindIcon}</span>
@@ -69,7 +69,6 @@ function RouteNodeInner({ data, selected }: Props) {
           </span>
           <p
             className={`mt-0.5 truncate text-xs ${isEndpoint ? 'text-white/90' : 'text-gray-700 dark:text-gray-200'}`}
-            title={buildTooltip(data)}
           >
             {data.label}
           </p>

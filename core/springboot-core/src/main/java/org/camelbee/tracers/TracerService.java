@@ -85,7 +85,15 @@ public class TracerService {
     this.loggingService = loggingService;
   }
 
-  private boolean isActive() {
+  /**
+   * Whether anything would be done with a traced event right now - either structured logging or
+   * UI tracing. {@link NodeIdInterceptStrategy} and {@link PollInterceptStrategy} check this before
+   * doing any per-exchange work (property reads/writes, reading the body as a string), since none of
+   * it is consumed when both are off.
+   *
+   * @return boolean true if logging or tracing would use a traced event.
+   */
+  public boolean isActive() {
     return loggingEnabled || (tracerEnabled && isTracingActivated());
   }
 

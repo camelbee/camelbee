@@ -1,10 +1,13 @@
 package org.camelbee.utils;
 
+import static org.camelbee.constants.CamelBeeConstants.CAMEL_FAILED_EVENT_ENDPOINT;
 import static org.camelbee.constants.CamelBeeConstants.CAMEL_FAILED_EVENT_IDENTITY_HASHCODE;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -28,7 +31,7 @@ class TracerUtilsTest {
     when(exchange.getException()).thenReturn(null);
 
     // Act
-    String result = TracerUtils.handleError(exchange);
+    String result = TracerUtils.handleError(exchange, "direct:test");
 
     // Assert
     assertNull(result);
@@ -41,9 +44,10 @@ class TracerUtilsTest {
 
     when(exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class)).thenReturn(testException);
     when(exchange.getProperty(CAMEL_FAILED_EVENT_IDENTITY_HASHCODE)).thenReturn(null);
+    when(exchange.getProperty(CAMEL_FAILED_EVENT_ENDPOINT)).thenReturn(null);
 
     // Act
-    String result = TracerUtils.handleError(exchange);
+    String result = TracerUtils.handleError(exchange, "direct:test");
 
     // Assert
     assertEquals("Test error message", result);
@@ -58,9 +62,10 @@ class TracerUtilsTest {
 
     when(exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class)).thenReturn(testException);
     when(exchange.getProperty(CAMEL_FAILED_EVENT_IDENTITY_HASHCODE)).thenReturn(exceptionHashCode);
+    when(exchange.getProperty(CAMEL_FAILED_EVENT_ENDPOINT)).thenReturn(null);
 
     // Act
-    String result = TracerUtils.handleError(exchange);
+    String result = TracerUtils.handleError(exchange, "direct:test");
 
     // Assert
     assertNull(result);
@@ -76,11 +81,53 @@ class TracerUtilsTest {
     when(exchange.getProperty(CAMEL_FAILED_EVENT_IDENTITY_HASHCODE)).thenReturn(null);
 
     // Act
-    String result = TracerUtils.handleError(exchange);
+    String result = TracerUtils.handleError(exchange, "direct:test");
 
     // Assert
     assertEquals("Test error message", result);
     verify(exchange).setProperty(eq(CAMEL_FAILED_EVENT_IDENTITY_HASHCODE), anyInt());
+  }
+
+  @Test
+  void handleErrorPrefersFreshExceptionOnSameHopRedeliveryRetry() {
+    // Arrange: EXCEPTION_CAUGHT still holds the previous attempt's (already-reported) exception,
+    // as it does mid-DeadLetterChannel-redelivery, but this SENT is for the same endpoint that
+    // reported it.
+    Exception previousAttempt = new RuntimeException("attempt 1");
+    Exception currentAttempt = new RuntimeException("attempt 2");
+
+    when(exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class)).thenReturn(previousAttempt);
+    when(exchange.getProperty(CAMEL_FAILED_EVENT_IDENTITY_HASHCODE))
+        .thenReturn(System.identityHashCode(previousAttempt));
+    when(exchange.getProperty(CAMEL_FAILED_EVENT_ENDPOINT)).thenReturn("direct:flakyTarget");
+    when(exchange.getException()).thenReturn(currentAttempt);
+
+    // Act
+    String result = TracerUtils.handleError(exchange, "direct:flakyTarget");
+
+    // Assert
+    assertEquals("attempt 2", result);
+  }
+
+  @Test
+  void handleErrorKeepsExceptionCaughtForAnUnrelatedFailureOnADifferentHop() {
+    // Arrange: EXCEPTION_CAUGHT is stale/already-reported from an earlier failure on a DIFFERENT
+    // endpoint (e.g. a redelivery elsewhere in the same exchange), and exchange.getException() is
+    // fresh for THIS hop - but this is not a same-hop retry, so EXCEPTION_CAUGHT should still win,
+    // deferring to whichever event Camel actually attaches the caught exception to.
+    Exception stale = new RuntimeException("earlier failure");
+    Exception freshUnrelated = new RuntimeException("boom");
+
+    when(exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class)).thenReturn(stale);
+    when(exchange.getProperty(CAMEL_FAILED_EVENT_IDENTITY_HASHCODE))
+        .thenReturn(System.identityHashCode(stale));
+    when(exchange.getProperty(CAMEL_FAILED_EVENT_ENDPOINT)).thenReturn("direct:flakyTarget");
+
+    // Act
+    String result = TracerUtils.handleError(exchange, "direct:boom");
+
+    // Assert
+    assertNull(result);
   }
 
   @Test

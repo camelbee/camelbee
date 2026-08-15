@@ -42,7 +42,13 @@ export function DebuggerPage() {
     return buildRouteGraph(context).edges;
   }, [context]);
 
-  // Track dynamic edges added by RouteGraph at runtime
+  // Track dynamic edges RouteGraph synthesizes at runtime for hops the static topology didn't
+  // declare (e.g. a dynamicRouter's runtime-only targets) - not surfaced as a toolbar alert
+  // (removed 2026-08-15: it treated "an EIP that's inherently impossible to know statically" the
+  // same as "the tracer got something wrong", so it fired on every route using such an EIP and
+  // taught users to ignore it). Still tracked here purely so MessagePanel can resolve one of
+  // these edges by id when clicked directly on the canvas - the node/edge/message flow itself
+  // renders and is fully inspectable regardless of this list.
   const [dynamicEdges, setDynamicEdges] = useState<MessageEdge[]>([]);
 
   const onDynamicEdgeAdded = useCallback((edge: MessageEdge) => {
@@ -53,8 +59,7 @@ export function DebuggerPage() {
   }, []);
 
   // Reset dynamic edges when the topology changes, and when the messages they were derived from
-  // are cleared - otherwise the "N dynamic hops" badge keeps counting hops that no longer have
-  // any messages behind them. RouteGraph drops the matching edges/nodes on the same signal.
+  // are cleared. RouteGraph drops the matching edges/nodes on the same signal.
   useEffect(() => {
     setDynamicEdges([]);
   }, [context, clearGeneration]);
@@ -64,17 +69,6 @@ export function DebuggerPage() {
     () => [...staticEdges, ...dynamicEdges],
     [staticEdges, dynamicEdges],
   );
-
-  /**
-   * Hops observed in traffic that the static topology did not predict. RouteGraph synthesizes an
-   * edge for each of them so their messages are still reachable, which means nothing is lost - but
-   * it also means a topology or matching gap leaves no trace. Surfacing the count makes it visible:
-   * a non-zero value says the route model and the tracer disagree about how the routes connect.
-   *
-   * This is deliberately the already-tracked dynamic edge count rather than a re-match of every
-   * message against every edge, which would be an O(messages x edges) scan on each poll.
-   */
-  const dynamicHopCount = dynamicEdges.length;
 
   if (isLoading) {
     return (
@@ -96,7 +90,7 @@ export function DebuggerPage() {
 
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden">
-      <Toolbar context={context} health={health ?? undefined} dynamicHopCount={dynamicHopCount} />
+      <Toolbar context={context} health={health ?? undefined} />
 
       <div className="flex flex-1 overflow-hidden">
         <div className="flex-1">

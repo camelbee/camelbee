@@ -50,6 +50,7 @@ import org.junit.jupiter.api.TestInstance;
 class MessageTracingIntegrationTest extends CamelBeeApplicationSupport {
 
   private static final String FLAKY_EDGE = "direct://flakyTarget?block=true";
+  private static final String DLQ_TARGET_EDGE = "direct://boomDlq";
 
   private static List<JsonNode> traced;
 
@@ -149,6 +150,34 @@ class MessageTracingIntegrationTest extends CamelBeeApplicationSupport {
     });
   }
 
+  /**
+   * Distinct from {@link #keepsEveryRedeliveryAttempt()}: invokeFlaky always recovers by the 3rd
+   * attempt, so it never actually reaches the dead-letter channel - a tracing shape of its own,
+   * since redeliveries are exhausted (not eventually successful) and Camel routes the exchange to
+   * {@code direct:deadLetter} rather than returning a normal response to the immediate caller.
+   */
+  @Test
+  @DisplayName("exhausts redelivery on a permanent failure and lands in the dead-letter channel")
+  void exhaustsRedeliveryAndReachesDeadLetterChannel() {
+    List<JsonNode> attempts = where(message -> DLQ_TARGET_EDGE.equals(text(message, "endpoint")));
+    assertThat(attempts).isNotEmpty();
+
+    Map<String, List<JsonNode>> byExchange = groupByExchange(attempts);
+    assertThat(byExchange).allSatisfy((exchangeId, messages) -> {
+      List<String> types = messageTypes(messages);
+      // 3 attempts, all failing - unlike invokeFlaky, this route never recovers, so every
+      // attempt (not just the first) must be typed ERROR_RESPONSE.
+      assertThat(types).filteredOn("REQUEST"::equals).hasSize(3);
+      assertThat(types).filteredOn("ERROR_RESPONSE"::equals).hasSize(3);
+    });
+
+    // Once exhausted, DeadLetterChannel routes the exchange to direct:deadLetter, which is
+    // itself a real traced hop, and deadLetterRoute's own steps run normally after it.
+    assertThat(where(message -> "direct://deadLetter".equals(text(message, "endpoint")))).isNotEmpty();
+    assertThat(where(message -> "log://deadLetter?level=WARN".equals(text(message, "endpoint")))).isNotEmpty();
+    assertThat(where(message -> "mock://dlq".equals(text(message, "endpoint")))).isNotEmpty();
+  }
+
   @Test
   @DisplayName("types a failed send as ERROR_RESPONSE and carries the exception")
   void typesFailuresAsErrorResponse() {
@@ -169,6 +198,7 @@ class MessageTracingIntegrationTest extends CamelBeeApplicationSupport {
         "httpBridgeEndpoint", "httpEndpoint", "sedaProducerEndpoint",
         "enrichEndpoint", "enrichDynamicEndpoint", "fileEndpoint",
         "flakyBridgeEndpoint", "flakyEndpoint", "flakyMockEndpoint", "boomEndpoint",
+        "dlqBridgeEndpoint", "boomDlqEndpoint", "dlqEndpoint",
         "mockAEndpoint", "mockBEndpoint", "mockCEndpoint", "mockDEndpoint");
   }
 

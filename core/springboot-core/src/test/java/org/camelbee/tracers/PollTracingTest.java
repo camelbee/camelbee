@@ -81,7 +81,7 @@ class PollTracingTest {
       tracerService.activateTracing(tracingActive);
 
       context.getManagementStrategy().addEventNotifier(new CamelBeeEventNotifier(tracerService));
-      context.getCamelContextExtension().addInterceptStrategy(new NodeIdInterceptStrategy());
+      context.getCamelContextExtension().addInterceptStrategy(new NodeIdInterceptStrategy(tracerService));
       context.getCamelContextExtension().addInterceptStrategy(new PollInterceptStrategy(tracerService));
 
       context.addRoutes(new RouteBuilder() {

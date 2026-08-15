@@ -107,8 +107,8 @@ describe('debuggerStore', () => {
   });
 
   // DebuggerPage and RouteGraph hold the synthesized dynamic edges/nodes in component state and
-  // drop them when this counter changes. Without the bump, the "N dynamic hops" badge and the
-  // ghost edges outlive the messages they describe.
+  // drop them when this counter changes. Without the bump, ghost edges would outlive the
+  // messages they describe.
   it('bumps clearGeneration on every clearMessages', () => {
     const before = get().clearGeneration;
     get().clearMessages();

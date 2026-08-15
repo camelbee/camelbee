@@ -17,6 +17,7 @@
 package org.camelbee.utils;
 
 import static org.camelbee.constants.CamelBeeConstants.CAMELBEE_NODE_ID;
+import static org.camelbee.constants.CamelBeeConstants.CAMEL_FAILED_EVENT_ENDPOINT;
 import static org.camelbee.constants.CamelBeeConstants.CAMEL_FAILED_EVENT_IDENTITY_HASHCODE;
 
 import org.apache.camel.Exchange;
@@ -53,15 +54,43 @@ public class TracerUtils {
   /**
    * handleError in response tracers.
    *
-   * @param exchange The exchange.
+   * @param exchange           The exchange.
+   * @param currentEndpointUri The endpoint URI of the hop currently being traced (the target of a
+   *                           SENDING, or the endpoint whose send just completed for a SENT).
    * @return The error message.
    */
-  public static String handleError(Exchange exchange) {
+  public static String handleError(Exchange exchange, String currentEndpointUri) {
 
-    Exception cause = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
+    Exception caught = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
+    Exception cause = caught;
 
     if (cause == null) {
       cause = exchange.getException();
+    } else {
+      /*
+       Both sources are set. Exchange.EXCEPTION_CAUGHT is set by the error handler's own
+       bookkeeping, which - under DeadLetterChannel redelivery - still holds the PREVIOUS
+       attempt's exception at the moment the CURRENT attempt's SENT event fires; it only catches
+       up by the next SENDING. exchange.getException() is fresh immediately, so it is the right
+       source for a same-hop redelivery retry.
+
+       But exchange.getException() is also fresh for an entirely unrelated, later failure on a
+       DIFFERENT hop (e.g. a doTry/doCatch boundary), while EXCEPTION_CAUGHT may still be
+       carrying a stale, already-reported exception left over from an earlier redelivery
+       elsewhere in the same exchange - Camel never clears it once the retry loop concludes. Only
+       prefer the fresh exception when this event is for the SAME endpoint that last reported an
+       error, i.e. a genuine same-hop retry; otherwise keep EXCEPTION_CAUGHT, so an unrelated
+       failure elsewhere is left for whichever event Camel actually attaches it to.
+       */
+      Object lastFailedEndpoint = exchange.getProperty(CAMEL_FAILED_EVENT_ENDPOINT);
+
+      if (currentEndpointUri != null && currentEndpointUri.equals(lastFailedEndpoint)) {
+        Exception thrown = exchange.getException();
+
+        if (thrown != null) {
+          cause = thrown;
+        }
+      }
     }
 
     String errorMessage = null;
@@ -78,6 +107,7 @@ public class TracerUtils {
 
       if (!eventIdentityHashCode.equals(previousEventIdentityHashCode)) {
         exchange.setProperty(CAMEL_FAILED_EVENT_IDENTITY_HASHCODE, eventIdentityHashCode);
+        exchange.setProperty(CAMEL_FAILED_EVENT_ENDPOINT, currentEndpointUri);
 
         errorMessage = cause.getLocalizedMessage();
       }

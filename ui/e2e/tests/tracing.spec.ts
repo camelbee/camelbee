@@ -99,6 +99,12 @@ test.describe('message tracing', () => {
    *
    * And the edge still has to carry its messages. It is sourced around the tracer's routeId, so it
    * can no longer be matched by route; it is matched by the node id of the router instead.
+   *
+   * This is also the sole remaining coverage of "the static topology never predicted this edge, it
+   * had to be synthesized from traffic" - a former separate spec asserted that via the toolbar's "N
+   * dynamic hops" badge, which was removed as user-facing noise (it couldn't distinguish an EIP
+   * that's inherently unpredictable, like this one, from an actual tracer bug); the dynamic edge
+   * still gets synthesized and traced correctly, which is what this spec verifies directly.
    */
   test('draws a dynamicRouter hop from the route that owns it, with its messages', async ({ page }) => {
     const dynamicEdge = page.locator(
@@ -167,20 +173,6 @@ test.describe('message tracing', () => {
     await triggerPipeline(request);
     await clickEdge(page, ENRICH_EDGE);
     await expect(page.getByText('enrichedData')).toHaveCount(2, ARRIVAL);
-  });
-
-  /**
-   * KNOWN GAP, made visible. The sample produces hops the static topology does not predict: the
-   * tracer attributes a routingSlip/dynamicRouter continuation to the previous callee route
-   * (`direct://invokeMockC -> direct://invokeMockD`) rather than the route owning the EIP node, so
-   * no static edge matches and RouteGraph has to synthesize one. The badge reports that disagreement
-   * instead of letting it pass unnoticed.
-   *
-   * If that attribution is ever fixed the badge disappears and this test must be flipped to assert
-   * absence - the diff here is the proof the gap actually closed.
-   */
-  test('reports hops the static topology did not predict', async ({ page }) => {
-    await expect(page.getByText(/dynamic hop/)).toBeVisible(ARRIVAL);
   });
 
   test('clears traced messages from the toolbar', async ({ page, request }) => {

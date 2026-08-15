@@ -239,3 +239,98 @@ export function buildInteractionsForEdge(
     })),
   );
 }
+
+/* ------------------------------------------------------------------ */
+/*  computeEdgeStats                                                  */
+/* ------------------------------------------------------------------ */
+
+export interface EdgeStats {
+  /** Distinct exchanges that crossed this edge - a throughput metric, not an attempt count. */
+  messageCount: number;
+  hasError: boolean;
+  /** Average/max elapsed ms across SENT messages on this edge (roadmap #9). */
+  avgTimeTaken?: number;
+  maxTimeTaken?: number;
+  /**
+   * Set only when a DeadLetterChannel-style redelivery genuinely happened on this edge (roadmap
+   * #18): an exchange that sent more than one REQUEST here AND had at least one ERROR_RESPONSE.
+   * Deliberately NOT just "requestCount > exchangeCount" - the same exchange can legitimately
+   * send two clean REQUESTs to the same edge via two different EIPs (e.g. a routingSlip AND a
+   * dynamicRouter both targeting the same endpoint), and that must not be flagged as a retry.
+   */
+  retryCount?: number;
+}
+
+/**
+ * Computes per-edge message stats (count, error state, latency, retry indicator) for the given
+ * slice of the timeline. Pure - callers resolve dynamic edges (which requires mutating React
+ * state) before calling this, passing the complete edge list (static + already-created dynamic).
+ * Messages that don't match any edge in `edges` are silently skipped.
+ */
+export function computeEdgeStats(messages: Message[], edges: MessageEdge[]): Map<string, EdgeStats> {
+  const counts = new Map<
+    string,
+    {
+      exchanges: Set<string>;
+      perExchangeRequests: Map<string, number>;
+      erroredExchanges: Set<string>;
+      hasError: boolean;
+      totalTimeTaken: number;
+      timeTakenCount: number;
+      maxTimeTaken: number;
+    }
+  >();
+
+  for (const msg of messages) {
+    const matched = matchMessageToEdge(msg, edges);
+    if (!matched) continue;
+
+    const entry = counts.get(matched.id) ?? {
+      exchanges: new Set(),
+      perExchangeRequests: new Map(),
+      erroredExchanges: new Set(),
+      hasError: false,
+      totalTimeTaken: 0,
+      timeTakenCount: 0,
+      maxTimeTaken: 0,
+    };
+    entry.exchanges.add(msg.exchangeId);
+    if (msg.messageType === 'REQUEST') {
+      entry.perExchangeRequests.set(
+        msg.exchangeId,
+        (entry.perExchangeRequests.get(msg.exchangeId) ?? 0) + 1,
+      );
+    }
+    if (msg.messageType === 'ERROR_RESPONSE') {
+      entry.hasError = true;
+      entry.erroredExchanges.add(msg.exchangeId);
+    }
+    // Only SENT events carry a real elapsed time (roadmap #9).
+    if (msg.exchangeEventType === 'SENT' && msg.timeTaken > 0) {
+      entry.totalTimeTaken += msg.timeTaken;
+      entry.timeTakenCount += 1;
+      entry.maxTimeTaken = Math.max(entry.maxTimeTaken, msg.timeTaken);
+    }
+    counts.set(matched.id, entry);
+  }
+
+  const result = new Map<string, EdgeStats>();
+  for (const [edgeId, stats] of counts) {
+    let retryCount: number | undefined;
+    for (const exchangeId of stats.erroredExchanges) {
+      const attempts = stats.perExchangeRequests.get(exchangeId) ?? 0;
+      if (attempts > 1) {
+        retryCount = retryCount === undefined ? attempts : Math.max(retryCount, attempts);
+      }
+    }
+    const hasTiming = stats.timeTakenCount > 0;
+    result.set(edgeId, {
+      messageCount: stats.exchanges.size,
+      hasError: stats.hasError,
+      avgTimeTaken: hasTiming ? Math.round(stats.totalTimeTaken / stats.timeTakenCount) : undefined,
+      maxTimeTaken: hasTiming ? stats.maxTimeTaken : undefined,
+      retryCount,
+    });
+  }
+  return result;
+}

@@ -31,9 +31,10 @@ For a guide to the UI's pages and features, see the [CamelBee User Guide](../../
 This sample doubles as the integration-test bed for the CamelBee core libraries. Its topology is
 deliberately EIP-rich so that every shape the topology extractor and the message tracer have to
 handle is exercised by real traffic: query strings on `direct:` targets, `toD`, `poll()`,
-`pollEnrich`, both `enrich` forms, `recipientList`, `routingSlip`, `dynamicRouter`, a dead-letter
-channel with redelivery, a caught failure, and an `http` hop that calls this application back on
-its own port (so it stays infrastructure-free).
+`pollEnrich`, both `enrich` forms, `recipientList`, `routingSlip`, `dynamicRouter`, redelivery that
+eventually recovers, redelivery that's exhausted and actually reaches the dead-letter channel, a
+caught failure, and an `http` hop that calls this application back on its own port (so it stays
+infrastructure-free).
 
 ### Java integration tests
 
