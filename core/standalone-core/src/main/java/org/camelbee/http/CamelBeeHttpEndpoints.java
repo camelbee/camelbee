@@ -161,6 +161,40 @@ public class CamelBeeHttpEndpoints {
     });
     // Registered after the API routes, so /camelbee/routes etc. take precedence over static serving.
     router.route(BASE_PATH + "/*").handler(ui);
+
+    /*
+     Single-page-app fallback. The UI is a BrowserRouter with basename "/camelbee", so its routes are
+     real paths - /camelbee/settings, /camelbee/metrics. StaticHandler has no file for those, so a
+     reload or a bookmarked link 404s even though the same page reached by clicking works fine.
+     Serve index.html instead and let the router take it from there.
+
+     Only for navigations: a request that accepts HTML and has no file extension. A missing .js or
+     .png must stay a 404 rather than silently returning a page of HTML, which turns a broken asset
+     into a confusing parse error.
+    */
+    router.get(BASE_PATH + "/*").handler(this::spaFallback);
+  }
+
+  /**
+   * Serves {@code index.html} for a UI route that has no file behind it, so the router can take over.
+   *
+   * <p>Only for navigations: a request that accepts HTML and whose last path segment has no
+   * extension. A missing {@code .js} or {@code .png} must stay a 404 rather than silently returning
+   * a page of HTML, which turns a broken asset into a confusing parse error somewhere else.
+   *
+   * @param rc the routing context.
+   */
+  void spaFallback(RoutingContext rc) {
+    final String path = rc.request().path();
+    final String accept = rc.request().getHeader("Accept");
+    final boolean wantsHtml = accept != null && accept.contains("text/html");
+    final boolean looksLikeFile = path.substring(path.lastIndexOf('/') + 1).contains(".");
+
+    if (wantsHtml && !looksLikeFile) {
+      rc.reroute(BASE_PATH + "/index.html");
+    } else {
+      rc.next();
+    }
   }
 
   // The handler methods below are package-private (not private) so they can be unit-tested directly

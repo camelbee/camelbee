@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, fireEvent, within, act } from '@testing-library/react';
 import {
   WaterfallPanel,
   MAX_SPANS_PER_FLOW,
@@ -475,7 +475,10 @@ describe('WaterfallPanel scroll-into-view', () => {
 
     expect(scrolled).toHaveLength(0);
 
-    useDebuggerStore.getState().selectEdge('edge-1');
+    // act(), because this drives a store update into a MOUNTED component - the same path
+    // RouteGraph takes when an edge is clicked. Without it React warns, and the assertion below
+    // could run before the effect has flushed.
+    act(() => useDebuggerStore.getState().selectEdge('edge-1'));
     rerender(<WaterfallPanel onClose={() => {}} edges={linkedEdges} />);
 
     expect(scrolled).toHaveLength(1);
@@ -505,7 +508,7 @@ describe('WaterfallPanel scroll-into-view', () => {
     useDebuggerStore.getState().selectEdge('edge-1');
     const { rerender } = render(<WaterfallPanel onClose={() => {}} edges={twoEdges} />);
 
-    useDebuggerStore.getState().selectEdge('edge-2');
+    act(() => useDebuggerStore.getState().selectEdge('edge-2'));
     rerender(<WaterfallPanel onClose={() => {}} edges={twoEdges} />);
 
     expect(scrolled.length).toBeGreaterThan(1);
@@ -517,7 +520,7 @@ describe('WaterfallPanel scroll-into-view', () => {
     const { rerender } = render(<WaterfallPanel onClose={() => {}} edges={linkedEdges} />);
     const afterSelect = scrolled.length;
 
-    useDebuggerStore.getState().selectEdge(null);
+    act(() => useDebuggerStore.getState().selectEdge(null));
     rerender(<WaterfallPanel onClose={() => {}} edges={linkedEdges} />);
 
     expect(scrolled).toHaveLength(afterSelect);

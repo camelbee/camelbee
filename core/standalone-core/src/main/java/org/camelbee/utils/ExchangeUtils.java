@@ -38,6 +38,9 @@ public class ExchangeUtils {
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(ExchangeUtils.class);
 
+  /** Stand-in recorded instead of a body when body capture is switched off. */
+  public static final String BODY_NOT_CAPTURED = "[body not captured]";
+
   /**
    * Redaction applied to everything read here, which is the only place headers and bodies enter a
    * traced Message.
@@ -47,9 +50,6 @@ public class ExchangeUtils {
    * fails closed. That matches how the rest of CamelBee is configured: off, or safe, unless
    * explicitly turned on.
    */
-  /** Stand-in recorded instead of a body when body capture is switched off. */
-  public static final String BODY_NOT_CAPTURED = "[body not captured]";
-
   private static volatile Masker masker = Masker.withDefaults();
 
   /**

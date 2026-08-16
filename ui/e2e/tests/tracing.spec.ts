@@ -204,6 +204,71 @@ test.describe('message tracing', () => {
     expect(all).toContain('Coltrane');
     // Monk's request was never recorded at all, not merely hidden
     expect(all).not.toContain('Monk');
+
+    // The subtle half of the feature: matching is per FLOW, not per message. The branches this
+    // request spawns get their own exchange ids and transformed bodies that never repeat 'Coltrane',
+    // so a per-message filter would keep the entry point and silently drop everything it fanned out
+    // to - half a flow, which is worse than none.
+    const messages = (await (await request.get(
+      `${CAMELBEE_API}/messages?index=0&addVersion=-1&resetVersion=-1`)).json()).messages;
+
+    const exchangeIds = new Set(messages.map((m: { exchangeId: string }) => m.exchangeId));
+    expect(exchangeIds.size).toBeGreaterThan(1);
+
+    const endpoints = new Set(messages.map((m: { endpoint: string | null }) => m.endpoint));
+    // wireTap and multicast branches, none of which carry the matched text
+    expect(endpoints).toContain('direct://invokeWireTap');
+    expect(endpoints).toContain('direct://invokeMockA');
+  });
+
+  test('never lets a masked header value reach the browser', async ({ page, request }) => {
+    // Masking is unit tested per core, but this is the property that actually matters: a secret must
+    // not survive route -> tracer -> REST API -> UI. Asserted end to end because every one of those
+    // hops is a chance to leak it, and redaction that is merely usually applied invites trust.
+    const HEADER_SECRET = 'super-secret-token-value';
+    const BODY_SECRET = 'super-secret-body-value';
+
+    await page.getByRole('button', { name: 'Stop Tracing' }).click();
+    await page.getByLabel('Only trace messages containing').fill('');
+    await startTracing(page);
+
+    await request.post(`${APP_URL}/api/musicians`, {
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${HEADER_SECRET}` },
+      // both halves in one request: header masking is exact because the key is known, body masking is
+      // best-effort pattern matching and is the half more likely to regress
+      data: { name: 'Coltrane', instrument: 'Sax', password: BODY_SECRET },
+    });
+
+    await expect
+      .poll(async () => {
+        const res = await request.get(`${CAMELBEE_API}/messages?index=0&addVersion=-1&resetVersion=-1`);
+        return (await res.json()).messages.length;
+      }, { timeout: 20_000 })
+      .toBeGreaterThan(0);
+
+    const payload = await (await request.get(
+      `${CAMELBEE_API}/messages?index=0&addVersion=-1&resetVersion=-1`)).json();
+    const messages: { messageBody: string | null; headers: string | null }[] = payload.messages;
+
+    // Asserted on the parsed fields, not on JSON.stringify of the list - stringifying escapes the
+    // quotes inside messageBody and the substring stops matching for the wrong reason.
+    const bodies = messages.map((m) => m.messageBody ?? '').join('\n');
+    const headers = messages.map((m) => m.headers ?? '').join('\n');
+
+    // Positive assertions, not just absence: each is recorded with its value replaced. Checking only
+    // that the secret is missing would also pass if it never reached the tracer at all, which would
+    // prove nothing about masking.
+    expect(headers).toContain('Authorization:***');
+    expect(bodies).toContain('"password":"***"');
+
+    const served = JSON.stringify(messages);
+    expect(served).not.toContain(HEADER_SECRET);
+    expect(served).not.toContain(BODY_SECRET);
+
+    // and nothing in the rendered page carries either of them
+    const rendered = await page.content();
+    expect(rendered).not.toContain(HEADER_SECRET);
+    expect(rendered).not.toContain(BODY_SECRET);
   });
 
   test('closes the message panel', async ({ page }) => {
@@ -266,6 +331,33 @@ test.describe('waterfall', () => {
     // at least one flow, with at least one measured bar
     await expect(panel.getByTestId('waterfall-bar').first()).toBeVisible(ARRIVAL);
     await expect(panel.getByText(/\d+ hops? · \d+ms/).first()).toBeVisible();
+  });
+
+  test('renders one request as ONE flow, with its branches nested underneath', async ({ page }) => {
+    /*
+     The regression guard for exchange parentage. Every branch of this pipeline - wireTap, multicast,
+     enrich, recipientList - gets a fresh exchange id, and an earlier implementation chained them to
+     each other instead of to the request, which produced a cycle and split one request into a dozen
+     unrelated flows here. Nothing in the UI would have complained; it just looked wrong.
+    */
+    await page.getByRole('button', { name: 'Waterfall', exact: true }).click();
+
+    const panel = page.getByTestId('waterfall-panel');
+    await expect(panel.getByTestId('waterfall-bar').first()).toBeVisible(ARRIVAL);
+
+    // the sample's http hop calls the application back, so /api/health is a genuinely separate
+    // request and a second flow is expected - but not a dozen
+    const flowHeaders = panel.getByRole('button', { expanded: true }).or(
+      panel.getByRole('button', { expanded: false }));
+    expect(await flowHeaders.count()).toBeLessThanOrEqual(2);
+
+    // and the big flow really is the whole pipeline rather than a fragment of it
+    await expect(panel.getByText(/\d\d+ hops · \d+ms/)).toBeVisible();
+
+    // branch endpoints appear as rows inside it, which only happens when they were grouped in
+    // exact: 'direct://invokeEnrich' is also a prefix of 'direct://invokeEnrichDynamic'
+    await expect(panel.getByText('direct://invokeWireTap', { exact: true })).toBeVisible();
+    await expect(panel.getByText('direct://invokeEnrich', { exact: true })).toBeVisible();
   });
 
   test('can be dragged taller, and the size survives closing and reopening', async ({ page }) => {

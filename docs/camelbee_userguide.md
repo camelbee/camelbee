@@ -7,8 +7,14 @@
   - [Route Visualization](#route-visualization)
   - [Message Tracing](#message-tracing)
   - [Message Panel](#message-panel)
+  - [Waterfall Panel](#waterfall-panel)
+  - [Linking the Waterfall and the Graph](#linking-the-waterfall-and-the-graph)
   - [Health Panel](#health-panel)
   - [Filtering Messages](#filtering-messages)
+  - [Resizing the Panels](#resizing-the-panels)
+- [Using CamelBee in Production](#using-camelbee-in-production)
+  - [Redacting Sensitive Data](#redacting-sensitive-data)
+  - [Tracing a Single Transaction](#tracing-a-single-transaction)
 - [Metrics Page](#metrics-page)
   - [Metrics Topology](#metrics-topology)
   - [Metrics Detail Modal](#metrics-detail-modal)
@@ -63,7 +69,13 @@ The Debugger page is the main workspace of CamelBee. It visualizes the topology 
 - The topology graph animates to show which routes and connections were involved at each point in time, with color-coded edges (green for success, red for failure).
 - The **Clear** button resets all collected messages for a fresh start.
 
-> **Note:** When tracing is enabled, all messages exchanged between routes are collected. Use with caution in production environments.
+- Exchanges that end in an **unhandled exception** are traced too, and their closing marker is typed
+  as an error. This matters most on routes started by a consumer (timer, file, JMS), where there is
+  no caller to report the failure to.
+
+> **Note:** When tracing is enabled, messages exchanged between routes are collected. Before using
+> this in production, read [Using CamelBee in Production](#using-camelbee-in-production) — sensitive
+> values are redacted by default, and you can restrict tracing to a single transaction.
 
 ### Message Panel
 
@@ -79,6 +91,43 @@ The Message Panel displays the details of each message exchanged within that con
 - Navigate through messages using the **Prev** and **Next** buttons.
 - Click **Go to timeline position** to jump to the exact point in time when this interaction occurred on the global timeline.
 
+### Waterfall Panel
+
+Click **Waterfall** in the toolbar to open a timing view along the bottom of the page. It answers the
+question the graph cannot: *where did the time actually go?*
+
+![Waterfall Panel](../images/debugger_waterfall.png)
+
+- Each row is one **hop**, drawn as a bar positioned by when it started and sized by how long it took.
+- Rows are grouped into **flows**. A flow is one request together with everything it spawned, so the
+  branches created by `wireTap`, `multicast`, `split`, `recipientList` and `seda` handoffs appear
+  **indented underneath the exchange that started them** rather than as unrelated entries.
+- The flow header shows the total hop count and duration, and is marked **OK** or **Error**.
+- Failed hops are drawn in red; a hop still in flight shows a dash instead of a duration.
+- A wide parent bar over near-instant children usually means waiting rather than working — retry
+  delays and poll timeouts show up exactly this way.
+- Click a flow header to collapse or expand it. With more than three flows, only the newest is
+  expanded by default.
+- The panel follows the **timeline bar**, so it always shows the same slice as the graph.
+
+> Very large flows (for example a `split()` over thousands of items) are capped for rendering, with a
+> note saying how many hops are hidden. The slowest hops are always shown, wherever they occur, and
+> the flow header always counts and times **all** of them.
+
+### Linking the Waterfall and the Graph
+
+The waterfall and the topology graph are two views of the same data, and selecting in one highlights
+the other:
+
+![Waterfall linked to the graph](../images/debugger_waterfall_linked.png)
+
+- **Click a connection badge on the graph** → its hops are highlighted in the waterfall, the flow
+  containing them is expanded, and the panel scrolls to them if they are below the fold.
+- **Click a bar in the waterfall** → the matching connection is selected on the graph and its Message
+  Panel opens. Clicking the same bar again clears the selection.
+
+Bars with no matching connection on the graph are not clickable.
+
 ### Health Panel
 
 The Health Panel provides a quick overview of your microservice's health status.
@@ -90,8 +139,68 @@ The Health Panel provides a quick overview of your microservice's health status.
 
 ### Filtering Messages
 
-- Use the **Filter messages...** text field in the toolbar to filter traced messages by keyword.
-- This helps you focus on specific routes or endpoints when debugging complex message flows.
+There are **two** filter boxes in the toolbar, and they do different things:
+
+![Toolbar filters](../images/debugger_toolbar_filters.png)
+
+| Box | Colour | What it does |
+|-----|--------|--------------|
+| **Only trace containing…** | amber | Decides what the server **records at all**. Applied when tracing starts, or on Enter. |
+| **Filter messages…** | grey | Hides rows that were **already recorded**, in your browser only. |
+
+For everyday debugging the grey box is enough. For a busy or production application, use the amber
+one — see [Tracing a Single Transaction](#tracing-a-single-transaction).
+
+### Resizing the Panels
+
+Both side panels can be resized by dragging the grip on their inner edge:
+
+- The **Waterfall** panel: drag its top edge up or down.
+- The **Message** panel: drag its left edge sideways.
+
+The grips also respond to the arrow keys once focused. Sizes are remembered across page reloads.
+
+---
+
+## Using CamelBee in Production
+
+CamelBee's tracer is designed to be safe to switch on outside development: it starts **off**, and it
+**disarms itself** after a period of inactivity (`camelbee.tracer-max-idle-time`). Two further
+features exist specifically for production use.
+
+### Redacting Sensitive Data
+
+Traced headers and bodies are shown in the UI and written to the application log, so anything
+captured is disclosed. CamelBee therefore **redacts sensitive values by default** — you do not have
+to switch this on.
+
+- Keys such as `password`, `token`, `authorization`, `apikey`, `creditcard`, `cvv`, `iban` and `ssn`
+  are replaced with `***`.
+- Matching ignores case and separators, so one `apikey` entry also catches `X-Api-Key`.
+- Set `camelbee.masked-keys` to your own comma-separated list to replace the defaults.
+
+**Know the limits.** Header redaction is exact, because the key name is known. Body redaction is
+best-effort pattern matching over JSON, XML and form-encoded payloads: it cannot redact a field you
+did not configure, and a body in some other format is left untouched. If a body must never be
+captured under any circumstances, set `camelbee.tracer-body-enabled = false`, which reads no body
+text at all. Note that this setting does **not** affect headers — redaction is what protects those.
+
+### Tracing a Single Transaction
+
+In an application handling hundreds of exchanges a second, capturing everything is neither readable
+nor safe. Type a value into the amber **Only trace containing…** box before starting tracing, and
+CamelBee records **only the flow that contains it**:
+
+- Type an order id, a customer reference, a correlation id — anything that appears in the body or the
+  headers of the request you are chasing.
+- Once any message of an exchange matches, the **whole** exchange is kept, and so are the branches it
+  spawns. You get the complete flow, not fragments of it.
+- Everything else is never recorded at all — not merely hidden from view.
+- Matching is case-insensitive, and runs against the text **after** redaction, so a value that
+  masking removes cannot be searched for.
+
+Press **Enter** to apply the filter while tracing is already running; it is also applied
+automatically when you press **Start Tracing**. Changing it starts a fresh investigation.
 
 ---
 

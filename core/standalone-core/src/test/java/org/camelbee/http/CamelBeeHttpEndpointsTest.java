@@ -244,4 +244,59 @@ class CamelBeeHttpEndpointsTest {
 
     assertDoesNotThrow(() -> endpoints.register(camelContext));
   }
+
+  /**
+   * The UI is a BrowserRouter with basename "/camelbee", so its pages are real paths that no file
+   * backs. Without a fallback, reloading or bookmarking anything but the root 404s even though the
+   * same page reached by clicking works - which is how this was found.
+   */
+  @Test
+  void spaFallbackShouldServeIndexForAUiRoute() {
+    when(routingContext.request()).thenReturn(request);
+    when(request.path()).thenReturn("/camelbee/settings");
+    when(request.getHeader("Accept")).thenReturn("text/html,application/xhtml+xml");
+
+    endpoints.spaFallback(routingContext);
+
+    verify(routingContext).reroute("/camelbee/index.html");
+    verify(routingContext, never()).next();
+  }
+
+  @Test
+  void spaFallbackShouldLeaveAMissingAssetAs404() {
+    // returning HTML for a missing .js turns a broken asset into a parse error somewhere else
+    when(routingContext.request()).thenReturn(request);
+    when(request.path()).thenReturn("/camelbee/assets/main.js");
+    when(request.getHeader("Accept")).thenReturn("text/html,*/*");
+
+    endpoints.spaFallback(routingContext);
+
+    verify(routingContext, never()).reroute(anyString());
+    verify(routingContext).next();
+  }
+
+  @Test
+  void spaFallbackShouldIgnoreNonNavigationRequests() {
+    // an XHR that 404s must stay a 404; the caller is code, and it cannot use a page of HTML
+    when(routingContext.request()).thenReturn(request);
+    when(request.path()).thenReturn("/camelbee/whatever");
+    when(request.getHeader("Accept")).thenReturn("application/json");
+
+    endpoints.spaFallback(routingContext);
+
+    verify(routingContext, never()).reroute(anyString());
+    verify(routingContext).next();
+  }
+
+  @Test
+  void spaFallbackShouldIgnoreARequestWithNoAcceptHeader() {
+    when(routingContext.request()).thenReturn(request);
+    when(request.path()).thenReturn("/camelbee/settings");
+    when(request.getHeader("Accept")).thenReturn(null);
+
+    endpoints.spaFallback(routingContext);
+
+    verify(routingContext, never()).reroute(anyString());
+    verify(routingContext).next();
+  }
 }

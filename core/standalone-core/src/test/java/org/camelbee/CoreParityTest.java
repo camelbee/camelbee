@@ -51,13 +51,13 @@ class CoreParityTest {
 
   private static final List<String> CORES = List.of("quarkus-core", "springboot-core", "standalone-core");
 
-  private static Path packageDir(String core, String pkg) {
+  private static Path packageDir(String core, String sourceSet, String pkg) {
     // surefire runs with the module basedir as the working directory
-    return Path.of("..", core, "src", "main", "java", "org", "camelbee").resolve(pkg);
+    return Path.of("..", core, "src", sourceSet, "java", "org", "camelbee").resolve(pkg);
   }
 
-  private static SortedSet<String> classesIn(String core, String pkg) throws IOException {
-    Path dir = packageDir(core, pkg);
+  private static SortedSet<String> classesIn(String core, String sourceSet, String pkg) throws IOException {
+    Path dir = packageDir(core, sourceSet, pkg);
     assertThat(dir)
         .as("expected to find %s of %s - has the reactor layout changed?", pkg, core)
         .exists();
@@ -78,14 +78,45 @@ class CoreParityTest {
       "debugger/model/route",
       "utils",
       "constants",
+      "notifier",
+      "logging",
+      "masking",
   })
   @DisplayName("all three cores declare the same classes")
   void allCoresDeclareTheSameClasses(String pkg) throws IOException {
-    SortedSet<String> reference = classesIn(CORES.get(0), pkg);
+    SortedSet<String> reference = classesIn(CORES.get(0), "main", pkg);
 
     for (String core : CORES.subList(1, CORES.size())) {
-      assertThat(classesIn(core, pkg))
+      assertThat(classesIn(core, "main", pkg))
           .as("%s of %s differs from %s - a change was applied to one core and not the others",
+              pkg, core, CORES.get(0))
+          .isEqualTo(reference);
+    }
+  }
+
+  /**
+   * The same guard for the tests, which are mirrored by hand exactly like the main code.
+   *
+   * <p>Worth its own assertion because a forgotten test copy is quieter than a forgotten class: the
+   * build still passes, the feature still works in the core it was written against, and the other
+   * two are simply never exercised. Nothing else would notice.
+   */
+  @ParameterizedTest(name = "test org.camelbee.{0}")
+  @ValueSource(strings = {
+      "tracers",
+      "debugger/service",
+      "debugger/model/exchange",
+      "utils",
+      "masking",
+      "logging",
+  })
+  @DisplayName("all three cores mirror the same tests")
+  void allCoresMirrorTheSameTests(String pkg) throws IOException {
+    SortedSet<String> reference = classesIn(CORES.get(0), "test", pkg);
+
+    for (String core : CORES.subList(1, CORES.size())) {
+      assertThat(classesIn(core, "test", pkg))
+          .as("test %s of %s differs from %s - a test was added to one core and not the others",
               pkg, core, CORES.get(0))
           .isEqualTo(reference);
     }

@@ -151,6 +151,12 @@ camelbee:
   tracer-max-idle-time: 60000
   # maximum collected trace messages
   tracer-max-messages-count: 10000
+  # when enabled redacts configured keys out of traced headers and bodies (default: true)
+  masking-enabled: true
+  # comma-separated key names to redact; replaces the built-in list entirely (default: see below)
+  masked-keys: password,token,authorization,apikey,creditcard,cvv,iban,ssn
+  # when disabled no message body text is captured at all - the only hard guarantee (default: true)
+  tracer-body-enabled: true
   # when enabled it logs the messages exchanged between endpoints
   logging-enabled: true
 ```
@@ -169,35 +175,6 @@ quarkus:
       prometheus:
         path: /metrics
 ```
-
-## Accessing the Embedded UI
-
-Once your application is running, the embedded CamelBee UI is available at:
-
-`http://localhost:8080/camelbee/index.html`
-
-This provides route visualization, message tracing, debugging with replay, filtering, endpoint triggering, and metrics directly in your browser.
-
-## Example Implementation
-
-Discover a practical and functional application of this core library within the 'allcomponent-quarkus-sample' Maven project showcased below as a successful and operational example:
-
-```shell
-camelbee/
-|-- core/
-|   |-- quarkus-core/
-|   |   |-- ...
-|-- examples/
-|   |-- allcomponent-quarkus-sample/
-|   |   |-- ...
-```
-
-## Related Documentation
-
-- [CamelBee User Guide](../../docs/camelbee_userguide.md) — a tour of the UI's pages and features
-- Using Spring Boot? See the [Spring Boot Core README](../springboot-core/README.md)
-- Using plain Camel (`camel-main`)? See the [Standalone Core README](../standalone-core/README.md)
-- Running on Camel K? Camel K pins an older Camel than this build, so use `camelbee-quarkus-core-camelk` — the same sources built by [`pom-camelk.xml`](./pom-camelk.xml) — and see the [Camel K sample](../../examples/allcomponent-camelk-sample/README.md)
 
 ### Redacting sensitive data
 
@@ -253,3 +230,32 @@ Enter - not per keystroke, because changing it discards what matched the previou
 
 This is different from the toolbar's grey **Filter messages** box, which only hides rows that were
 already recorded and already served. For production, the capture filter is the one that matters.
+
+## Accessing the Embedded UI
+
+Once your application is running, the embedded CamelBee UI is available at:
+
+`http://localhost:8080/camelbee/index.html`
+
+This provides route visualization, message tracing, debugging with replay, filtering, endpoint triggering, and metrics directly in your browser.
+
+## Example Implementation
+
+Discover a practical and functional application of this core library within the 'allcomponent-quarkus-sample' Maven project showcased below as a successful and operational example:
+
+```shell
+camelbee/
+|-- core/
+|   |-- quarkus-core/
+|   |   |-- ...
+|-- examples/
+|   |-- allcomponent-quarkus-sample/
+|   |   |-- ...
+```
+
+## Related Documentation
+
+- [CamelBee User Guide](../../docs/camelbee_userguide.md) — a tour of the UI's pages and features
+- Using Spring Boot? See the [Spring Boot Core README](../springboot-core/README.md)
+- Using plain Camel (`camel-main`)? See the [Standalone Core README](../standalone-core/README.md)
+- Running on Camel K? Camel K pins an older Camel than this build, so use `camelbee-quarkus-core-camelk` — the same sources built by [`pom-camelk.xml`](./pom-camelk.xml) — and see the [Camel K sample](../../examples/allcomponent-camelk-sample/README.md)

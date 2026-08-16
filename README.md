@@ -17,9 +17,25 @@ to visualize the topology within the **embedded CamelBee UI** served directly fr
 - Inspect full request and response message contents including headers and body in the side panel.
 - Detect bottlenecks, errors, or unexpected behavior in your message processing.
 - Navigate through the debugging session's timeline using the timeline bar at the bottom, moving back and forth to thoroughly analyze the process flow.
+- Follow a request across the exchanges it spawns: `wireTap`, `multicast`, `split`, `recipientList` and `seda` branches are linked back to the exchange that started them instead of appearing as unrelated traffic.
+- See failures even on routes started by a consumer (timer, file, JMS), where there is no caller for the error to be reported to.
 - Filter traced messages to focus on specific routes or endpoints.
 
 ![Message Tracing](images/debugger_messages.png)
+
+### Latency Waterfall
+- See where the time actually went: every hop is drawn as a bar positioned by when it started and sized by how long it took.
+- Branches are nested under the request that spawned them, so one request reads as one flow rather than a dozen disconnected entries.
+- Retry delays and poll timeouts are obvious at a glance — a wide parent bar over near-instant children is waiting, not working.
+- Click a bar to select that connection on the topology graph, or click a connection on the graph to highlight and scroll to its bars. The two views stay in step.
+
+![Latency Waterfall](images/debugger_waterfall.png)
+
+### Safe to Run Outside Development
+- Tracing starts **off** and disarms itself after a configurable period of inactivity, so it cannot be left running by accident.
+- Sensitive values in headers and bodies are **redacted by default** — passwords, tokens, API keys, card numbers and more — with a configurable key list.
+- Bodies can be excluded from capture entirely when even best-effort redaction is not enough.
+- Trace a **single transaction** in a busy application: give CamelBee an order id or correlation id and it records only the flow containing it, along with the branches that flow spawns. Everything else is never recorded at all.
 
 ### Health Monitoring
 - View the health status of your microservice at a glance with the built-in health panel, showing context name, framework version, Camel version, JVM, and garbage collector information.
@@ -505,6 +521,29 @@ public class YourApplication {
 Wiring and `application.properties` configuration are the same as in Option 1 above — attach CamelBee explicitly with `CamelBee.register(main)` before the context starts.
 
 Once your application is running, the CamelBee UI is available at: `http://localhost:8080/camelbee/index.html` (Quarkus/Spring Boot) or `http://localhost:8081/camelbee` (Standalone, served on the camel-main management server).
+
+### Running CamelBee Outside Development
+
+The snippets above are enough to get started, and the production-safety defaults are already correct
+— tracing starts off, disarms itself when idle, and sensitive values are redacted without any
+configuration. Three further properties are available when you need them:
+
+```properties
+# redact configured keys out of traced headers and bodies (default: true)
+camelbee.masking-enabled = true
+# your own comma-separated key list, replacing the built-in one
+camelbee.masked-keys = password,token,authorization,apikey,creditcard,cvv,iban,ssn
+# never capture body text at all - the only hard guarantee (default: true)
+camelbee.tracer-body-enabled = true
+```
+
+To trace one transaction in a busy application, type an order id or correlation id into the amber
+**Only trace containing…** box in the toolbar before starting tracing: only the flow containing it is
+recorded, along with the branches that flow spawns.
+
+See [Using CamelBee in Production](https://github.com/camelbee/camelbee/blob/main/docs/camelbee_userguide.md#using-camelbee-in-production)
+in the User Guide, and the Configuration section of your runtime's core README, for what these
+guarantee and — just as importantly — what they do not.
 
 ### Detailed Documentation
 

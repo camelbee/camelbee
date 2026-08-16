@@ -45,11 +45,13 @@ export async function triggerPipeline(request: APIRequestContext) {
 export async function useStandaloneObservabilityUrls(page: Page) {
   await page.getByRole('link', { name: 'SETTINGS' }).click();
 
-  const healthInput = page.getByRole('textbox').first();
+  // by accessible name rather than by position - the inputs used to be reachable only as
+  // textbox().first()/.nth(1), which silently follows whatever order the form happens to be in
+  const healthInput = page.getByLabel('health url');
   await expect(healthInput).toHaveValue('/health');
   await healthInput.fill('/observe/health');
 
-  const metricsInput = page.getByRole('textbox').nth(1);
+  const metricsInput = page.getByLabel('metrics url');
   await expect(metricsInput).toHaveValue('/metrics');
   await metricsInput.fill('/observe/metrics');
 }

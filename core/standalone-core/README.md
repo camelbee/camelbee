@@ -118,6 +118,12 @@ camelbee.logging-enabled = false
 camelbee.tracer-max-idle-time = 300000
 # maximum collected trace messages (default: 1000)
 camelbee.tracer-max-messages-count = 1000
+# when enabled redacts configured keys out of traced headers and bodies (default: true)
+camelbee.masking-enabled = true
+# comma-separated key names to redact; replaces the built-in list entirely (default: see below)
+camelbee.masked-keys = password,token,authorization,apikey,creditcard,cvv,iban,ssn
+# when disabled no message body text is captured at all - the only hard guarantee (default: true)
+camelbee.tracer-body-enabled = true
 ```
 
 ### Application and Management Ports
@@ -130,38 +136,6 @@ camel.server.enabled = true
 camel.server.host = 0.0.0.0
 camel.server.port = 8080
 ```
-
-## Accessing the Embedded UI
-
-Once your application is running, the embedded CamelBee UI is available on the management server at:
-
-`http://localhost:8081/camelbee`
-
-This provides route visualization, message tracing, debugging with replay, filtering, endpoint triggering, and metrics directly in your browser.
-
-Prometheus metrics are exposed on the same management server at:
-
-`http://localhost:8081/observe/metrics`
-
-## Example Implementation
-
-Discover a practical and functional application of this core library within the 'allcomponent-standalone-sample' Maven project showcased below as a successful and operational example:
-
-```shell
-camelbee/
-|-- core/
-|   |-- standalone-core/
-|   |   |-- ...
-|-- examples/
-|   |-- allcomponent-standalone-sample/
-|   |   |-- ...
-```
-
-## Related Documentation
-
-- [CamelBee User Guide](../../docs/camelbee_userguide.md) — a tour of the UI's pages and features
-- Using Quarkus? See the [Quarkus Core README](../quarkus-core/README.md)
-- Using Spring Boot? See the [Spring Boot Core README](../springboot-core/README.md)
 
 ### Redacting sensitive data
 
@@ -217,3 +191,35 @@ Enter - not per keystroke, because changing it discards what matched the previou
 
 This is different from the toolbar's grey **Filter messages** box, which only hides rows that were
 already recorded and already served. For production, the capture filter is the one that matters.
+
+## Accessing the Embedded UI
+
+Once your application is running, the embedded CamelBee UI is available on the management server at:
+
+`http://localhost:8081/camelbee`
+
+This provides route visualization, message tracing, debugging with replay, filtering, endpoint triggering, and metrics directly in your browser.
+
+Prometheus metrics are exposed on the same management server at:
+
+`http://localhost:8081/observe/metrics`
+
+## Example Implementation
+
+Discover a practical and functional application of this core library within the 'allcomponent-standalone-sample' Maven project showcased below as a successful and operational example:
+
+```shell
+camelbee/
+|-- core/
+|   |-- standalone-core/
+|   |   |-- ...
+|-- examples/
+|   |-- allcomponent-standalone-sample/
+|   |   |-- ...
+```
+
+## Related Documentation
+
+- [CamelBee User Guide](../../docs/camelbee_userguide.md) — a tour of the UI's pages and features
+- Using Quarkus? See the [Quarkus Core README](../quarkus-core/README.md)
+- Using Spring Boot? See the [Spring Boot Core README](../springboot-core/README.md)
