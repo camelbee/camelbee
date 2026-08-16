@@ -21,8 +21,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -346,6 +348,73 @@ class MessageTracingIntegrationTest extends CamelBeeApplicationSupport {
   private static String text(JsonNode message, String field) {
     JsonNode value = message.get(field);
     return value == null || value.isNull() ? null : value.asText();
+  }
+
+  @Test
+  @DisplayName("every traced exchange links back to the one request, with no cycle")
+  void parentExchangeIdFormsOneAcyclicTree() {
+    // This pipeline - wireTap, multicast, two enriches, recipientList, routingSlip, dynamicRouter,
+    // toD, pollEnrich - is the reason this test exists. Each single EIP is easy to get right in
+    // isolation; the combination is not. The aggregating ones copy a branch's properties back onto
+    // the original when merging results, and an earlier implementation that derived the parent from
+    // its own PREVIOUS_EXCHANGE_ID was corrupted by exactly that: copies inherited a SIBLING's id
+    // and the root ended up parented to its own grandchild, i.e. a cycle. The UI's waterfall then
+    // split one request into a dozen unrelated flows.
+    Map<String, String> parentOf = new LinkedHashMap<>();
+
+    for (JsonNode message : traced) {
+      String exchangeId = message.get("exchangeId").asText();
+      JsonNode parent = message.get("parentExchangeId");
+      String parentId = parent == null || parent.isNull() ? null : parent.asText();
+
+      // every message of an exchange must agree on the parent
+      if (parentOf.containsKey(exchangeId)) {
+        assertThat(parentId)
+            .as("messages of exchange %s disagree on the parent", exchangeId)
+            .isEqualTo(parentOf.get(exchangeId));
+      }
+      parentOf.put(exchangeId, parentId);
+    }
+
+    assertThat(parentOf).as("nothing was traced").isNotEmpty();
+
+    // no cycle, and no parent that was never traced
+    parentOf.forEach((start, ignored) -> {
+      Set<String> seen = new LinkedHashSet<>();
+      String cursor = start;
+      while (cursor != null && parentOf.get(cursor) != null) {
+        assertThat(seen.add(cursor)).as("cycle reached from %s: %s", start, seen).isTrue();
+        String next = parentOf.get(cursor);
+        assertThat(parentOf).as("%s claims parent %s, never traced", cursor, next).containsKey(next);
+        cursor = next;
+      }
+    });
+
+    // an exchange is never its own parent
+    parentOf.forEach((exchangeId, parentId) -> assertThat(parentId).as("%s is its own parent", exchangeId).isNotEqualTo(exchangeId));
+  }
+
+  @Test
+  @DisplayName("the branch-spawning EIPs all record a parent")
+  void branchingEipsRecordAParent() {
+    // the copies these make are the whole point of parentExchangeId: without it each appears in the
+    // UI as an island unrelated to the request that spawned it
+    List<String> branchTargets = List.of(
+        "direct://invokeWireTap", "direct://invokeMockA", "direct://invokeMockB",
+        "direct://invokeEnrich", "direct://invokeEnrichDynamic", "direct://invokeFile");
+
+    for (String target : branchTargets) {
+      List<JsonNode> messages = where(message -> {
+        JsonNode endpoint = message.get("endpoint");
+        return endpoint != null && !endpoint.isNull() && target.equals(endpoint.asText());
+      });
+
+      assertThat(messages).as("no messages traced for %s", target).isNotEmpty();
+      assertThat(messages).as("%s recorded no parent", target).anySatisfy(message -> {
+        JsonNode parent = message.get("parentExchangeId");
+        assertThat(parent != null && !parent.isNull()).isTrue();
+      });
+    }
   }
 
   private static List<JsonNode> where(Predicate<JsonNode> predicate) {

@@ -6,6 +6,7 @@ import { Toolbar } from '@/components/debugger/Toolbar';
 import { RouteGraph } from '@/components/debugger/RouteGraph';
 import { TimelineBar } from '@/components/debugger/TimelineBar';
 import { MessagePanel } from '@/components/debugger/MessagePanel';
+import { WaterfallPanel } from '@/components/debugger/WaterfallPanel';
 import { buildRouteGraph, type MessageEdge } from '@/utils/routeGraph';
 
 export function DebuggerPage() {
@@ -51,6 +52,10 @@ export function DebuggerPage() {
   // renders and is fully inspectable regardless of this list.
   const [dynamicEdges, setDynamicEdges] = useState<MessageEdge[]>([]);
 
+  // Closed by default: it costs vertical space the graph would otherwise use, and is a
+  // "why was this slow" tool rather than something needed on every visit.
+  const [waterfallOpen, setWaterfallOpen] = useState(false);
+
   const onDynamicEdgeAdded = useCallback((edge: MessageEdge) => {
     setDynamicEdges((prev) => {
       if (prev.some((e) => e.id === edge.id)) return prev;
@@ -90,7 +95,12 @@ export function DebuggerPage() {
 
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden">
-      <Toolbar context={context} health={health ?? undefined} />
+      <Toolbar
+        context={context}
+        health={health ?? undefined}
+        waterfallOpen={waterfallOpen}
+        onToggleWaterfall={() => setWaterfallOpen((open) => !open)}
+      />
 
       <div className="flex flex-1 overflow-hidden">
         <div className="flex-1">
@@ -100,6 +110,10 @@ export function DebuggerPage() {
         </div>
         <MessagePanel edges={allEdges} />
       </div>
+
+      {waterfallOpen && (
+        <WaterfallPanel edges={allEdges} onClose={() => setWaterfallOpen(false)} />
+      )}
 
       <TimelineBar />
     </div>

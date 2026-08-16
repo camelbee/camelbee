@@ -98,11 +98,12 @@ public class MusicianRoute extends RouteBuilder {
 
     // period/delay are properties so a test run can silence this route - its traffic would
     // otherwise keep arriving while an assertion is inspecting the traced messages
-    from("timer://foo?period={{camelbee.sample.timer-period}}&delay={{camelbee.sample.timer-delay}}")
+    /*from("timer://foo?period={{camelbee.sample.timer-period}}&delay={{camelbee.sample.timer-delay}}")
         .routeId("timerRoute")
         .description("Periodic traffic generator so the UI has something to show")
         .setBody(constant("timerTestMessage"))
         .to(MUSICIAN_PROCESSOR_ROUTE);
+    */
 
     from("file://inputdir?delete=true").routeId("fileListenerRoute")
         .description("Picks up files dropped into inputdir")

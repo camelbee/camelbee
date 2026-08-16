@@ -23,6 +23,7 @@ import static org.camelbee.constants.CamelBeeConstants.INITIAL_EXCHANGE_ID;
 import java.util.Deque;
 import org.apache.camel.Exchange;
 import org.apache.camel.spi.CamelEvent.ExchangeCompletedEvent;
+import org.apache.camel.spi.CamelEvent.ExchangeFailedEvent;
 import org.apache.camel.support.DefaultExchange;
 import org.camelbee.debugger.model.exchange.Message;
 import org.camelbee.debugger.model.exchange.MessageEventType;
@@ -49,8 +50,27 @@ public class ExchangeCompletedEventTracer {
    * @return The Messages.
    */
   public Message traceEvent(ExchangeCompletedEvent event) {
+    return traceTermination(event.getExchange(), false);
+  }
 
-    Exchange exchange = event.getExchange();
+  /**
+   * Trace ExchangeFailedEvent, which Camel fires <em>instead of</em> ExchangeCompletedEvent when an
+   * exchange terminates with an unhandled exception - the two are mutually exclusive.
+   *
+   * <p>Without this the closing marker is simply absent for a failed exchange. On a producer-started
+   * route the error still surfaces, because the enclosing send reports it on its own SENT; on a
+   * consumer-started route (timer, file, jms - the common production shape) there is no enclosing
+   * send, and the failure went unrecorded entirely: the trace ended at the last successful hop and
+   * was indistinguishable from a route that finished cleanly.
+   *
+   * @param event The ExchangeFailedEvent.
+   * @return The Message.
+   */
+  public Message traceEvent(ExchangeFailedEvent event) {
+    return traceTermination(event.getExchange(), true);
+  }
+
+  private Message traceTermination(Exchange exchange, boolean failed) {
 
     try {
       /*
@@ -70,7 +90,7 @@ public class ExchangeCompletedEventTracer {
       final String responseCompletedBody = ExchangeUtils.readBodyAsString(exchange, true);
       final var responseHeaders = ExchangeUtils.getHeaders(exchange);
 
-      return processCompletedMessage(exchange, responseCompletedBody, responseHeaders);
+      return processCompletedMessage(exchange, responseCompletedBody, responseHeaders, failed);
 
     } catch (Exception e) {
       LOGGER.warn("Could not trace ExchangeCompletedEvent: {} with exception: {}", exchange, e);
@@ -79,7 +99,8 @@ public class ExchangeCompletedEventTracer {
 
   }
 
-  private Message processCompletedMessage(Exchange exchange, String responseCompletedBody, String requestHeaders) {
+  private Message processCompletedMessage(Exchange exchange, String responseCompletedBody, String requestHeaders,
+      boolean failed) {
 
     Deque<String> routeStack = (Deque<String>) exchange.getProperty(CURRENT_ROUTE_TRACE_STACK);
 
@@ -91,13 +112,18 @@ public class ExchangeCompletedEventTracer {
     final String currentRoute = routeStack.pop();
     final String callerRoute = routeStack.peek();
 
-    MessageType messageType = MessageType.RESPONSE;
-
     String errorMessage = TracerUtils.handleError(exchange, currentRoute);
 
-    if (errorMessage != null) {
-      messageType = MessageType.ERROR_RESPONSE;
-    }
+    /*
+     A failed exchange is reported as an error even when handleError returns nothing. That happens
+     when the exception was already reported on an earlier hop - handleError deduplicates by the
+     exception's identity - which is the producer-started case, where the enclosing send got there
+     first. Suppressing the text avoids showing the same exception twice; keeping ERROR_RESPONSE
+     keeps the closing marker from claiming the exchange ended cleanly.
+     */
+    MessageType messageType = failed || errorMessage != null
+        ? MessageType.ERROR_RESPONSE
+        : MessageType.RESPONSE;
 
     /*
       if this ExchangeCompletedEvent is triggered after another ExchangeCompletedEvent
@@ -106,8 +132,9 @@ public class ExchangeCompletedEventTracer {
      */
     final String endpointId = ((DefaultExchange) exchange).getExchangeExtension().getHistoryNodeId();
 
-    return new Message(exchange.getExchangeId(), MessageEventType.COMPLETED, responseCompletedBody, requestHeaders, callerRoute,
-        currentRoute, TracerUtils.resolveNodeId(exchange, endpointId), messageType, errorMessage);
+    return TracerUtils.stampParentExchangeId(
+        new Message(exchange.getExchangeId(), MessageEventType.COMPLETED, responseCompletedBody, requestHeaders, callerRoute,
+            currentRoute, TracerUtils.resolveNodeId(exchange, endpointId), messageType, errorMessage), exchange);
   }
 
 }

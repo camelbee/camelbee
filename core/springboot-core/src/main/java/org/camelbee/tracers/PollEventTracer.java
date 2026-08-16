@@ -81,13 +81,15 @@ public class PollEventTracer {
     final String headers = ExchangeUtils.getHeaders(exchange);
     final String errorMessage = TracerUtils.handleError(exchange, polledEndpoint);
 
-    Message request = new Message(exchange.getExchangeId(), MessageEventType.SENDING, requestBody,
-        headers, callerRoute, polledEndpoint, nodeId, MessageType.REQUEST, null);
+    Message request = TracerUtils.stampParentExchangeId(
+        new Message(exchange.getExchangeId(), MessageEventType.SENDING, requestBody,
+            headers, callerRoute, polledEndpoint, nodeId, MessageType.REQUEST, null), exchange);
 
-    Message response = new Message(exchange.getExchangeId(), MessageEventType.SENT, responseBody,
-        headers, callerRoute, polledEndpoint, nodeId,
-        errorMessage != null ? MessageType.ERROR_RESPONSE : MessageType.RESPONSE, errorMessage,
-        timeTaken);
+    Message response = TracerUtils.stampParentExchangeId(
+        new Message(exchange.getExchangeId(), MessageEventType.SENT, responseBody,
+            headers, callerRoute, polledEndpoint, nodeId,
+            errorMessage != null ? MessageType.ERROR_RESPONSE : MessageType.RESPONSE, errorMessage,
+            timeTaken), exchange);
 
     return List.of(request, response);
   }

@@ -108,8 +108,9 @@ public class ExchangeCreatedEventTracer {
 
     final String endpointId = ((DefaultExchange) exchange).getExchangeExtension().getHistoryNodeId();
 
-    return new Message(exchange.getExchangeId(), MessageEventType.CREATED, directRequestBody, requestHeaders, initialRoute,
-        currentRouteName, TracerUtils.resolveNodeId(exchange, endpointId), MessageType.REQUEST, null);
+    return TracerUtils.stampParentExchangeId(
+        new Message(exchange.getExchangeId(), MessageEventType.CREATED, directRequestBody, requestHeaders, initialRoute,
+            currentRouteName, TracerUtils.resolveNodeId(exchange, endpointId), MessageType.REQUEST, null), exchange);
 
   }
 

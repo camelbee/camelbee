@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { MessagePanel } from './MessagePanel';
 import type { MessageEdge, MessageEdgeData } from '@/utils/routeGraph';
 import { useDebuggerStore } from '@/store/debuggerStore';
+import { useSettingsStore } from '@/store/settingsStore';
 import { makeMessage } from '@/test/factories';
 
 function edge(id: string, data: Partial<MessageEdgeData> = {}): MessageEdge {
@@ -155,5 +156,74 @@ describe('MessagePanel', () => {
     expect(screen.getByText('3 / 3')).toBeInTheDocument();
     expect(screen.getByText('Success')).toBeInTheDocument();
     expect((screen.getByText('Next ▶') as HTMLButtonElement).disabled).toBe(true);
+  });
+});
+
+describe('MessagePanel resizing', () => {
+  beforeEach(() => {
+    useSettingsStore.setState({ messagePanelWidth: 400 });
+    seedMessages();
+    useDebuggerStore.getState().selectEdge('edge-1');
+  });
+
+  /** Drag the grip by `dx` px; negative is leftwards, which makes the panel wider. */
+  function dragHandle(dx: number) {
+    fireEvent.mouseDown(screen.getByTestId('message-panel-resize-handle'), { clientX: 900 });
+    fireEvent.mouseMove(window, { clientX: 900 + dx });
+    fireEvent.mouseUp(window);
+  }
+
+  it('applies the stored width', () => {
+    useSettingsStore.setState({ messagePanelWidth: 520 });
+
+    render(<MessagePanel edges={edges} />);
+
+    expect(screen.getByTestId('message-panel')).toHaveStyle({ width: '520px' });
+  });
+
+  it('grows when the grip is dragged left', () => {
+    render(<MessagePanel edges={edges} />);
+
+    dragHandle(-150);
+
+    expect(useSettingsStore.getState().messagePanelWidth).toBe(550);
+    expect(screen.getByTestId('message-panel')).toHaveStyle({ width: '550px' });
+  });
+
+  it('shrinks when the grip is dragged right', () => {
+    render(<MessagePanel edges={edges} />);
+
+    dragHandle(80);
+
+    expect(useSettingsStore.getState().messagePanelWidth).toBe(320);
+  });
+
+  it('stops shrinking at the minimum instead of collapsing', () => {
+    render(<MessagePanel edges={edges} />);
+
+    dragHandle(5000);
+
+    expect(useSettingsStore.getState().messagePanelWidth).toBe(280);
+  });
+
+  it('never grows past the viewport, so the graph keeps room', () => {
+    render(<MessagePanel edges={edges} />);
+
+    dragHandle(-5000);
+
+    expect(useSettingsStore.getState().messagePanelWidth).toBeLessThanOrEqual(
+      window.innerWidth - 240,
+    );
+  });
+
+  it('resizes from the keyboard, with left growing the panel', () => {
+    render(<MessagePanel edges={edges} />);
+    const handle = screen.getByTestId('message-panel-resize-handle');
+
+    fireEvent.keyDown(handle, { key: 'ArrowLeft' });
+    expect(useSettingsStore.getState().messagePanelWidth).toBe(424);
+
+    fireEvent.keyDown(handle, { key: 'ArrowRight' });
+    expect(useSettingsStore.getState().messagePanelWidth).toBe(400);
   });
 });

@@ -9,9 +9,11 @@ import { HealthPanel } from '@/components/HealthPanel';
 interface ToolbarProps {
   context: CamelBeeContext | undefined;
   health?: HealthResponse;
+  waterfallOpen?: boolean;
+  onToggleWaterfall?: () => void;
 }
 
-export function Toolbar({ context, health }: ToolbarProps) {
+export function Toolbar({ context, health, waterfallOpen, onToggleWaterfall }: ToolbarProps) {
   const isTracing = useDebuggerStore((s) => s.isTracing);
   const setTracing = useDebuggerStore((s) => s.setTracing);
   const setFilterText = useDebuggerStore((s) => s.setFilterText);
@@ -109,6 +111,21 @@ export function Toolbar({ context, health }: ToolbarProps) {
       >
         {isTracing ? 'Stop Tracing' : 'Start Tracing'}
       </button>
+
+      {/* Waterfall toggle */}
+      {onToggleWaterfall && (
+        <button
+          onClick={onToggleWaterfall}
+          aria-pressed={!!waterfallOpen}
+          className={`rounded px-3 py-1 text-xs font-medium transition ${
+            waterfallOpen
+              ? 'bg-blue-600 text-white hover:bg-blue-700'
+              : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
+          }`}
+        >
+          Waterfall
+        </button>
+      )}
 
       {/* Delete messages */}
       <button

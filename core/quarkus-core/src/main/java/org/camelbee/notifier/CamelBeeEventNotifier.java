@@ -6,6 +6,7 @@ import org.apache.camel.impl.event.ExchangeSendingEvent;
 import org.apache.camel.impl.event.ExchangeSentEvent;
 import org.apache.camel.spi.CamelEvent;
 import org.apache.camel.spi.CamelEvent.ExchangeCompletedEvent;
+import org.apache.camel.spi.CamelEvent.ExchangeFailedEvent;
 import org.apache.camel.support.EventNotifierSupport;
 import org.camelbee.tracers.TracerService;
 import org.slf4j.Logger;
@@ -41,6 +42,12 @@ public class CamelBeeEventNotifier extends EventNotifierSupport {
       tracerService.traceExchangeSentEvent(exchangeSentEvent);
     } else if (event instanceof ExchangeCompletedEvent exchangeCompletedEvent) {
       tracerService.traceExchangeCompletedEvent(exchangeCompletedEvent);
+    } else if (event instanceof ExchangeFailedEvent exchangeFailedEvent) {
+      /*
+       fired instead of - never alongside - ExchangeCompletedEvent, so without this branch a failed
+       exchange has no closing marker at all
+       */
+      tracerService.traceExchangeFailedEvent(exchangeFailedEvent);
     } else {
       LOGGER.trace("Event type not traced: {}", event.getClass().getName());
     }

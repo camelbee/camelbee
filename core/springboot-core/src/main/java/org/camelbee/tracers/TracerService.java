@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.apache.camel.Exchange;
 import org.apache.camel.spi.CamelEvent.ExchangeCompletedEvent;
 import org.apache.camel.spi.CamelEvent.ExchangeCreatedEvent;
+import org.apache.camel.spi.CamelEvent.ExchangeFailedEvent;
 import org.apache.camel.spi.CamelEvent.ExchangeSendingEvent;
 import org.apache.camel.spi.CamelEvent.ExchangeSentEvent;
 import org.camelbee.debugger.model.exchange.Message;
@@ -193,6 +194,30 @@ public class TracerService {
 
     if (loggingEnabled) {
       loggingService.logMessage(message, "Response completed:", false);
+    }
+
+    if (tracerEnabled && isTracingActivated()) {
+      messageService.addMessage(message);
+    }
+
+  }
+
+  /**
+   * traceExchangeFailedEvent. Camel fires this instead of ExchangeCompletedEvent when an exchange
+   * terminates with an unhandled exception, so this is the closing marker for a failed exchange.
+   *
+   * @param exchangeFailedEvent The exchange.
+   */
+  public void traceExchangeFailedEvent(ExchangeFailedEvent exchangeFailedEvent) {
+
+    if (!isActive()) {
+      return;
+    }
+
+    Message message = exchangeCompletedEventTracer.traceEvent(exchangeFailedEvent);
+
+    if (loggingEnabled) {
+      loggingService.logMessage(message, "Response failed:", false);
     }
 
     if (tracerEnabled && isTracingActivated()) {

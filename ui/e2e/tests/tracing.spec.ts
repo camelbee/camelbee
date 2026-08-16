@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { openDebugger, startTracing, triggerPipeline, clickEdge, CAMELBEE_API } from '../fixtures';
 
+const DLQ_EDGE = 'edge-route-deadLetterRoute-producer-mock_dlq-dlqEndpoint';
 const FLAKY_EDGE = 'edge-route-invokeFlakyRoute-route-flakyTargetRoute-flakyEndpoint';
 const ENRICH_EDGE = 'edge-route-invokeEnrichRoute-producer-mock_enrich-enrichEndpoint';
 
@@ -148,6 +149,28 @@ test.describe('message tracing', () => {
     }
   });
 
+  test('the message panel can be dragged wider, and the size persists', async ({ page }) => {
+    await clickEdge(page, ENRICH_EDGE);
+
+    const panel = page.getByTestId('message-panel');
+    await expect(panel).toBeVisible();
+    const before = (await panel.boundingBox())!.width;
+
+    const grip = (await page.getByTestId('message-panel-resize-handle').boundingBox())!;
+    await page.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(grip.x - 160, grip.y + grip.height / 2, { steps: 10 });
+    await page.mouse.up();
+
+    const after = (await panel.boundingBox())!.width;
+    expect(after).toBeGreaterThan(before + 80);
+
+    // width is a stored setting, so reselecting the edge keeps it
+    await page.getByLabel('Close message panel').click();
+    await clickEdge(page, ENRICH_EDGE);
+    expect((await panel.boundingBox())!.width).toBeCloseTo(after, 0);
+  });
+
   test('closes the message panel', async ({ page }) => {
     await clickEdge(page, ENRICH_EDGE);
     await expect(page.getByText(/^Messages \(/)).toBeVisible(ARRIVAL);
@@ -182,5 +205,104 @@ test.describe('message tracing', () => {
       const payload = await (await request.get(`${CAMELBEE_API}/messages?index=0`)).json();
       expect(payload.info.count).toBe(0);
     }).toPass({ timeout: 10_000 });
+  });
+});
+
+/**
+ * The waterfall renders bars from `timeTaken`, which only ExchangeSentEvent carries, and groups
+ * exchanges into one flow using `parentExchangeId`. Both are produced by the running sample rather
+ * than by a fixture, so this is the only place either is exercised against real traced data.
+ */
+test.describe('waterfall', () => {
+  const ARRIVAL = { timeout: 20_000 };
+
+  test.beforeEach(async ({ page, request }) => {
+    await openDebugger(page);
+    await startTracing(page);
+    await triggerPipeline(request);
+  });
+
+  test('shows timed hops for real traffic', async ({ page }) => {
+    await page.getByRole('button', { name: 'Waterfall', exact: true }).click();
+
+    const panel = page.getByTestId('waterfall-panel');
+    await expect(panel).toBeVisible();
+
+    // at least one flow, with at least one measured bar
+    await expect(panel.getByTestId('waterfall-bar').first()).toBeVisible(ARRIVAL);
+    await expect(panel.getByText(/\d+ hops? · \d+ms/).first()).toBeVisible();
+  });
+
+  test('can be dragged taller, and the size survives closing and reopening', async ({ page }) => {
+    const toggle = page.getByRole('button', { name: 'Waterfall', exact: true });
+    await toggle.click();
+
+    const panel = page.getByTestId('waterfall-panel');
+    const before = (await panel.boundingBox())!.height;
+
+    const handle = page.getByTestId('waterfall-resize-handle');
+    const grip = (await handle.boundingBox())!;
+    await page.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(grip.x + grip.width / 2, grip.y - 120, { steps: 10 });
+    await page.mouse.up();
+
+    const after = (await panel.boundingBox())!.height;
+    expect(after).toBeGreaterThan(before + 50);
+
+    // the height is a stored setting, not component state, so it comes back
+    await page.getByLabel('Close waterfall').click();
+    await toggle.click();
+    expect((await panel.boundingBox())!.height).toBeCloseTo(after, 0);
+  });
+
+  test('links both ways with the topology graph', async ({ page }) => {
+    // topology -> waterfall: selecting the edge on the graph highlights its bars
+    await clickEdge(page, ENRICH_EDGE);
+    await page.getByRole('button', { name: 'Waterfall', exact: true }).click();
+
+    const highlighted = page.getByTestId('waterfall-row-selected');
+    await expect(highlighted.first()).toBeVisible(ARRIVAL);
+
+    // waterfall -> topology: clicking the highlighted bar again clears the selection everywhere,
+    // which also closes the message panel the graph selection had opened
+    await highlighted.first().click();
+    await expect(page.getByTestId('message-panel')).toBeHidden();
+    await expect(page.getByTestId('waterfall-row-selected')).toHaveCount(0);
+
+    // and clicking a bar selects that edge, reopening the message panel for it
+    await page.getByTestId('waterfall-row').first().click();
+    await expect(page.getByTestId('message-panel')).toBeVisible();
+  });
+
+  test('scrolls a selected hop into view when it is below the fold', async ({ page }) => {
+    await page.getByRole('button', { name: 'Waterfall', exact: true }).click();
+    const scrollArea = page.getByTestId('waterfall-panel').locator('div.overflow-y-auto');
+    await expect(page.getByTestId('waterfall-row').first()).toBeVisible(ARRIVAL);
+
+    // the main flow has ~49 hops in a 256px panel, so a late hop is well below the fold
+    expect(await scrollArea.evaluate((el) => el.scrollTop)).toBe(0);
+
+    await clickEdge(page, DLQ_EDGE);
+
+    const highlighted = page.getByTestId('waterfall-row-selected').first();
+    await expect(highlighted).toBeVisible();
+    expect(await scrollArea.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
+  });
+
+  test('closes from its own button and from the toolbar toggle', async ({ page }) => {
+    // exact: the panel's own close button is labelled 'Close waterfall' and would also match
+    const toggle = page.getByRole('button', { name: 'Waterfall', exact: true });
+
+    await toggle.click();
+    await expect(page.getByTestId('waterfall-panel')).toBeVisible();
+
+    await page.getByLabel('Close waterfall').click();
+    await expect(page.getByTestId('waterfall-panel')).toBeHidden();
+
+    await toggle.click();
+    await expect(page.getByTestId('waterfall-panel')).toBeVisible();
+    await toggle.click();
+    await expect(page.getByTestId('waterfall-panel')).toBeHidden();
   });
 });

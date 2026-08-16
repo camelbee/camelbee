@@ -43,6 +43,8 @@ public class Message {
 
   private final long timeTaken;
 
+  private String parentExchangeId;
+
   /**
    * Message Constructor.
    *
@@ -135,5 +137,23 @@ public class Message {
 
   public long getTimeTaken() {
     return timeTaken;
+  }
+
+  /**
+   * Id of the exchange this one was copied from, or null when the exchange was not a copy - which is
+   * the common case. Set once, before the message is published to the message list.
+   *
+   * <p>Non-null for the children of wireTap, multicast, split, recipientList and async handoffs,
+   * whose copies each get a fresh exchange id and would otherwise appear unrelated to the exchange
+   * that spawned them.
+   *
+   * @return the parent exchange id, or null.
+   */
+  public String getParentExchangeId() {
+    return parentExchangeId;
+  }
+
+  public void setParentExchangeId(String parentExchangeId) {
+    this.parentExchangeId = parentExchangeId;
   }
 }

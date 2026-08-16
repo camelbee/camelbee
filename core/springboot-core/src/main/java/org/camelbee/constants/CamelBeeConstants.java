@@ -60,4 +60,22 @@ public final class CamelBeeConstants {
 
   public static final String PREVIOUS_EXCHANGE_ID = "camelbee-previous-exchange-id";
 
+  /**
+   * Id of the exchange that started this lineage - written once, when an exchange is first traced
+   * and the property is absent, and never rewritten afterwards.
+   *
+   * <p>Never rewriting is the entire point. Exchange properties are carried into copies, so a copy
+   * inherits the root's id and reports it as its parent. The aggregating EIPs (multicast, enrich,
+   * pollEnrich, recipientList) then copy the branch's properties BACK onto the original when
+   * merging results - and because the branch never changed this value, what flows back is the value
+   * the original already had. Anything that did change per-exchange would corrupt the original here,
+   * which is exactly what an earlier attempt built on {@link #PREVIOUS_EXCHANGE_ID} did: the root
+   * ended up parented to its own grandchild, producing cycles.
+   *
+   * <p>Used only as the fallback. {@code ExchangePropertyKey.CORRELATION_ID} is preferred where
+   * Camel sets it, because it names the immediate parent rather than the lineage root; it is absent
+   * exactly for wireTap, which removes it from the copy.
+   */
+  public static final String CAMELBEE_LINEAGE_ROOT = "camelbee-lineage-root";
+
 }

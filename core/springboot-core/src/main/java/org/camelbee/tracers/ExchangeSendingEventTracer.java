@@ -141,9 +141,10 @@ public class ExchangeSendingEventTracer {
     // if custom error is thrown then we need to handle that one as well.
     String errorMessage = TracerUtils.handleError(exchange, currentRoute);
 
-    return new Message(exchange.getExchangeId(), MessageEventType.SENDING, requestBody, requestHeaders, routeId,
-        currentRoute, TracerUtils.resolveNodeId(exchange, endpointId), MessageType.REQUEST,
-        errorMessage);
+    return TracerUtils.stampParentExchangeId(
+        new Message(exchange.getExchangeId(), MessageEventType.SENDING, requestBody, requestHeaders, routeId,
+            currentRoute, TracerUtils.resolveNodeId(exchange, endpointId), MessageType.REQUEST,
+            errorMessage), exchange);
   }
 
   private Deque<String> adjustStack(Exchange exchange, Deque<String> routeStack) {

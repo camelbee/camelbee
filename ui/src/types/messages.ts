@@ -24,6 +24,15 @@ export interface Message {
   timeStamp: string;
   /** Elapsed ms from ExchangeSentEvent.getTimeTaken(); 0 for non-SENT message types. */
   timeTaken: number;
+  /**
+   * Id of the exchange this one was copied from, or null when it was not a copy — the common case.
+   * Non-null for the children of wireTap, multicast, split, recipientList and async handoffs, which
+   * each get a fresh exchangeId and would otherwise look unrelated to the flow that spawned them.
+   *
+   * Nothing renders this yet; it is carried so a flow-grouping view can be built on traces that are
+   * already being collected.
+   */
+  parentExchangeId: string | null;
 }
 
 /** Matches Java: org.camelbee.debugger.model.exchange.MessageListInfo */

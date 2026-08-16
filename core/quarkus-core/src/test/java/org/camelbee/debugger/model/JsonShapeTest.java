@@ -118,7 +118,7 @@ class JsonShapeTest {
   void messageKeys() {
     assertThat(keysOf(message())).containsExactlyInAnyOrder(
         "exchangeId", "exchangeEventType", "messageBody", "headers", "routeId", "endpoint",
-        "endpointId", "messageType", "exception", "timeStamp", "timeTaken");
+        "endpointId", "messageType", "exception", "timeStamp", "timeTaken", "parentExchangeId");
   }
 
   @Test

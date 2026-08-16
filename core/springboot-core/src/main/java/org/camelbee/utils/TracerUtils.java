@@ -16,11 +16,14 @@
 
 package org.camelbee.utils;
 
+import static org.camelbee.constants.CamelBeeConstants.CAMELBEE_LINEAGE_ROOT;
 import static org.camelbee.constants.CamelBeeConstants.CAMELBEE_NODE_ID;
 import static org.camelbee.constants.CamelBeeConstants.CAMEL_FAILED_EVENT_ENDPOINT;
 import static org.camelbee.constants.CamelBeeConstants.CAMEL_FAILED_EVENT_IDENTITY_HASHCODE;
 
 import org.apache.camel.Exchange;
+import org.apache.camel.ExchangePropertyKey;
+import org.camelbee.debugger.model.exchange.Message;
 
 /**
  * TracerUtils.
@@ -49,6 +52,65 @@ public class TracerUtils {
       return historyNodeId;
     }
     return exchange.getProperty(CAMELBEE_NODE_ID, String.class);
+  }
+
+  /**
+   * Records on the message which exchange this one was copied from, when it was a copy.
+   *
+   * @param message  the message being built, never null.
+   * @param exchange the exchange being traced.
+   * @return the same message, for use as {@code return stampParentExchangeId(new Message(...), ex)}.
+   */
+  public static Message stampParentExchangeId(Message message, Exchange exchange) {
+    message.setParentExchangeId(resolveParentExchangeId(exchange));
+    return message;
+  }
+
+  /**
+   * Resolves which exchange this one was copied from, or null when it was not a copy.
+   *
+   * <p>Two sources, in order:
+   *
+   * <ol>
+   * <li>Camel's {@code ExchangePropertyKey.CORRELATION_ID}, set by
+   * {@code ExchangeHelper.createCorrelatedCopy} for enrich, multicast, split, recipientList and
+   * routingSlip. It names the <em>immediate</em> parent, and {@code MulticastProcessor} removes and
+   * restores it around result aggregation, so it survives the merge back into the original.</li>
+   * <li>{@link org.camelbee.constants.CamelBeeConstants#CAMELBEE_LINEAGE_ROOT}, our own write-once
+   * property, for wireTap - the one EIP that deletes Camel's correlation id from the copy - and for
+   * async handoffs such as seda.</li>
+   * </ol>
+   *
+   * <p>Both are checked against the current exchange id before being believed. That matters for the
+   * first: once the aggregating EIPs have merged their branches back, the original exchange carries
+   * a correlation id equal to its <em>own</em> id, and treating that as a parent would make the
+   * root its own ancestor.
+   *
+   * @param exchange the exchange being traced.
+   * @return the parent exchange id, or null when this exchange started its own lineage.
+   */
+  public static String resolveParentExchangeId(Exchange exchange) {
+    final String self = exchange.getExchangeId();
+
+    final Object correlation = exchange.getProperty(ExchangePropertyKey.CORRELATION_ID);
+
+    if (correlation != null && !self.equals(correlation.toString())) {
+      return correlation.toString();
+    }
+
+    final String lineageRoot = exchange.getProperty(CAMELBEE_LINEAGE_ROOT, String.class);
+
+    if (lineageRoot == null) {
+      /*
+       first time this exchange is traced and nothing was inherited, so it starts its own lineage.
+       Written once and never rewritten - see the constant's javadoc for why rewriting it would
+       reintroduce the corruption this replaced.
+       */
+      exchange.setProperty(CAMELBEE_LINEAGE_ROOT, self);
+      return null;
+    }
+
+    return self.equals(lineageRoot) ? null : lineageRoot;
   }
 
   /**

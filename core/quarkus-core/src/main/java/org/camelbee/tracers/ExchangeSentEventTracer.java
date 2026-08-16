@@ -117,9 +117,10 @@ public class ExchangeSentEventTracer {
       callerRoute = exchange.getProperty(LAST_DIRECT_ROUTE, String.class);
     }
 
-    return new Message(exchange.getExchangeId(), MessageEventType.SENT, responseSentBody, requestHeaders, callerRoute,
-        currentRoute, TracerUtils.resolveNodeId(exchange, endpointId), messageType, errorMessage,
-        timeTaken);
+    return TracerUtils.stampParentExchangeId(
+        new Message(exchange.getExchangeId(), MessageEventType.SENT, responseSentBody, requestHeaders, callerRoute,
+            currentRoute, TracerUtils.resolveNodeId(exchange, endpointId), messageType, errorMessage,
+            timeTaken), exchange);
   }
 
 }

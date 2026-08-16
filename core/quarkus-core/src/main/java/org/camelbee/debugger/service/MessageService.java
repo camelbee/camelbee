@@ -21,6 +21,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 import org.camelbee.debugger.model.exchange.Message;
@@ -50,6 +52,12 @@ public class MessageService {
   // True once maxTracedMessageCount has been hit and further messages are being dropped
   private volatile boolean capReached = false;
 
+  /** Sentinel: ConcurrentHashMap cannot hold a null value, and "no parent" must be remembered. */
+  private static final String NO_PARENT = "";
+
+  /** Write-once parent per exchange - see {@link #applyRememberedParent(Message)}. */
+  private final Map<String, String> parentByExchange = new ConcurrentHashMap<>();
+
   public List<Message> getMessageList() {
     return messageList;
   }
@@ -74,6 +82,7 @@ public class MessageService {
       return;
     }
     if (maxTracedMessageCount > messageList.size()) {
+      applyRememberedParent(message);
       messageList.add(message);
       addVersion.incrementAndGet();
       lastModified = Instant.now();
@@ -83,11 +92,39 @@ public class MessageService {
   }
 
   /**
+   * Pins an exchange's parent to whatever was resolved for its FIRST traced message, and forces
+   * every later message of that exchange to agree.
+   *
+   * <p>The tracers resolve the parent from exchange properties, which are only trustworthy the
+   * first time an exchange is seen. Camel's aggregating EIPs copy a branch's properties back onto
+   * the original when merging results: {@code MulticastProcessor} guards its correlation id against
+   * that, but {@code PollEnricher} does not - so after {@code pollEnrich} drains a queue that a
+   * {@code wireTap} fed, the ORIGINAL exchange carries its own descendant's correlation id and
+   * would otherwise report that descendant as its parent. That is a cycle, and it splits one
+   * request into a dozen unrelated flows in the UI.
+   *
+   * <p>Deciding once, here, is what makes it safe: the first message of an exchange is emitted
+   * before any of its branches exist, so nothing has flowed back yet. Bounded by
+   * {@code maxTracedMessageCount} (there cannot be more exchanges than messages) and cleared by
+   * {@link #reset()}.
+   *
+   * @param message the message about to be recorded; its parent is rewritten in place.
+   */
+  private void applyRememberedParent(Message message) {
+    final String remembered = parentByExchange.computeIfAbsent(
+        message.getExchangeId(),
+        exchangeId -> message.getParentExchangeId() == null ? NO_PARENT : message.getParentExchangeId());
+
+    message.setParentExchangeId(NO_PARENT.equals(remembered) ? null : remembered);
+  }
+
+  /**
    * Reset the message list and increment the reset version.
    * This also resets the addVersion to 0 as we're starting fresh.
    */
   public void reset() {
     messageList.clear();
+    parentByExchange.clear();
     resetVersion.incrementAndGet();
     addVersion.set(0); // Reset add version when list is cleared
     lastModified = Instant.now();
