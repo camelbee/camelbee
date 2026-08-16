@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { CamelBeeContext } from '@/types';
 import type { HealthResponse } from '@/api';
-import { useTraceStatus, useDeleteMessages } from '@/api';
+import { useTraceStatus, useDeleteMessages, useCaptureFilter } from '@/api';
 import { useDebuggerStore } from '@/store/debuggerStore';
 import { HealthPanel } from '@/components/HealthPanel';
 
@@ -32,9 +32,23 @@ export function Toolbar({ context, health, waterfallOpen, onToggleWaterfall }: T
   const queryClient = useQueryClient();
   const traceStatus = useTraceStatus();
   const deleteMessages = useDeleteMessages();
+  const captureFilter = useCaptureFilter();
+
+  /*
+   Deliberately NOT debounced into the server the way localFilter is. This decides what the server
+   records, so changing it mid-session throws away what matched the previous value - it is applied
+   when tracing starts, or explicitly with Enter, never on every keystroke.
+  */
+  const [localCaptureFilter, setLocalCaptureFilter] = useState('');
+
+  const applyCaptureFilter = () => captureFilter.mutate(localCaptureFilter);
 
   const handleToggleTrace = () => {
     const next = !isTracing;
+    if (next) {
+      // applied before tracing starts, so nothing outside the investigation is ever recorded
+      captureFilter.mutate(localCaptureFilter);
+    }
     if (next) {
       // Clear old messages before starting a new tracing session
       deleteMessages.mutate(undefined, {
@@ -89,11 +103,32 @@ export function Toolbar({ context, health, waterfallOpen, onToggleWaterfall }: T
         </span>
       )}
 
-      {/* Filter */}
+      {/* Capture filter - what the SERVER records. Applied on Enter or when tracing starts. */}
+      <input
+        type="text"
+        aria-label="Only trace messages containing"
+        placeholder="Only trace containing…"
+        title={
+          'Recorded server-side: only exchanges whose body or headers contain this text are traced'
+          + ', along with the branches they spawn. Empty records everything.'
+          + '\nApplied when tracing starts, or press Enter.'
+        }
+        value={localCaptureFilter}
+        onChange={(e) => setLocalCaptureFilter(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            applyCaptureFilter();
+          }
+        }}
+        className="w-48 rounded border border-amber-400 bg-amber-50 px-2 py-1 text-xs text-gray-800 placeholder-amber-700/60 focus:border-amber-500 focus:outline-none dark:border-amber-600/60 dark:bg-amber-950/30 dark:text-gray-200 dark:placeholder-amber-500/60"
+      />
+
+      {/* Display filter - hides already-recorded messages, client side only */}
       <input
         type="text"
         aria-label="Filter messages"
         placeholder="Filter messages…"
+        title="Hides messages already recorded. Does not change what is traced."
         value={localFilter}
         onChange={(e) => setLocalFilter(e.target.value)}
         className="w-48 rounded border border-gray-300 bg-gray-50 px-2 py-1 text-xs text-gray-800 placeholder-gray-400 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:placeholder-gray-500"

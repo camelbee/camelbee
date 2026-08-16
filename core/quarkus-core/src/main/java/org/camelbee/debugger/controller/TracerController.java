@@ -72,6 +72,27 @@ public class TracerController {
   }
 
   /**
+   * Sets the substring a message must contain to be recorded at all. An empty body clears it.
+   *
+   * <p>Taken as raw text rather than JSON: the filter is an arbitrary payload fragment - an order
+   * id, a customer reference - and quoting rules would only get in the way.
+   *
+   * @param filter the substring, or empty to record everything.
+   * @return String The result.
+   */
+  @POST
+  @Consumes("text/plain")
+  @Produces("text/plain")
+  @Path("/camelbee/tracer/filter")
+  public Response updateCaptureFilter(String filter) {
+    messageService.setCaptureFilter(filter);
+
+    return Response.ok(messageService.getCaptureFilter() == null
+        ? "capture filter cleared."
+        : "capture filter set.").build();
+  }
+
+  /**
    * Returns messages starting from the specified index along with version info.
    * This endpoint is useful for polling new messages without retrieving the entire list.
    *

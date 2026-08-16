@@ -26,6 +26,7 @@ import org.camelbee.debugger.service.MessageService;
 import org.camelbee.debugger.service.RouteContextService;
 import org.camelbee.logging.CamelBeeUnitOfWork;
 import org.camelbee.logging.LoggingService;
+import org.camelbee.masking.Masker;
 import org.camelbee.notifier.CamelBeeEventNotifier;
 import org.camelbee.tracers.ExchangeCompletedEventTracer;
 import org.camelbee.tracers.ExchangeCreatedEventTracer;
@@ -34,6 +35,7 @@ import org.camelbee.tracers.ExchangeSentEventTracer;
 import org.camelbee.tracers.NodeIdInterceptStrategy;
 import org.camelbee.tracers.PollInterceptStrategy;
 import org.camelbee.tracers.TracerService;
+import org.camelbee.utils.ExchangeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,6 +107,16 @@ public final class CamelBee {
   public static void attach(CamelContext camelContext) throws Exception {
 
     final CamelBeeConfig config = CamelBeeConfig.from(camelContext);
+
+    /*
+     Applied before anything can be traced. ExchangeUtils starts out masking with the default keys,
+     so the window before this line is safe rather than open.
+     */
+    ExchangeUtils.configureMasking(
+        config.isMaskingEnabled()
+            ? new Masker(true, Masker.parseKeys(config.getMaskedKeys()))
+            : Masker.disabled(),
+        config.isTracerBodyEnabled());
 
     if (config.isRouteConfigurerEnabled()) {
       camelContext.setStreamCaching(true);

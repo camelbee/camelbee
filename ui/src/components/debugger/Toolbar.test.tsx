@@ -72,3 +72,63 @@ describe('Toolbar', () => {
 // something wrong", so it fired on every route using such an EIP and taught users to ignore it.
 // The dynamically-created node/edge/message flow itself is unaffected - see RouteGraph.test.tsx
 // and DebuggerPage's dynamicEdges tracking, which MessagePanel still relies on.
+
+describe('Toolbar capture filter', () => {
+  beforeEach(() => {
+    useDebuggerStore.getState().clearMessages();
+    useDebuggerStore.getState().setTracing(false);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({ ok: true, status: 200, statusText: 'OK', text: () => Promise.resolve('"OK"') }),
+    );
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  const filterCalls = () =>
+    vi.mocked(fetch).mock.calls.filter(([url]) => url === '/camelbee/tracer/filter').length;
+
+  it('exposes the capture filter and the display filter as separate controls', () => {
+    // the distinction matters: one decides what the server RECORDS, the other only hides rows that
+    // were already recorded and already served
+    renderWithProviders(<Toolbar context={context} />);
+
+    expect(screen.getByLabelText('Only trace messages containing')).toBeInTheDocument();
+    expect(screen.getByLabelText('Filter messages')).toBeInTheDocument();
+  });
+
+  it('does not send the capture filter on every keystroke', async () => {
+    renderWithProviders(<Toolbar context={context} />);
+
+    fireEvent.change(screen.getByLabelText('Only trace messages containing'), {
+      target: { value: 'order-42' },
+    });
+
+    // changing it mid-session discards what matched the previous value, so it is applied on Enter
+    // or when tracing starts - never per character, unlike the display filter
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    expect(filterCalls()).toBe(0);
+  });
+
+  it('applies the capture filter on Enter', async () => {
+    renderWithProviders(<Toolbar context={context} />);
+
+    const input = screen.getByLabelText('Only trace messages containing');
+    fireEvent.change(input, { target: { value: 'order-42' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+
+    await waitFor(() => expect(filterCalls()).toBe(1));
+  });
+
+  it('applies the capture filter when tracing starts, before anything can be recorded', async () => {
+    renderWithProviders(<Toolbar context={context} />);
+
+    fireEvent.change(screen.getByLabelText('Only trace messages containing'), {
+      target: { value: 'order-42' },
+    });
+    fireEvent.click(screen.getByText('Start Tracing'));
+
+    await waitFor(() => expect(filterCalls()).toBe(1));
+  });
+});

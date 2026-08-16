@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.camel.Exchange;
 import org.apache.camel.StreamCache;
 import org.apache.commons.lang3.StringUtils;
+import org.camelbee.masking.Masker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,8 +38,44 @@ public class ExchangeUtils {
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(ExchangeUtils.class);
 
+  /**
+   * Redaction applied to everything read here, which is the only place headers and bodies enter a
+   * traced Message.
+   *
+   * <p>Starts masking with the default keys rather than starting open, so an application whose
+   * configuration is never applied - a wiring mistake, a runtime that boots the tracer differently -
+   * fails closed. That matches how the rest of CamelBee is configured: off, or safe, unless
+   * explicitly turned on.
+   */
+  /** Stand-in recorded instead of a body when body capture is switched off. */
+  public static final String BODY_NOT_CAPTURED = "[body not captured]";
+
+  private static volatile Masker masker = Masker.withDefaults();
+
+  /**
+   * Whether bodies are captured at all. Unlike masking, turning this off is a guarantee rather than
+   * a best effort, because no body text is ever read.
+   */
+  private static volatile boolean bodyCaptureEnabled = true;
+
   private ExchangeUtils() {
     // Private constructor
+  }
+
+  /**
+   * Applies the configured redaction. Called once during startup.
+   *
+   * @param configuredMasker the masker to use.
+   * @param captureBodies    whether bodies may be captured at all.
+   */
+  public static void configureMasking(Masker configuredMasker, boolean captureBodies) {
+    masker = configuredMasker;
+    bodyCaptureEnabled = captureBodies;
+  }
+
+  /** Visible for the tracers that need to know whether a body was suppressed rather than empty. */
+  public static boolean isBodyCaptureEnabled() {
+    return bodyCaptureEnabled;
   }
 
   /**
@@ -54,7 +91,12 @@ public class ExchangeUtils {
     }
 
     var headers = new StringBuilder();
-    headerMap.forEach((p, q) -> headers.append(p).append(":").append(q).append("\n"));
+    // masked by key, which is exact - the name is known here, so nothing is being guessed
+    headerMap.forEach((p, q) -> headers
+        .append(p)
+        .append(":")
+        .append(masker.isSensitiveKey(String.valueOf(p)) ? Masker.MASK : q)
+        .append("\n"));
     return headers.toString();
   }
 
@@ -66,6 +108,9 @@ public class ExchangeUtils {
    */
   @SuppressWarnings("java:S3740")
   public static String readBodyAsString(Exchange exchange, boolean resetBefore) {
+    if (!bodyCaptureEnabled) {
+      return BODY_NOT_CAPTURED;
+    }
     try {
       boolean useMessage = exchange.getMessage() != null && exchange.getMessage().getBody() != null;
 
@@ -78,19 +123,19 @@ public class ExchangeUtils {
       }
 
       if (bodyObject instanceof StreamCache streamCache) {
-        return processStreamCache(streamCache, resetBefore);
+        return masker.maskBody(processStreamCache(streamCache, resetBefore));
       }
       if (bodyObject instanceof List<?> list) {
-        return buildListString(list);
+        return masker.maskBody(buildListString(list));
       }
       String converted = itemToString(bodyObject);
       if (converted != null) {
-        return converted;
+        return masker.maskBody(converted);
       }
       // Fallback: Camel's type converter handles JAXB, XML Document, etc.
-      return useMessage
+      return masker.maskBody(useMessage
           ? exchange.getMessage().getBody(String.class)
-          : exchange.getIn().getBody(String.class);
+          : exchange.getIn().getBody(String.class));
 
     } catch (Exception e) {
       LOGGER.warn("Could not read Exchange body: {}", exchange, e);

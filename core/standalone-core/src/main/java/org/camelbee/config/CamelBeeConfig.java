@@ -35,10 +35,15 @@ public final class CamelBeeConfig {
   private final boolean metricsEnabled;
   private final long tracerMaxIdleTime;
   private final long tracerMaxMessagesCount;
+  private final boolean maskingEnabled;
+  private final String maskedKeys;
+  private final boolean tracerBodyEnabled;
 
+  @SuppressWarnings("java:S107")
   private CamelBeeConfig(boolean contextEnabled, boolean tracerEnabled, boolean loggingEnabled,
       boolean notifierEnabled, boolean routeConfigurerEnabled, boolean metricsEnabled,
-      long tracerMaxIdleTime, long tracerMaxMessagesCount) {
+      long tracerMaxIdleTime, long tracerMaxMessagesCount,
+      boolean maskingEnabled, String maskedKeys, boolean tracerBodyEnabled) {
     this.contextEnabled = contextEnabled;
     this.tracerEnabled = tracerEnabled;
     this.loggingEnabled = loggingEnabled;
@@ -47,6 +52,9 @@ public final class CamelBeeConfig {
     this.metricsEnabled = metricsEnabled;
     this.tracerMaxIdleTime = tracerMaxIdleTime;
     this.tracerMaxMessagesCount = tracerMaxMessagesCount;
+    this.maskingEnabled = maskingEnabled;
+    this.maskedKeys = maskedKeys;
+    this.tracerBodyEnabled = tracerBodyEnabled;
   }
 
   /**
@@ -67,7 +75,19 @@ public final class CamelBeeConfig {
         resolveBoolean(camelContext, "camelbee.route-configurer-enabled", true),
         resolveBoolean(camelContext, "camelbee.metrics-enabled", true),
         resolveLong(camelContext, "camelbee.tracer-max-idle-time", 300000L),
-        resolveLong(camelContext, "camelbee.tracer-max-messages-count", 1000L));
+        resolveLong(camelContext, "camelbee.tracer-max-messages-count", 1000L),
+        /*
+         Masking defaults to ON, unlike every other switch here. The rest fail closed by staying
+         off; this one fails closed by staying on - forgetting to configure it must not be the
+         thing that leaks a password into a traced body.
+         */
+        resolveBoolean(camelContext, "camelbee.masking-enabled", true),
+        resolveString(camelContext, "camelbee.masked-keys", null),
+        resolveBoolean(camelContext, "camelbee.tracer-body-enabled", true));
+  }
+
+  private static String resolveString(CamelContext camelContext, String key, String defaultValue) {
+    return camelContext.getPropertiesComponent().resolveProperty(key).orElse(defaultValue);
   }
 
   private static boolean resolveBoolean(CamelContext camelContext, String key, boolean defaultValue) {
@@ -110,5 +130,18 @@ public final class CamelBeeConfig {
 
   public long getTracerMaxMessagesCount() {
     return tracerMaxMessagesCount;
+  }
+
+  public boolean isMaskingEnabled() {
+    return maskingEnabled;
+  }
+
+  /** Comma-separated key list, or null to use {@code Masker.DEFAULT_KEYS}. */
+  public String getMaskedKeys() {
+    return maskedKeys;
+  }
+
+  public boolean isTracerBodyEnabled() {
+    return tracerBodyEnabled;
   }
 }

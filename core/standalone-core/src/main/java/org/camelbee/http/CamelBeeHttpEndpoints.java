@@ -56,6 +56,7 @@ import org.slf4j.LoggerFactory;
  * <li>GET /camelbee/messages - traced messages from an index (MessageListWithInfo)</li>
  * <li>DELETE /camelbee/messages - clear traced messages</li>
  * <li>POST /camelbee/tracer/status - ACTIVE/INACTIVE to toggle tracing</li>
+ * <li>POST /camelbee/tracer/filter - raw text every recorded message must contain, empty to clear</li>
  * <li>GET /camelbee[/...] - the embedded single-page UI</li>
  * </ul>
  */
@@ -140,6 +141,9 @@ public class CamelBeeHttpEndpoints {
     router.post(BASE_PATH + "/tracer/status")
         .handler(BodyHandler.create())
         .handler(this::tracerStatus);
+    router.post(BASE_PATH + "/tracer/filter")
+        .handler(BodyHandler.create())
+        .handler(this::tracerFilter);
   }
 
   private void registerUi(VertxPlatformHttpRouter router) {
@@ -213,6 +217,22 @@ public class CamelBeeHttpEndpoints {
 
     rc.response().putHeader("content-type", "text/plain")
         .end("tracing status updated as:" + status);
+  }
+
+  /**
+   * Sets the substring a message must contain to be recorded at all. An empty body clears it.
+   *
+   * <p>Taken as raw text rather than JSON: the filter is an arbitrary payload fragment - an order
+   * id, a customer reference - and quoting rules would only get in the way.
+   */
+  void tracerFilter(RoutingContext rc) {
+    String filter = rc.body() != null ? rc.body().asString() : null;
+    messageService.setCaptureFilter(filter);
+
+    rc.response().putHeader("content-type", "text/plain")
+        .end(messageService.getCaptureFilter() == null
+            ? "capture filter cleared."
+            : "capture filter set.");
   }
 
   private void writeJson(RoutingContext rc, Object body) {

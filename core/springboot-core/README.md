@@ -243,3 +243,58 @@ camelbee/
 - [CamelBee User Guide](../../docs/camelbee_userguide.md) — a tour of the UI's pages and features
 - Using Quarkus? See the [Quarkus Core README](../quarkus-core/README.md)
 - Using plain Camel (`camel-main`)? See the [Standalone Core README](../standalone-core/README.md)
+
+### Redacting sensitive data
+
+Traced bodies and headers are served over HTTP and written to the structured log, so anything
+captured is disclosed. Three properties control that, and they are applied **at capture** - nothing
+sensitive is stored and filtered later.
+
+| property | default | meaning |
+| --- | --- | --- |
+| `camelbee.masking-enabled` | **`true`** | Redact configured keys out of headers and bodies. |
+| `camelbee.masked-keys` | see below | Comma-separated key names, replacing the defaults entirely. |
+| `camelbee.tracer-body-enabled` | `true` | Set `false` to never capture bodies at all. |
+
+Unlike every other `camelbee.*` switch, masking defaults to **on**. The others fail closed by
+staying off; this one fails closed by staying on.
+
+Default keys (case-insensitive, and `-`/`_`/`.` are ignored, so one `apikey` entry catches
+`X-Api-Key` and `api_key`):
+
+```
+password, passwd, secret, token, authorization, auth, apikey, accesskey, privatekey,
+credential, creditcard, cardnumber, cardno, cvv, cvc, iban, ssn, pin, otp
+```
+
+A key matches if it *contains* a configured entry, so `password` also covers `userPassword`.
+
+**What this does and does not guarantee.** Header masking is exact - the key is known, so a
+configured key is always redacted. Body masking is **best effort** pattern matching over JSON, XML
+and form-encoded shapes: it cannot redact a field nobody configured, and a body in some other
+format is left untouched. Treat it as defence in depth. The only guarantee available is
+`camelbee.tracer-body-enabled=false`, which reads no body text at all.
+
+### Tracing one transaction in a busy application
+
+With hundreds of exchanges a second, recording everything is neither readable nor safe. The capture
+filter records **only the flow under investigation**:
+
+```
+POST /camelbee/tracer/filter      body: order-42        (raw text; empty clears)
+```
+
+In the UI it is the amber box next to **Start Tracing**. It is applied when tracing starts, or on
+Enter - not per keystroke, because changing it discards what matched the previous value.
+
+- Matching is **per exchange, not per message**: once anything in an exchange matches, the rest of
+  that exchange is kept, and so are the branches it spawns (wireTap, multicast, seda...). A branch
+  rarely repeats the id its parent matched on, and half a flow is worse than none.
+- Matching is case-insensitive and covers both body and headers.
+- It runs against the text **after masking**, so a value that redaction removes cannot be filtered
+  on. That is deliberate.
+- Known limit: messages of an exchange emitted *before* the matching one are not recovered. In
+  practice the identifying value is present from the first message.
+
+This is different from the toolbar's grey **Filter messages** box, which only hides rows that were
+already recorded and already served. For production, the capture filter is the one that matters.

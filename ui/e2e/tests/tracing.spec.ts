@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { openDebugger, startTracing, triggerPipeline, clickEdge, CAMELBEE_API } from '../fixtures';
+import { APP_URL } from '../playwright.config';
 
 const DLQ_EDGE = 'edge-route-deadLetterRoute-producer-mock_dlq-dlqEndpoint';
 const FLAKY_EDGE = 'edge-route-invokeFlakyRoute-route-flakyTargetRoute-flakyEndpoint';
@@ -169,6 +170,40 @@ test.describe('message tracing', () => {
     await page.getByLabel('Close message panel').click();
     await clickEdge(page, ENRICH_EDGE);
     expect((await panel.boundingBox())!.width).toBeCloseTo(after, 0);
+  });
+
+  test('the capture filter records only the matching flow, server side', async ({ page, request }) => {
+    // restart tracing with a filter that only one of two requests can match
+    await page.getByRole('button', { name: 'Stop Tracing' }).click();
+    await page.getByLabel('Only trace messages containing').fill('Coltrane');
+    // the helper waits for the button to flip, which only happens once the clear-then-activate
+    // chain has completed - posting before that would race the DELETE and lose the traffic
+    await startTracing(page);
+
+    await request.post(`${APP_URL}/api/musicians`, {
+      headers: { 'Content-Type': 'application/json' },
+      data: { name: 'Coltrane', instrument: 'Sax' },
+    });
+    await request.post(`${APP_URL}/api/musicians`, {
+      headers: { 'Content-Type': 'application/json' },
+      data: { name: 'Monk', instrument: 'Piano' },
+    });
+
+    // asserted against the API, not the rendered rows - the point is what the SERVER kept
+    await expect
+      .poll(async () => {
+        const res = await request.get(`${CAMELBEE_API}/messages?index=0&addVersion=-1&resetVersion=-1`);
+        const body = await res.json();
+        return body.messages.length;
+      }, { timeout: 20_000 })
+      .toBeGreaterThan(0);
+
+    const res = await request.get(`${CAMELBEE_API}/messages?index=0&addVersion=-1&resetVersion=-1`);
+    const all = JSON.stringify((await res.json()).messages);
+
+    expect(all).toContain('Coltrane');
+    // Monk's request was never recorded at all, not merely hidden
+    expect(all).not.toContain('Monk');
   });
 
   test('closes the message panel', async ({ page }) => {

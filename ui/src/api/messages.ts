@@ -52,6 +52,33 @@ export function useTraceStatus() {
   });
 }
 
+/**
+ * POST /camelbee/tracer/filter — the substring a message must contain to be RECORDED.
+ *
+ * Distinct from the toolbar's `filterText`, which hides already-recorded messages in the browser.
+ * This one decides what the server keeps at all, which is what makes tracing a busy production app
+ * practical: only the transaction under investigation is stored, and nothing else is ever exposed.
+ *
+ * Sent as raw text, not JSON — the value is an arbitrary payload fragment.
+ */
+function updateCaptureFilter(filter: string): Promise<string> {
+  return apiFetch<string>('/camelbee/tracer/filter', {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: filter,
+  });
+}
+
+export function useCaptureFilter() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: updateCaptureFilter,
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['messages'] });
+    },
+  });
+}
+
 /** DELETE /camelbee/messages — clear all traced messages */
 function deleteMessages(): Promise<string> {
   return apiFetch<string>('/camelbee/messages', { method: 'DELETE' });

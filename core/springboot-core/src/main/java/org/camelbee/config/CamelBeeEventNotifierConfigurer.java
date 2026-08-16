@@ -18,8 +18,10 @@ package org.camelbee.config;
 
 import jakarta.annotation.PostConstruct;
 import org.apache.camel.CamelContext;
+import org.camelbee.masking.Masker;
 import org.camelbee.notifier.CamelBeeEventNotifier;
 import org.camelbee.tracers.TracerService;
+import org.camelbee.utils.ExchangeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,20 @@ public class CamelBeeEventNotifierConfigurer {
   @Autowired
   private TracerService tracerService;
 
+  /*
+   Masking defaults to ON, unlike every other camelbee switch, which default to off. The others fail
+   closed by staying off; this one fails closed by staying on - forgetting to configure it must not
+   be the thing that leaks a password into a traced body.
+  */
+  @Value("${camelbee.masking-enabled:true}")
+  private boolean maskingEnabled;
+
+  @Value("${camelbee.masked-keys:}")
+  private String maskedKeys;
+
+  @Value("${camelbee.tracer-body-enabled:true}")
+  private boolean tracerBodyEnabled;
+
   @Value("${camelbee.notifier-enabled:true}")
   private boolean notifierEnabled;
 
@@ -51,6 +67,15 @@ public class CamelBeeEventNotifierConfigurer {
    */
   @PostConstruct
   public void onStart() {
+    /*
+     Applied before the notifier is attached, so nothing can be traced unmasked. ExchangeUtils also
+     starts out masking with the default keys, so the window before this runs is safe rather than
+     open - and stays safe if this configurer is never reached at all.
+     */
+    ExchangeUtils.configureMasking(
+        maskingEnabled ? new Masker(true, Masker.parseKeys(maskedKeys)) : Masker.disabled(),
+        tracerBodyEnabled);
+
     if (notifierEnabled) {
       // Only when notifier is enabled do we create the notifier
       // The notifiers themselves will check tracer-enabled and logging-enabled
