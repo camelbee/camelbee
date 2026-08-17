@@ -27,12 +27,6 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.spring.junit6.CamelSpringBootTest;
 import org.camelbee.debugger.controller.ContextController;
 import org.camelbee.debugger.service.MessageService;
-import org.camelbee.debugger.service.RouteContextService;
-import org.camelbee.logging.LoggingService;
-import org.camelbee.tracers.ExchangeCompletedEventTracer;
-import org.camelbee.tracers.ExchangeCreatedEventTracer;
-import org.camelbee.tracers.ExchangeSendingEventTracer;
-import org.camelbee.tracers.ExchangeSentEventTracer;
 import org.camelbee.tracers.NodeIdInterceptStrategy;
 import org.camelbee.tracers.PollInterceptStrategy;
 import org.camelbee.tracers.TracerService;
@@ -48,14 +42,10 @@ import org.springframework.test.context.TestPropertySource;
 @CamelSpringBootTest
 @TestPropertySource(properties = "camelbee.tracer-enabled=true")
 @SpringBootApplication
-@Import({TracerService.class,
-    MessageService.class,
-    LoggingService.class,
-    ExchangeCreatedEventTracer.class,
-    ExchangeSendingEventTracer.class,
-    ExchangeSentEventTracer.class,
-    ExchangeCompletedEventTracer.class,
-    RouteContextService.class,
+@Import({
+    // The engine beans, now contributed by CamelBeeCoreBeans rather than listed one by one - the
+    // engine classes moved to camelbee-core and carry no Spring annotations of their own.
+    CamelBeeCoreBeans.class,
     // Conditional beans still honour their own @ConditionalOnProperty when imported this way - see
     // shouldNotRegisterContextControllerWhenContextEnabledIsUnset.
     ContextController.class

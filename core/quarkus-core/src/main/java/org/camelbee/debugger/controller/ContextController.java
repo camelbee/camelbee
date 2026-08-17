@@ -41,6 +41,9 @@ import org.eclipse.microprofile.config.Config;
 @IfBuildProperty(name = "camelbee.context-enabled", stringValue = "true")
 public class ContextController {
 
+  /** Reported to the UI. Runtime-specific, so it stays here rather than in the shared engine. */
+  private static final String FRAMEWORK = "Quarkus";
+
   @Inject
   CamelContext camelContext;
 
@@ -68,7 +71,7 @@ public class ContextController {
     String jvm = "%s - %s".formatted(System.getProperty(CamelBeeConstants.SYSTEM_JVM_VENDOR),
         System.getProperty(CamelBeeConstants.SYSTEM_JVM_VERSION));
 
-    String framework = "%s - %s".formatted(CamelBeeConstants.FRAMEWORK,
+    String framework = "%s - %s".formatted(FRAMEWORK,
         io.quarkus.runtime.Quarkus.class.getPackage().getImplementationVersion());
 
     String camelVersion = camelContext.getVersion();

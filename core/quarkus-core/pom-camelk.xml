@@ -88,6 +88,7 @@
 	<properties>
 		<!-- Match the operator's catalog exactly; see the header comment. -->
 		<camel-quarkus.version>3.15.3</camel-quarkus.version>
+		<build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
 		<quarkus.version>3.15.4</quarkus.version>
 
 		<!-- Requires the -21-jdk operator image; see the header comment. -->
@@ -214,6 +215,33 @@
 		<directory>${project.basedir}/target-camelk</directory>
 
 		<plugins>
+			<!--
+			  The engine lives in camelbee-core, which the reactor compiles against Camel 4.21. This
+			  variant targets Camel 4.8.5, so it compiles those sources itself rather than depending
+			  on that jar - the same "rebuild the same sources against an older baseline" approach
+			  this whole POM exists for. It also means a 4.8-incompatible API added to the engine
+			  fails here at compile time instead of at runtime on a Camel K cluster.
+			-->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>${build-helper-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>add-shared-core-sources</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${project.basedir}/../shared-core/src/main/java</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven-compiler-plugin.version}</version>

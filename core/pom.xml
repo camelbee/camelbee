@@ -34,6 +34,8 @@
   <description>CamelBee Core Pom</description>
 
   <modules>
+      <!-- first: the other three depend on it -->
+      <module>shared-core</module>
       <module>quarkus-core</module>
       <module>springboot-core</module>
       <module>standalone-core</module>

@@ -36,7 +36,13 @@
 	</properties>
 
 	<dependencies>
-
+        <!-- The framework-neutral CamelBee engine: tracing, topology, redaction, logging.
+             DI wiring and the HTTP layer stay in this module. -->
+        <dependency>
+            <groupId>io.camelbee</groupId>
+            <artifactId>camelbee-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>org.apache.camel.quarkus</groupId>
 			<artifactId>camel-quarkus-microprofile-health</artifactId>

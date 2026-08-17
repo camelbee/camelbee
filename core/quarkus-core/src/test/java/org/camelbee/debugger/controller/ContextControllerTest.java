@@ -100,7 +100,7 @@ class ContextControllerTest {
     assertEquals(mockRoutes, context.getRoutes());
     assertEquals("Test Vendor - 11.0.1", context.getJvm());
     assertEquals("3.18.0", context.getCamelVersion());
-    assertTrue(context.getFramework().startsWith(CamelBeeConstants.FRAMEWORK));
+    assertTrue(context.getFramework().startsWith("Quarkus"));
     assertNotNull(context.getJvmInputParameters());
     assertNotNull(context.getGarbageCollectors());
 

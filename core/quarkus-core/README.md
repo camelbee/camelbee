@@ -231,6 +231,87 @@ Enter - not per keystroke, because changing it discards what matched the previou
 This is different from the toolbar's grey **Filter messages** box, which only hides rows that were
 already recorded and already served. For production, the capture filter is the one that matters.
 
+### Securing the CamelBee endpoints
+
+CamelBee's UI and REST API are served on **your application's own HTTP port**, alongside your
+routes. **They are not authenticated by default, and CamelBee does not authenticate them itself** —
+anything that can reach your application port can use them.
+
+What is published depends on two properties, both evaluated by Quarkus at **build time**
+(`@IfBuildProperty`), so changing them requires a rebuild, not a restart:
+
+| Property | Effect when `true` |
+| --- | --- |
+| `camelbee.context-enabled` | Publishes `GET /camelbee/routes` (the topology). |
+| `camelbee.context-enabled` **and** `camelbee.tracer-enabled` | Additionally publishes `/camelbee/messages` and `/camelbee/tracer/*`. |
+
+An unauthenticated caller can do more than read:
+
+| Endpoint | What it gives away, or does |
+| --- | --- |
+| `GET /camelbee/routes` | The complete route topology: route ids, EIP structure and every endpoint URI — including hostnames, queue names and any credentials embedded in a URI. |
+| `POST /camelbee/tracer/status` | **Turns tracing on.** A caller does not have to wait for someone else to start a session; they can arm it themselves. |
+| `GET /camelbee/messages` | Every captured message — bodies, headers, timings and exception text — subject only to best-effort redaction. |
+| `DELETE /camelbee/messages` | Discards the collected trace. |
+
+Redaction and the capture filter govern **what is recorded**. They do not govern **who may read it**,
+and they do not apply to the topology at all. Treat `/camelbee` as an internal debugging interface:
+
+> **Do not publish `/camelbee` through a public gateway, ingress or load balancer.** In production
+> it should be reachable only from inside your network perimeter — an internal address, a VPN, a
+> port-forward, or a route protected by the authentication below.
+
+Because CamelBee shares your application's port, excluding it at the edge is a path rule rather than
+a port rule: deny `/camelbee` and `/camelbee/*` on the public ingress that fronts the service.
+
+**The properties that decide how much there is to expose.** All default to the safe value, so this
+is about what you turn on rather than what you must turn off:
+
+| Property | Default | Effect on exposure |
+| --- | --- | --- |
+| `camelbee.context-enabled` | `false` | Publishes the REST API. Build-time — see above. |
+| `camelbee.tracer-enabled` | `false` | Publishes the tracer endpoints and allows capture to be armed. Also build-time. |
+| `camelbee.logging-enabled` | `false` | **A second disclosure path — see the warning below.** |
+| `camelbee.masking-enabled` | **`true`** | Redacts configured keys before a value reaches the UI, the API *or* the log. |
+| `camelbee.masked-keys` | built-in list | Replaces that list **entirely** — a key you leave out is no longer redacted. |
+| `camelbee.tracer-body-enabled` | `true` | `false` captures no body text at all. The only hard guarantee; does not affect headers. |
+| `camelbee.tracer-max-idle-time` | `300000` (5 min) | How long capture stays armed with no UI activity before it disarms itself. Lower it to narrow the window. |
+| `camelbee.tracer-max-messages-count` | `1000` | How many messages, with full bodies, are held in heap until cleared. |
+
+> **`camelbee.logging-enabled: true` writes traced bodies and headers to the application log**, and
+> it is governed by none of the tracer's safety mechanisms: not the UI's Start/Stop Tracing toggle,
+> not `tracer-max-idle-time`, and not the capture filter. If it is on, every message is written, for
+> as long as the application runs. Values are redacted first, so masking still applies — but in a
+> production environment your logs are usually shipped to an aggregator with a different audience
+> and a much longer retention than a debugging session. Leave it `false` unless you specifically
+> want that.
+
+**Requiring authentication.** Protect the path with Quarkus' standard HTTP policy layer, using
+whichever identity provider the application already uses (OIDC, JWT, basic, mTLS):
+
+```properties
+quarkus.http.auth.permission.camelbee.paths=/camelbee,/camelbee/*
+quarkus.http.auth.permission.camelbee.policy=authenticated
+```
+
+Use a role-based policy instead of `authenticated` if only some users should reach it:
+
+```properties
+quarkus.http.auth.policy.camelbee-role.roles-allowed=camelbee-admin
+quarkus.http.auth.permission.camelbee.policy=camelbee-role
+```
+
+Note that the embedded UI does not currently attach a bearer token, so token-based schemes suit API
+clients; browser access needs a scheme the browser itself can satisfy, such as basic auth or an
+OIDC redirect flow.
+
+**Turning the endpoints off entirely.** Build the production artifact with
+`camelbee.context-enabled=false` to remove the REST API. Be aware that this removes the **API only**
+— the UI's static assets ship inside the core jar under `META-INF/resources/camelbee` and are served
+by Quarkus' static resource handling, independently of this property. To remove those as well, leave
+the CamelBee dependency out of the production build, or block the path at the edge as described
+above.
+
 ## Accessing the Embedded UI
 
 Once your application is running, the embedded CamelBee UI is available at:

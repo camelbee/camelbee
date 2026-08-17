@@ -122,11 +122,18 @@ class CamelBeeTracingConfigurationTest {
         .as("an application's scan of org.camelbee must not find the tracing configuration")
         .noneSatisfy(candidate -> assertThat(candidate.getBeanClassName())
             .isEqualTo(CamelBeeTracingConfiguration.class.getName()))
-        .as("that same scan has to find the configurer and the tracer, or this test proves nothing")
+        .as("nor the engine classes themselves - they moved to camelbee-core and carry no Spring "
+            + "annotations, so the scan cannot find them and CamelBeeCoreBeans contributes them")
+        .noneSatisfy(candidate -> assertThat(candidate.getBeanClassName())
+            .isEqualTo(TracerService.class.getName()))
+        .as("but it MUST find CamelBeeCoreBeans: the documented setup is a scan of org.camelbee, "
+            + "and that scan is now the only thing standing between an application and a missing "
+            + "TracerService bean")
         .anySatisfy(candidate -> assertThat(candidate.getBeanClassName())
-            .isEqualTo(CamelBeeRouteConfigurer.class.getName()))
+            .isEqualTo(CamelBeeCoreBeans.class.getName()))
+        .as("and the configurer, or this test proves nothing")
         .anySatisfy(candidate -> assertThat(candidate.getBeanClassName())
-            .isEqualTo(TracerService.class.getName()));
+            .isEqualTo(CamelBeeRouteConfigurer.class.getName()));
   }
 
 }

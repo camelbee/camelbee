@@ -15,6 +15,8 @@
 - [Using CamelBee in Production](#using-camelbee-in-production)
   - [Redacting Sensitive Data](#redacting-sensitive-data)
   - [Tracing a Single Transaction](#tracing-a-single-transaction)
+  - [Restricting Who Can Reach CamelBee](#restricting-who-can-reach-camelbee)
+  - [One More Way Traced Data Leaves the Application](#one-more-way-traced-data-leaves-the-application)
 - [Metrics Page](#metrics-page)
   - [Metrics Topology](#metrics-topology)
   - [Metrics Detail Modal](#metrics-detail-modal)
@@ -166,7 +168,8 @@ The grips also respond to the arrow keys once focused. Sizes are remembered acro
 
 CamelBee's tracer is designed to be safe to switch on outside development: it starts **off**, and it
 **disarms itself** after a period of inactivity (`camelbee.tracer-max-idle-time`). Two further
-features exist specifically for production use.
+features exist specifically for production use, and a third section covers the one decision CamelBee
+cannot make for you — who is allowed to reach it.
 
 ### Redacting Sensitive Data
 
@@ -201,6 +204,57 @@ CamelBee records **only the flow that contains it**:
 
 Press **Enter** to apply the filter while tracing is already running; it is also applied
 automatically when you press **Start Tracing**. Changing it starts a fresh investigation.
+
+### Restricting Who Can Reach CamelBee
+
+Redaction and the capture filter decide **what CamelBee records**. They do not decide **who can read
+it**. That is a separate decision, and it is yours to make — CamelBee does not authenticate its own
+endpoints, so on a running application the UI and its API are available to anyone who can reach the
+port they are served on.
+
+It is worth knowing what that exposes, because it is more than a read-only page:
+
+- The **topology** is available even when tracing has never been switched on. It lists every route
+  and every endpoint URI, which typically includes internal hostnames and queue names.
+- **Tracing can be switched on by whoever opens the UI.** There is no separate permission for
+  arming capture; the toggle is part of the interface.
+- Once tracing is on, **captured bodies, headers, timings and error text** are readable, protected
+  only by redaction — which is exact for headers and best-effort for bodies.
+
+> **CamelBee is an internal debugging tool. It should not be published through a public gateway,
+> ingress or load balancer.** In production, keep it inside your network perimeter — reachable over
+> an internal address, a VPN or a port-forward — or protect it with authentication, or leave it
+> disabled and enable it only for the duration of an investigation.
+
+None of this requires changes to CamelBee itself: each runtime has a supported way to require
+authentication on the `/camelbee` path, and a way to remove the endpoints altogether. The exact
+configuration, and the caveats specific to each runtime, are in the **Securing the CamelBee
+endpoints** section of the core README for
+[Quarkus](../core/quarkus-core/README.md#securing-the-camelbee-endpoints),
+[Spring Boot](../core/springboot-core/README.md#securing-the-camelbee-endpoints) and
+[Standalone](../core/standalone-core/README.md#securing-the-camelbee-endpoints).
+
+Used this way — inside the perimeter, armed only when needed, redacting by default and recording
+only the transaction under investigation — CamelBee is safe to leave installed in production. Used
+on a publicly reachable path, it is a disclosure risk regardless of how little it records.
+
+### One More Way Traced Data Leaves the Application
+
+Everything above is about the HTTP endpoints. There is a second path, and it is easy to overlook:
+
+`camelbee.logging-enabled` writes every traced message — body and headers — into the **application
+log**. Redaction is applied first, so the same masking protects it. But none of the tracer's other
+safety mechanisms do:
+
+- it is **not** affected by the **Start Tracing** / **Stop Tracing** toggle in the UI;
+- it is **not** affected by `camelbee.tracer-max-idle-time`, so it never disarms itself;
+- it is **not** affected by the **Only trace containing…** capture filter, so narrowing an
+  investigation in the UI does not narrow what is logged.
+
+If it is switched on, every message is written for as long as the application runs — and in most
+production setups logs are shipped to a central platform with a broader audience and a much longer
+retention than a debugging session. Leave `camelbee.logging-enabled` off in production unless you
+deliberately want traced payloads in your log pipeline.
 
 ---
 

@@ -62,6 +62,9 @@ import org.slf4j.LoggerFactory;
  */
 public class CamelBeeHttpEndpoints {
 
+  /** Reported to the UI. Runtime-specific, so it stays here rather than in the shared engine. */
+  private static final String FRAMEWORK = "Standalone";
+
   private static final Logger LOGGER = LoggerFactory.getLogger(CamelBeeHttpEndpoints.class);
 
   private static final String BASE_PATH = "/camelbee";
@@ -210,7 +213,7 @@ public class CamelBeeHttpEndpoints {
 
     String camelVersion = camelContext.getVersion();
 
-    String framework = "%s - Camel %s".formatted(CamelBeeConstants.FRAMEWORK, camelVersion);
+    String framework = "%s - Camel %s".formatted(FRAMEWORK, camelVersion);
 
     String jvmInputParameters = ManagementFactory.getRuntimeMXBean().getInputArguments().stream()
         .collect(Collectors.joining(", "));

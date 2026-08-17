@@ -401,6 +401,29 @@ Useful endpoints:
 For a guide to the UI's pages and features, see the
 [CamelBee User Guide](../../docs/camelbee_userguide.md).
 
+### Before exposing this outside a local cluster
+
+This sample uses `trait=service.enabled=true`, which publishes the integration's HTTP port as a
+Kubernetes Service — and `/camelbee` rides on that same port. **CamelBee does not authenticate its
+endpoints**, so anyone able to reach the Service can read the route topology (including every
+endpoint URI), switch tracing **on**, and then read captured bodies, headers and error text. Only
+best-effort redaction stands between them and the payloads.
+
+That is fine for the kind-and-a-local-registry setup described above. On a shared or
+internet-facing cluster it is not:
+
+- **Do not add an Ingress or OpenShift Route that exposes `/camelbee`.** Keep the Service
+  `ClusterIP` and reach the UI with `kubectl port-forward`, which is what step 4 above already does.
+- If the integration must be exposed publicly for its own API, deny `/camelbee` and `/camelbee/*`
+  at the ingress, since CamelBee shares the application port on Quarkus.
+- Restrict in-cluster reachability with a `NetworkPolicy` if other workloads should not be able to
+  call it.
+- To require authentication instead, use Quarkus' HTTP policy layer — the properties are in the
+  [Quarkus core README](../../core/quarkus-core/README.md#securing-the-camelbee-endpoints), and can
+  be set from the modeline with `// camel-k: property=...`. Remember that
+  `camelbee.context-enabled` is a **build-time** property on Quarkus, so removing the API entirely
+  needs `build-property=` and a rebuild.
+
 ## Rebuilding the core for a different Camel K runtime
 
 The published `camelbee-quarkus-core-camelk` is built against one runtime — the one Camel K 2.10.1

@@ -16,13 +16,6 @@
 
 package org.camelbee.config;
 
-import org.camelbee.debugger.service.MessageService;
-import org.camelbee.debugger.service.RouteContextService;
-import org.camelbee.logging.LoggingService;
-import org.camelbee.tracers.ExchangeCompletedEventTracer;
-import org.camelbee.tracers.ExchangeCreatedEventTracer;
-import org.camelbee.tracers.ExchangeSendingEventTracer;
-import org.camelbee.tracers.ExchangeSentEventTracer;
 import org.camelbee.tracers.TracerService;
 import org.springframework.context.annotation.Import;
 
@@ -36,7 +29,8 @@ import org.springframework.context.annotation.Import;
  * Such a test lists this class as well and gets the whole graph.
  *
  * <p>Listing it rather than the eight beans keeps the graph the framework's business: a tracer
- * gaining a collaborator is then a change here, not a change in every generated project's tests.
+ * gaining a collaborator is then a change in {@link CamelBeeCoreBeans}, not a change in every
+ * generated project's tests.
  *
  * <p><b>Deliberately not annotated {@code @Configuration} or {@code @Component}.</b> Component
  * scanning only picks up {@code @Component}-meta-annotated types, so as written this class is
@@ -47,15 +41,6 @@ import org.springframework.context.annotation.Import;
  * treat it as a configuration class when it is named explicitly, which is the only way it is ever
  * used. {@code CamelBeeTracingConfigurationTest} guards both halves of that.
  */
-@Import({
-    TracerService.class,
-    MessageService.class,
-    LoggingService.class,
-    RouteContextService.class,
-    ExchangeCreatedEventTracer.class,
-    ExchangeSendingEventTracer.class,
-    ExchangeSentEventTracer.class,
-    ExchangeCompletedEventTracer.class
-})
+@Import(CamelBeeCoreBeans.class)
 public class CamelBeeTracingConfiguration {
 }
