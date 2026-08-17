@@ -55,7 +55,7 @@
 	<artifactId>camelbee-quarkus-core-camelk</artifactId>
 	<name>CamelBee Quarkus Core (Camel K runtime)</name>
 	<packaging>jar</packaging>
-	<version>3.3.1</version>
+	<version>4.0.0</version>
 
 	<description>CamelBee Quarkus core built against the Camel Quarkus version used by the Apache
 		Camel K runtime, for consumption from a Camel K integration modeline. Same sources and

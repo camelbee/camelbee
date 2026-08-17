@@ -1,3 +1,4 @@
+import pkg from './package.json' with { type: 'json' };
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
@@ -74,6 +75,9 @@ function mockPlugin() {
 }
 
 export default defineConfig({
+  // Single source for the version shown in the UI. It used to be hardcoded in NavBar as
+  // well as declared here, and nothing kept the two in step across a release.
+  define: { __APP_VERSION__: JSON.stringify(pkg.version) },
   plugins: [react(), ...(useMock ? [mockPlugin()] : [])],
   base: '/camelbee/',
   resolve: {

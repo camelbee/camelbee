@@ -451,3 +451,21 @@ export function buildRouteGraph(context: CamelBeeContext): {
 
   return { nodes, edges };
 }
+
+/**
+ * Maps each route id to the component type of the endpoint it consumes from - `timer`, `rest`,
+ * `jms`, `file` and so on.
+ *
+ * Built from the same graph nodes the topology renders, so the label a route carries in the
+ * waterfall is by construction the one shown on its node. Deriving it separately from the route's
+ * input URI would be a second implementation of `extractComponentType`'s edge cases (rest verbs,
+ * dynamic endpoints) and the two would drift.
+ */
+export function buildRouteTypeIndex(nodes: RouteNode[]): Map<string, string> {
+  const index = new Map<string, string>();
+  for (const node of nodes) {
+    const { routeId, componentType } = node.data;
+    if (routeId && componentType) index.set(routeId, componentType);
+  }
+  return index;
+}

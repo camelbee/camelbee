@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { CamelBeeContext } from '@/types';
-import { buildRouteGraph } from './routeGraph';
+import { buildRouteTypeIndex, buildRouteGraph } from './routeGraph';
 import routesFixture from '../../mock/routes.json';
 
 const context = routesFixture as unknown as CamelBeeContext;
@@ -217,5 +217,26 @@ describe('buildRouteGraph — dynamicRouter outputs', () => {
 
     expect(edges.some((e) => e.data!.outputId === 'dynamicRouter1')).toBe(false);
     expect(nodes.some((n) => n.id.toLowerCase().includes('dynamicrouter'))).toBe(false);
+  });
+});
+
+describe('buildRouteTypeIndex', () => {
+  it('maps each route id to the component type its node shows', () => {
+    const { nodes } = buildRouteGraph(context);
+
+    const index = buildRouteTypeIndex(nodes);
+
+    // Derived from the same nodes the topology renders, so the two cannot disagree.
+    for (const node of nodes) {
+      const { routeId, componentType } = node.data;
+      if (routeId && componentType) expect(index.get(routeId)).toBe(componentType);
+    }
+    expect(index.size).toBeGreaterThan(0);
+  });
+
+  it('skips nodes with no route id, such as external endpoints', () => {
+    const index = buildRouteTypeIndex(buildRouteGraph(context).nodes);
+
+    expect([...index.keys()].every((k) => k.length > 0)).toBe(true);
   });
 });

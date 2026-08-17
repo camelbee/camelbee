@@ -21,7 +21,7 @@
     <groupId>io.camelbee</groupId>
     <artifactId>camelbee-standalone-core-custom</artifactId>
     <packaging>jar</packaging>
-    <version>3.3.1</version>
+    <version>4.0.0</version>
 
     <name>camelbee-standalone-core</name>
     <description>CamelBee Standalone Core Library</description>

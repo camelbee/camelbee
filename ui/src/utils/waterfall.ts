@@ -44,6 +44,13 @@ export interface Span {
  */
 export interface Flow {
   rootExchangeId: string;
+  /**
+   * The route the flow entered through - Camel's own `getFromRouteId()`, so a consumer route id
+   * like `timerRoute` or `fileListenerRoute` for consumer-started traffic.
+   *
+   * Null when it cannot be determined. See {@link resolveFromRouteId} for why that happens.
+   */
+  fromRouteId: string | null;
   start: number;
   end: number;
   durationMs: number;
@@ -169,6 +176,31 @@ function resolveRoots(parentOf: Map<string, string | null>): {
  * Flows are returned newest-first, matching how the debugger surfaces recent traffic elsewhere.
  * Spans within a flow are ordered by start time so the staircase reads top-to-bottom.
  */
+/**
+ * Works out which route a flow entered through.
+ *
+ * Two sources, in order of authority:
+ *
+ * 1. The CREATED marker. The Java side puts `exchange.getFromRouteId()` on its `routeId`, which is
+ *    exactly the consumer route. **Note this is not reachable from the debugger panel today**:
+ *    `debuggerStore.applyFilter` keeps only SENDING/SENT, so the marker never arrives. It is kept
+ *    first because it is the correct answer whenever a caller does have the full message list.
+ * 2. The route the first send was made from. For a ROOT exchange this is the consumer route in
+ *    practice - routing begins in the consumer, so its first `to(...)` is stamped with that route.
+ *    Verified against a running sample: a timer-started exchange reports `timerRoute` from both
+ *    sources.
+ *
+ * Null when neither is available, in which case the header simply omits the label.
+ */
+function resolveFromRouteId(rootMessages: Message[] | undefined): string | null {
+  if (!rootMessages) return null;
+
+  const created = rootMessages.find((m) => m.exchangeEventType === 'CREATED' && m.routeId);
+  if (created?.routeId) return created.routeId;
+
+  return rootMessages.find((m) => m.exchangeEventType === 'SENDING' && m.routeId)?.routeId ?? null;
+}
+
 export function buildFlows(messages: Message[]): Flow[] {
   const byExchange = new Map<string, Message[]>();
   const parentOf = new Map<string, string | null>();
@@ -213,6 +245,7 @@ export function buildFlows(messages: Message[]): Flow[] {
 
     flows.push({
       rootExchangeId,
+      fromRouteId: resolveFromRouteId(byExchange.get(rootExchangeId)),
       start,
       end,
       durationMs: end - start,

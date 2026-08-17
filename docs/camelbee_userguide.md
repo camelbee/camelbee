@@ -279,8 +279,6 @@ The Metrics page allows you to monitor your Camel microservice's performance and
 
 The topology view shows the same route graph as the Debugger page, but overlaid with exchange count metrics. This lets you visualize traffic flow across your routes.
 
-- Concurrently invoke consumer endpoints to conduct stress tests and observe how traffic flows through your routes.
-
 ### Metrics Detail Modal
 
 Click **show all metrics** to open a modal displaying all available metrics from your application's metrics endpoint.

@@ -7,7 +7,7 @@ import { RouteGraph } from '@/components/debugger/RouteGraph';
 import { TimelineBar } from '@/components/debugger/TimelineBar';
 import { MessagePanel } from '@/components/debugger/MessagePanel';
 import { WaterfallPanel } from '@/components/debugger/WaterfallPanel';
-import { buildRouteGraph, type MessageEdge } from '@/utils/routeGraph';
+import { buildRouteGraph, buildRouteTypeIndex, type MessageEdge } from '@/utils/routeGraph';
 
 export function DebuggerPage() {
   const { data: context, isLoading, error } = useRoutes();
@@ -70,6 +70,12 @@ export function DebuggerPage() {
   }, [context, clearGeneration]);
 
   // Merge static + dynamic edges for MessagePanel
+  /** Route id to component type, so the waterfall can badge a flow the way the graph badges a node. */
+  const routeTypes = useMemo(
+    () => (context ? buildRouteTypeIndex(buildRouteGraph(context).nodes) : new Map<string, string>()),
+    [context],
+  );
+
   const allEdges = useMemo(
     () => [...staticEdges, ...dynamicEdges],
     [staticEdges, dynamicEdges],
@@ -112,7 +118,7 @@ export function DebuggerPage() {
       </div>
 
       {waterfallOpen && (
-        <WaterfallPanel edges={allEdges} onClose={() => setWaterfallOpen(false)} />
+        <WaterfallPanel edges={allEdges} routeTypes={routeTypes} onClose={() => setWaterfallOpen(false)} />
       )}
 
       <TimelineBar />

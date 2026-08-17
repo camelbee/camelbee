@@ -283,3 +283,76 @@ describe('visibleSpans', () => {
     expect(visibleSpans(flow, 100, 10)).toHaveLength(100);
   });
 });
+
+describe('buildFlows - fromRouteId', () => {
+  it('takes the consumer route from the CREATED marker', () => {
+    // The Java side puts exchange.getFromRouteId() on CREATED.routeId, so this is the authority.
+    const flows = buildFlows([
+      makeMessage({
+        exchangeId: 'ex-1',
+        exchangeEventType: 'CREATED',
+        routeId: 'timerRoute',
+        endpoint: null,
+        timeStamp: '1000',
+      }),
+      ...hop('ex-1', 'http://backend', 1200, 50, { routeId: 'invokeHttpRoute' }),
+    ]);
+
+    expect(flows).toHaveLength(1);
+    // NOT invokeHttpRoute - that is where the send was made from, not where the flow entered.
+    expect(flows[0]!.fromRouteId).toBe('timerRoute');
+  });
+
+  it('falls back to the first send when CREATED was never captured', () => {
+    // Arming the tracer part-way through a flow loses its opening marker, and the message cap can
+    // evict it. Verified against a running sample: exchanges traced mid-flight have no CREATED.
+    const flows = buildFlows(hop('ex-2', 'http://backend', 1200, 50, { routeId: 'invokeHttpRoute' }));
+
+    expect(flows[0]!.fromRouteId).toBe('invokeHttpRoute');
+  });
+
+  it('is null when no message carries a route at all', () => {
+    const flows = buildFlows(hop('ex-3', 'mock:x', 1000, 5, { routeId: null }));
+
+    expect(flows[0]!.fromRouteId).toBeNull();
+  });
+
+  it('reports the ROOT exchange route, not a branch route', () => {
+    // A wireTap branch runs in a different route. The header describes the flow, so it has to name
+    // where the flow entered - otherwise a branch's route would surface as the flow's origin.
+    const flows = buildFlows([
+      makeMessage({
+        exchangeId: 'root',
+        exchangeEventType: 'CREATED',
+        routeId: 'fileListenerRoute',
+        endpoint: null,
+        timeStamp: '1000',
+      }),
+      ...hop('root', 'direct://tap', 1100, 10, { routeId: 'mainRoute' }),
+      ...hop('child', 'mock:tapped', 1150, 20, {
+        routeId: 'tappedRoute',
+        parentExchangeId: 'root',
+      }),
+    ]);
+
+    expect(flows).toHaveLength(1);
+    expect(flows[0]!.fromRouteId).toBe('fileListenerRoute');
+  });
+
+  it('ignores a CREATED marker with no route and uses the send instead', () => {
+    // getFromRouteId() is null for an exchange created by the platform-http producer - the Java
+    // tracer documents exactly this case.
+    const flows = buildFlows([
+      makeMessage({
+        exchangeId: 'ex-4',
+        exchangeEventType: 'CREATED',
+        routeId: null,
+        endpoint: null,
+        timeStamp: '1000',
+      }),
+      ...hop('ex-4', 'http://backend', 1100, 30, { routeId: 'restEntryRoute' }),
+    ]);
+
+    expect(flows[0]!.fromRouteId).toBe('restEntryRoute');
+  });
+});

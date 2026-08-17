@@ -526,3 +526,82 @@ describe('WaterfallPanel scroll-into-view', () => {
     expect(scrolled).toHaveLength(afterSelect);
   });
 });
+
+describe('WaterfallPanel - flow origin', () => {
+  it('shows the route a flow entered through, alongside the exchange id', () => {
+    // The store keeps only SENDING/SENT (debuggerStore.applyFilter), so the panel derives this from
+    // the first send of the root exchange - which for a root IS the consumer route, because routing
+    // begins there. A CREATED marker seeded here would be filtered out before it ever arrived.
+    seed(hop('ex-origin', 'http://backend', 1150, 50, { routeId: 'fileListenerRoute' }));
+
+    render(<WaterfallPanel onClose={() => {}} />);
+
+    expect(screen.getByText('fileListenerRoute')).toBeInTheDocument();
+    expect(screen.getByText('ex-origin')).toBeInTheDocument();
+  });
+
+  it('names the ROOT route, not a branch route', () => {
+    // A wireTap branch runs in its own route. The header describes the flow, so it must name where
+    // the flow entered - otherwise the branch's route would surface as the origin.
+    seed([
+      ...hop('root', 'direct://tap', 1100, 10, { routeId: 'mainRoute' }),
+      ...hop('child', 'mock:tapped', 1150, 20, { routeId: 'tappedRoute', parentExchangeId: 'root' }),
+    ]);
+
+    render(<WaterfallPanel onClose={() => {}} />);
+
+    expect(screen.getByText('mainRoute')).toBeInTheDocument();
+    expect(screen.queryByText('tappedRoute')).not.toBeInTheDocument();
+  });
+
+  it('renders the flow without an origin label when no route is known', () => {
+    seed(hop('ex-unknown', 'mock:x', 1005, 5, { routeId: null }));
+
+    render(<WaterfallPanel onClose={() => {}} />);
+
+    expect(screen.getByText('ex-unknown')).toBeInTheDocument();
+  });
+});
+
+describe('WaterfallPanel - flow origin type', () => {
+  it('badges the flow with the consumer component type', () => {
+    seed(hop('ex-t', 'http://backend', 1150, 50, { routeId: 'timerRoute' }));
+
+    render(
+      <WaterfallPanel
+        onClose={() => {}}
+        routeTypes={new Map([['timerRoute', 'timer']])}
+      />,
+    );
+
+    // Same label the topology node shows for that route.
+    expect(screen.getByText('timer')).toBeInTheDocument();
+    expect(screen.getByText('timerRoute')).toBeInTheDocument();
+  });
+
+  it('shows the route name without a badge when the type is unknown', () => {
+    // A route the topology does not have a node for - the name is still useful on its own.
+    seed(hop('ex-u', 'http://backend', 1150, 50, { routeId: 'someRoute' }));
+
+    render(<WaterfallPanel onClose={() => {}} routeTypes={new Map()} />);
+
+    expect(screen.getByText('someRoute')).toBeInTheDocument();
+  });
+
+  it('badges each flow with its own consumer type', () => {
+    seed([
+      ...hop('ex-a', 'http://backend', 1150, 50, { routeId: 'timerRoute' }),
+      ...hop('ex-b', 'http://backend', 2150, 50, { routeId: 'fileListenerRoute' }),
+    ]);
+
+    render(
+      <WaterfallPanel
+        onClose={() => {}}
+        routeTypes={new Map([['timerRoute', 'timer'], ['fileListenerRoute', 'file']])}
+      />,
+    );
+
+    expect(screen.getByText('timer')).toBeInTheDocument();
+    expect(screen.getByText('file')).toBeInTheDocument();
+  });
+});

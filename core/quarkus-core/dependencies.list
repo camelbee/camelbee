@@ -33,7 +33,7 @@ The following files have been resolved:
    commons-cli:commons-cli:jar:1.8.0:test -- module org.apache.commons.cli
    commons-codec:commons-codec:jar:1.22.1:test -- module org.apache.commons.codec
    commons-io:commons-io:jar:2.22.0:compile -- module org.apache.commons.io
-   io.camelbee:camelbee-core:jar:3.3.1:compile -- module camelbee.core (auto)
+   io.camelbee:camelbee-core:jar:4.0.0:compile -- module camelbee.core (auto)
    io.netty:netty-buffer:jar:4.1.137.Final:compile -- module io.netty.buffer [auto]
    io.netty:netty-codec-dns:jar:4.1.137.Final:compile -- module io.netty.codec.dns [auto]
    io.netty:netty-codec-haproxy:jar:4.1.137.Final:compile -- module io.netty.codec.haproxy [auto]

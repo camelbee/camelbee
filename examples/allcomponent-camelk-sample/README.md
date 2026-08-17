@@ -31,7 +31,7 @@ so the helper beans of the other samples are methods on the route builder here, 
 ## How it works
 
 - The modeline at the top of [`MusicianRoute.java`](./MusicianRoute.java) adds:
-  - `mvn:io.camelbee:camelbee-quarkus-core-camelk:3.3.1` — the CamelBee monitoring beans + embedded
+  - `mvn:io.camelbee:camelbee-quarkus-core-camelk:4.0.0` — the CamelBee monitoring beans + embedded
     UI. It brings the REST/Jackson stack transitively (unlike `camelbee-quarkus-core`, where those
     are `provided`), so the modeline does not list them.
   - `camel:http`, `camel:mock`, `camel:seda`, `camel:file`, `camel:timer`, `camel:direct`,
@@ -100,7 +100,7 @@ The **starters are not usable on Camel K**: `camelbee-quarkus-starter` pulls the
   matching in `switch`), so on a stock operator the integration dies with
   `UnsupportedClassVersionError`. See
   [the Camel K JDK docs](https://camel.apache.org/camel-k/2.10.x/installation/advanced/jdk-version.html).
-- **An operator whose runtime matches the published core.** `camelbee-quarkus-core-camelk:3.3.1` is
+- **An operator whose runtime matches the published core.** `camelbee-quarkus-core-camelk:4.0.0` is
   on Maven Central, built against the runtime Camel K 2.10.1 ships (`camel-quarkus 3.15.3` /
   Camel 4.8.5), so the operator resolves it in-cluster with nothing for you to build or host. On an
   operator with a *different* runtime you have to rebuild the core against it and make your build
@@ -331,14 +331,14 @@ mvn -f pom-camelk.xml clean install
 
 # 2. copy the artifacts out of ~/.m2 - deploy:deploy-file refuses to publish from inside it
 mkdir -p /tmp/camelbee-stage /tmp/camelbee-repo
-cp ~/.m2/repository/io/camelbee/camelbee-quarkus-core-camelk/3.3.1/camelbee-quarkus-core-camelk-3.3.1.{jar,pom} \
+cp ~/.m2/repository/io/camelbee/camelbee-quarkus-core-camelk/4.0.0/camelbee-quarkus-core-camelk-4.0.0.{jar,pom} \
    /tmp/camelbee-stage/
 
 # 3. publish into a real repository layout (this is what generates the checksums)
 mvn org.apache.maven.plugins:maven-deploy-plugin:3.1.2:deploy-file \
-  -DgroupId=io.camelbee -DartifactId=camelbee-quarkus-core-camelk -Dversion=3.3.1 -Dpackaging=jar \
-  -Dfile=/tmp/camelbee-stage/camelbee-quarkus-core-camelk-3.3.1.jar \
-  -DpomFile=/tmp/camelbee-stage/camelbee-quarkus-core-camelk-3.3.1.pom \
+  -DgroupId=io.camelbee -DartifactId=camelbee-quarkus-core-camelk -Dversion=4.0.0 -Dpackaging=jar \
+  -Dfile=/tmp/camelbee-stage/camelbee-quarkus-core-camelk-4.0.0.jar \
+  -DpomFile=/tmp/camelbee-stage/camelbee-quarkus-core-camelk-4.0.0.pom \
   -Durl=file:///tmp/camelbee-repo -DrepositoryId=local-m2
 
 # 4. serve it (leave this running)
@@ -357,7 +357,7 @@ to reach you:
 ```sh
 kubectl exec deploy/camel-k-operator -- \
   curl -s -o /dev/null -w '%{http_code}\n' \
-  http://host.minikube.internal:8000/io/camelbee/camelbee-quarkus-core-camelk/3.3.1/camelbee-quarkus-core-camelk-3.3.1.pom
+  http://host.minikube.internal:8000/io/camelbee/camelbee-quarkus-core-camelk/4.0.0/camelbee-quarkus-core-camelk-4.0.0.pom
 ```
 
 Remember to clear the operator's Maven cache (see [step 5](#5-when-something-goes-wrong)) after

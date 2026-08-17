@@ -5,6 +5,7 @@ import { useDragResize } from '@/hooks/useDragResize';
 import { matchMessageToEdge } from '@/utils/messageMatching';
 import type { MessageEdge } from '@/utils/routeGraph';
 import { buildFlows, spanGeometry, visibleSpans, type Flow, type Span } from '@/utils/waterfall';
+import { getComponentColors } from '@/utils/colorMap';
 
 /** How many flows to render at once. The panel is a recent-traffic view, not a log. */
 const MAX_FLOWS = 50;
@@ -35,12 +36,17 @@ export const AUTO_COLLAPSE_ABOVE = 3;
 const MIN_GRAPH_PX = 160;
 
 interface WaterfallPanelProps {
+  /**
+   * Route id to component type (`timer`, `rest`, `jms`...), from {@link buildRouteTypeIndex}.
+   * Optional: without it the flow header shows the route name alone.
+   */
+  routeTypes?: Map<string, string>;
   onClose: () => void;
   /** Topology edges, so a bar can be tied to the hop it represents on the graph. */
   edges?: MessageEdge[];
 }
 
-export function WaterfallPanel({ onClose, edges = [] }: WaterfallPanelProps) {
+export function WaterfallPanel({ onClose, edges = [], routeTypes }: WaterfallPanelProps) {
   const filteredMessages = useDebuggerStore((s) => s.filteredMessages);
   const timelineIndex = useDebuggerStore((s) => s.timelineIndex);
 
@@ -171,6 +177,7 @@ export function WaterfallPanel({ onClose, edges = [] }: WaterfallPanelProps) {
             {flows.map((flow, index) => (
               <FlowRow
                 key={flow.rootExchangeId}
+                routeType={flow.fromRouteId ? routeTypes?.get(flow.fromRouteId) : undefined}
                 flow={flow}
                 collapsed={isCollapsed(flow, index)}
                 onToggle={() => toggle(flow, index)}
@@ -188,6 +195,7 @@ export function WaterfallPanel({ onClose, edges = [] }: WaterfallPanelProps) {
 
 function FlowRow({
   flow,
+  routeType,
   collapsed,
   onToggle,
   edgeIdOfSpan,
@@ -195,6 +203,8 @@ function FlowRow({
   onSelectEdge,
 }: {
   flow: Flow;
+  /** Component type of the route the flow entered through, e.g. `timer`. */
+  routeType?: string;
   collapsed: boolean;
   onToggle: () => void;
   edgeIdOfSpan: Map<Span, string | null>;
@@ -223,6 +233,23 @@ function FlowRow({
         >
           {flow.hasError ? 'Error' : 'OK'}
         </span>
+        {routeType && (
+          <span
+            className={`shrink-0 rounded px-1 py-0.5 text-[9px] font-semibold uppercase leading-tight ${
+              getComponentColors(routeType).bg
+            } ${getComponentColors(routeType).text}`}
+          >
+            {routeType}
+          </span>
+        )}
+        {flow.fromRouteId && (
+          <span
+            title="Route this flow entered through"
+            className="shrink-0 max-w-[40%] truncate text-[10px] font-medium text-gray-700 dark:text-gray-300"
+          >
+            {flow.fromRouteId}
+          </span>
+        )}
         <span className="truncate text-[10px] text-gray-500 dark:text-gray-400">
           {flow.rootExchangeId}
         </span>

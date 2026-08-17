@@ -31,6 +31,6 @@ camelbee.security.clock-skew = 30
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-quarkus-security</artifactId> <!-- or camelbee-springboot-security -->
-  <version>3.3.1</version>
+  <version>4.0.0</version>
 </dependency>
 ```

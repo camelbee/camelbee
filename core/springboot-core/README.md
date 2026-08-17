@@ -21,7 +21,7 @@ Add the CamelBee core dependency:
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-springboot-core</artifactId>
-  <version>3.3.1</version>
+  <version>4.0.0</version>
 </dependency>
 ```
 
@@ -70,7 +70,7 @@ Only suitable for new projects without an existing parent POM. Simply use `camel
 <parent>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-springboot-starter</artifactId>
-  <version>3.3.1</version>
+  <version>4.0.0</version>
 </parent>
 ```
 
@@ -129,7 +129,7 @@ mvn -f pom-custom.xml clean install    # run in ./camelbee/core/springboot-core
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-springboot-core-custom</artifactId>
-  <version>3.3.1</version>
+  <version>4.0.0</version>
 </dependency>
 ```
 
@@ -394,7 +394,7 @@ Once your application is running, the embedded CamelBee UI is available at:
 
 `http://localhost:8080/camelbee/index.html`
 
-This provides route visualization, message tracing, debugging with replay, filtering, endpoint triggering, and metrics directly in your browser.
+This provides route visualization, message tracing, debugging with timeline replay, filtering, and metrics directly in your browser.
 
 ## Example Implementation
 

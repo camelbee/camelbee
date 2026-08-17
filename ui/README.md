@@ -1,6 +1,6 @@
 # CamelBee Embedded UI
 
-The React-based CamelBee UI that is bundled into the core libraries and served directly from your application at the `/camelbee` path. It provides route visualization, message tracing, debugging with replay, filtering, endpoint triggering, and metrics.
+The React-based CamelBee UI that is bundled into the core libraries and served directly from your application at the `/camelbee` path. It provides route visualization, message tracing, debugging with timeline replay, filtering, and metrics.
 
 ## Tech Stack
 
