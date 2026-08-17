@@ -38,12 +38,19 @@ public final class CamelBeeConfig {
   private final boolean maskingEnabled;
   private final String maskedKeys;
   private final boolean tracerBodyEnabled;
+  private final boolean authEnabled;
+  private final String authUsername;
+  private final String authPassword;
+  private final long authSessionTimeout;
+  private final String corsAllowedOrigin;
 
   @SuppressWarnings("java:S107")
   private CamelBeeConfig(boolean contextEnabled, boolean tracerEnabled, boolean loggingEnabled,
       boolean notifierEnabled, boolean routeConfigurerEnabled, boolean metricsEnabled,
       long tracerMaxIdleTime, long tracerMaxMessagesCount,
-      boolean maskingEnabled, String maskedKeys, boolean tracerBodyEnabled) {
+      boolean maskingEnabled, String maskedKeys, boolean tracerBodyEnabled,
+      boolean authEnabled, String authUsername, String authPassword, long authSessionTimeout,
+      String corsAllowedOrigin) {
     this.contextEnabled = contextEnabled;
     this.tracerEnabled = tracerEnabled;
     this.loggingEnabled = loggingEnabled;
@@ -55,6 +62,11 @@ public final class CamelBeeConfig {
     this.maskingEnabled = maskingEnabled;
     this.maskedKeys = maskedKeys;
     this.tracerBodyEnabled = tracerBodyEnabled;
+    this.authEnabled = authEnabled;
+    this.authUsername = authUsername;
+    this.authPassword = authPassword;
+    this.authSessionTimeout = authSessionTimeout;
+    this.corsAllowedOrigin = corsAllowedOrigin;
   }
 
   /**
@@ -83,7 +95,18 @@ public final class CamelBeeConfig {
          */
         resolveBoolean(camelContext, "camelbee.masking-enabled", true),
         resolveString(camelContext, "camelbee.masked-keys", null),
-        resolveBoolean(camelContext, "camelbee.tracer-body-enabled", true));
+        resolveBoolean(camelContext, "camelbee.tracer-body-enabled", true),
+        /*
+         Authentication defaults ON. With no password configured, AuthService generates one and logs
+         it - deliberately not a fixed default, which would be a published credential and therefore
+         no protection at all.
+         */
+        resolveBoolean(camelContext, "camelbee.auth-enabled", true),
+        resolveString(camelContext, "camelbee.username", "camelbee"),
+        resolveString(camelContext, "camelbee.password", null),
+        resolveLong(camelContext, "camelbee.session-timeout", 120000L),
+        // Empty by default: CORS stays closed unless the UI dev server needs it.
+        resolveString(camelContext, "camelbee.cors-allowed-origin", null));
   }
 
   private static String resolveString(CamelContext camelContext, String key, String defaultValue) {
@@ -143,5 +166,25 @@ public final class CamelBeeConfig {
 
   public boolean isTracerBodyEnabled() {
     return tracerBodyEnabled;
+  }
+
+  public boolean isAuthEnabled() {
+    return authEnabled;
+  }
+
+  public String getAuthUsername() {
+    return authUsername;
+  }
+
+  public String getAuthPassword() {
+    return authPassword;
+  }
+
+  public long getAuthSessionTimeout() {
+    return authSessionTimeout;
+  }
+
+  public String getCorsAllowedOrigin() {
+    return corsAllowedOrigin;
   }
 }

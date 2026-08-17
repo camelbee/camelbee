@@ -161,8 +161,14 @@ public final class CamelBee {
       // when the context is fully started. Guarded so plain-core users without platform-http-main
       // are not forced onto the Vert.x classpath (mirrors the metrics guard below).
       if (isPresent("org.apache.camel.component.platform.http.main.ManagementHttpServer")) {
+        final org.camelbee.security.AuthService authService = config.isAuthEnabled()
+            ? new org.camelbee.security.AuthService(true, config.getAuthUsername(),
+                config.getAuthPassword(), config.getAuthSessionTimeout())
+            : org.camelbee.security.AuthService.disabled();
+
         final org.camelbee.http.CamelBeeHttpEndpoints endpoints = new org.camelbee.http.CamelBeeHttpEndpoints(
-            camelContext, tracerService, messageService, routeContextService);
+            camelContext, tracerService, messageService, routeContextService, authService,
+            config.getCorsAllowedOrigin());
         camelContext.addStartupListener((context, alreadyStarted) -> endpoints.register(context));
       } else {
         LOGGER.warn("CamelBee endpoints not exposed: camel-platform-http-main is not on the classpath. "

@@ -33,3 +33,38 @@ After launching the application, open a web browser and navigate to:
 The embedded CamelBee UI provides route visualization, message tracing, debugging with replay, filtering, endpoint triggering, and metrics directly in your browser.
 
 For a guide to the UI's pages and features, see the [CamelBee User Guide](../../docs/camelbee_userguide.md).
+
+### No login is required in this sample
+
+CamelBee requires a username and password by default (`camelbee.auth-enabled`, on since 4.0). This
+sample deliberately turns that **off** in `application.yml`, so the UI opens straight into the
+debugger and the end-to-end suite can drive the REST API without signing in:
+
+```yaml
+camelbee:
+  auth-enabled: false
+```
+
+**That is a sample convenience, not the recommended setting.** In a real application leave
+authentication on, so that nobody who can reach the port can read your traced traffic — or switch
+tracing on themselves, since the API is not read-only.
+
+To try the login flow here, flip it on and give it a password:
+
+```yaml
+camelbee:
+  auth-enabled: true
+  username: camelbee
+  password: s3cret
+```
+
+Without a password, one is generated at every start and written to the application log:
+
+```text
+WARN  CamelBee UI is protected. Generated password for user 'camelbee': f1d4a6a2-…
+```
+
+See the **Securing the CamelBee endpoints** section of the
+[Quarkus core README](../../core/quarkus-core/README.md#securing-the-camelbee-endpoints)
+for the full picture.
+

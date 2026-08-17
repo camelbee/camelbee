@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { NavBar } from '@/components/NavBar';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { AuthGate } from '@/components/AuthGate';
 import { DebuggerPage } from '@/pages/DebuggerPage';
 import { MetricsPage } from '@/pages/MetricsPage';
 import { SettingsPage } from '@/pages/SettingsPage';
@@ -10,6 +11,7 @@ export default function App() {
   useThemeSync();
 
   return (
+    <AuthGate>
     <div className="flex h-screen flex-col bg-gray-100 text-gray-800 dark:bg-gray-950 dark:text-gray-200">
       <NavBar />
       <ErrorBoundary>
@@ -21,5 +23,6 @@ export default function App() {
         </Routes>
       </ErrorBoundary>
     </div>
+    </AuthGate>
   );
 }

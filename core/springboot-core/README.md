@@ -198,6 +198,16 @@ camelbee:
   tracer-body-enabled: true
   # when enabled it logs the messages exchanged between endpoints
   logging-enabled: true
+  # --- Authentication (new in 4.0, ON by default) ---
+  # when enabled the UI and REST API require a login
+  auth-enabled: true
+  # the login name; not a secret
+  username: camelbee
+  # leave unset and one is GENERATED at startup and written to the log. There is deliberately no
+  # default password: a documented one protects nobody while looking as though it does.
+  # password: ${CAMELBEE_PASSWORD:}
+  # idle window in ms; each request re-issues the token, so an active session never expires
+  session-timeout: 120000
 ```
 
 
@@ -279,62 +289,85 @@ already recorded and already served. For production, the capture filter is the o
 
 ### Securing the CamelBee endpoints
 
-CamelBee's UI and REST API are served on **your application's own HTTP port**, alongside your
-routes. **They are not authenticated by default, and CamelBee does not authenticate them itself** —
-anything that can reach your application port can use them.
+With `camelbee.context-enabled` set, CamelBee publishes its UI and REST API under `/camelbee`.
+**Since 4.0 those endpoints require a login by default** — `camelbee.auth-enabled` defaults to
+`true`, and nothing is readable without a token.
 
-What is published depends on two properties, evaluated when the context starts
-(`@ConditionalOnProperty` / `@ConditionalOnExpression`), so a restart applies a change:
-
-| Property | Effect when `true` |
-| --- | --- |
-| `camelbee.context-enabled` | Publishes `GET /camelbee/routes` (the topology). |
-| `camelbee.context-enabled` **and** `camelbee.tracer-enabled` | Additionally publishes `/camelbee/messages` and `/camelbee/tracer/*`. |
-
-An unauthenticated caller can do more than read:
+That default exists because the API is not read-only:
 
 | Endpoint | What it gives away, or does |
 | --- | --- |
-| `GET /camelbee/routes` | The complete route topology: route ids, EIP structure and every endpoint URI — including hostnames, queue names and any credentials embedded in a URI. |
-| `POST /camelbee/tracer/status` | **Turns tracing on.** A caller does not have to wait for someone else to start a session; they can arm it themselves. |
-| `GET /camelbee/messages` | Every captured message — bodies, headers, timings and exception text — subject only to best-effort redaction. |
+| `GET /camelbee/routes` | The complete route topology: route ids, EIP structure and every endpoint URI — including hostnames and queue names. Credentials inside a URI are redacted. |
+| `POST /camelbee/tracer/status` | **Turns tracing on.** Without a gate, a caller does not have to wait for someone else to start a session — they can arm capture themselves and then read the traffic. |
+| `GET /camelbee/messages` | Every captured message — bodies, headers, timings and exception text — subject to redaction. |
 | `DELETE /camelbee/messages` | Discards the collected trace. |
 
-Redaction and the capture filter govern **what is recorded**. They do not govern **who may read it**,
-and they do not apply to the topology at all. Treat `/camelbee` as an internal debugging interface:
+Redaction and the capture filter govern **what is recorded**. Authentication governs **who may read
+it**. They are separate controls and you want both.
 
-> **Do not publish `/camelbee` through a public gateway, ingress or load balancer.** In production
-> it should be reachable only from inside your network perimeter — an internal address, a VPN, a
-> port-forward, or a route protected by the authentication below.
+#### Configuring the login
 
-Because CamelBee shares your application's port, excluding it at the edge is a path rule rather than
+| Property | Default | Meaning |
+| --- | --- | --- |
+| `camelbee.auth-enabled` | **`true`** | Require a login. Setting it `false` logs a warning at startup. |
+| `camelbee.username` | `camelbee` | The login name. Not a secret. |
+| `camelbee.password` | *(generated)* | Blank means one is generated at startup and written to the log. |
+| `camelbee.session-timeout` | `120000` (2 min) | Idle window. Each request re-issues the token, so an active session never expires and an abandoned one does. |
+
+**There is deliberately no default password.** A published default — `camelbee/camelbee` in a README
+— protects nobody, because the value is in the documentation, while looking as though it does. With
+none configured, CamelBee generates one per start and logs it:
+
+```text
+WARN  CamelBee UI is protected. Generated password for user 'camelbee': f1d4a6a2-4478-49a9-90e7-…
+WARN  Set camelbee.password (or CAMELBEE_PASSWORD) to use your own. Note that each replica
+      generates its own, so a multi-instance deployment must configure one.
+```
+
+That is fine on a laptop, where you read it out of your own log. For anything shared, set one — and
+keep it out of the file:
+
+```yaml
+camelbee:
+  auth-enabled: true
+  username: ${CAMELBEE_USERNAME:camelbee}
+  password: ${CAMELBEE_PASSWORD:}
+  session-timeout: 120000
+```
+
+**Limits worth knowing.**
+
+- **One shared credential is a gate, not an identity.** There is no per-user audit and no revocation
+  before the token expires. That is the right weight for a debugging tool; if you need SSO or an
+  audit trail, set `camelbee.auth-enabled=false` and put your host framework's own security in front
+  of `/camelbee/**` instead — see below.
+- **Use TLS.** The login carries the password and every later request carries a bearer token. Both
+  are readable in transit unless the endpoint is served over HTTPS.
+- **The UI shell is public by necessity.** `index.html` and its assets load without a token, because
+  a browser has to load the application before it can show a login form. Every byte of *data* sits
+  behind the guard.
+- **Health and metrics are not CamelBee's endpoints** and are not covered by this. They belong to
+  the host framework; protect them there if they matter.
+
+**Still keep it off the public edge.** Authentication is defence in depth, not a reason to publish a
+debugging interface to the internet:
+
+> Do not route `/camelbee` through a public gateway or ingress. Keep it on an internal address, a
+> VPN or a port-forward, with the login as the second line rather than the only one.
+
+**Turning the endpoints off entirely** remains the strongest control if CamelBee is present only for
+non-production environments — see below.
+
+#### Spring Boot specifics
+
+CamelBee shares your application's HTTP port, so excluding it at the edge is a path rule rather than
 a port rule: deny `/camelbee` and `/camelbee/**` on the public ingress that fronts the service.
 
-**The properties that decide how much there is to expose.** All default to the safe value, so this
-is about what you turn on rather than what you must turn off:
+The guard is a `OncePerRequestFilter`, which is the one place both the REST controllers and the UI's
+static resources under `static/camelbee` pass through. It adds no dependency.
 
-| Property | Default | Effect on exposure |
-| --- | --- | --- |
-| `camelbee.context-enabled` | `false` | Publishes the REST API. Nothing below matters until this is `true`. |
-| `camelbee.tracer-enabled` | `false` | Publishes the tracer endpoints and allows capture to be armed. |
-| `camelbee.logging-enabled` | `false` | **A second disclosure path — see the warning below.** |
-| `camelbee.masking-enabled` | **`true`** | Redacts configured keys before a value reaches the UI, the API *or* the log. |
-| `camelbee.masked-keys` | built-in list | Replaces that list **entirely** — a key you leave out is no longer redacted. |
-| `camelbee.tracer-body-enabled` | `true` | `false` captures no body text at all. The only hard guarantee; does not affect headers. |
-| `camelbee.tracer-max-idle-time` | `300000` (5 min) | How long capture stays armed with no UI activity before it disarms itself. Lower it to narrow the window. |
-| `camelbee.tracer-max-messages-count` | `1000` | How many messages, with full bodies, are held in heap until cleared. |
-
-> **`camelbee.logging-enabled: true` writes traced bodies and headers to the application log**, and
-> it is governed by none of the tracer's safety mechanisms: not the UI's Start/Stop Tracing toggle,
-> not `tracer-max-idle-time`, and not the capture filter. If it is on, every message is written, for
-> as long as the application runs. Values are redacted first, so masking still applies — but in a
-> production environment your logs are usually shipped to an aggregator with a different audience
-> and a much longer retention than a debugging session. Leave it `false` unless you specifically
-> want that.
-
-**Requiring authentication.** With `spring-boot-starter-security` on the classpath, add a filter
-chain for the path — using whichever mechanism the application already uses (form login, OAuth2
-resource server, basic, mTLS):
+**Host-level authentication instead.** If the application already uses Spring Security, use it rather
+than CamelBee's single credential:
 
 ```java
 @Bean
@@ -347,15 +380,13 @@ SecurityFilterChain camelBeeSecurity(HttpSecurity http) throws Exception {
 }
 ```
 
-Note that the embedded UI does not currently attach a bearer token, so token-based schemes suit API
-clients; browser access needs a scheme the browser itself can satisfy, such as basic auth or a
-session-based login.
+Set `camelbee.auth-enabled=false` when you do, so the two do not both challenge.
 
-**Turning the endpoints off entirely.** Start the production application with
-`camelbee.context-enabled=false` to remove the REST API. Be aware that this removes the **API only**
-— the UI's static assets ship inside the core jar under `static/camelbee` and are served by Spring's
-static resource handling, independently of this property. To remove those as well, leave the
-CamelBee dependency out of the production build, or block the path at the edge as described above.
+**Turning the endpoints off entirely.** Start the application with
+`camelbee.context-enabled=false`. This removes the **API only** — the UI's static assets ship inside
+the core jar under `static/camelbee` and are served by Spring's static resource handling
+independently. To remove those too, leave the CamelBee dependency out of the production build, or
+block the path at the edge.
 
 ## Accessing the Embedded UI
 

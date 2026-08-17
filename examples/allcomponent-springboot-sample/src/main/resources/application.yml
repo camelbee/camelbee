@@ -15,6 +15,10 @@ server:
   port: 8080
 
 camelbee:
+  # Sample only: the UI and API are left unauthenticated so the sample can be opened without
+  # credentials. CamelBee defaults this to TRUE - a real deployment should leave it on and set
+  # camelbee.password (or CAMELBEE_PASSWORD).
+  auth-enabled: false
   # when enabled it allows the CamelBe WebGL application to fetch the topology of the Camel Context.
   context-enabled: true
   # tracer-enabled SHOULD BE ONLY ENABLED FOR DEVELOPMENT PURPOSES, NOT FOR PRODUCTION.

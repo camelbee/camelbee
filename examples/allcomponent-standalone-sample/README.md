@@ -26,6 +26,38 @@ The embedded CamelBee UI provides route visualization, message tracing, debuggin
 
 For a guide to the UI's pages and features, see the [CamelBee User Guide](../../docs/camelbee_userguide.md).
 
+### No login is required in this sample
+
+CamelBee requires a username and password by default (`camelbee.auth-enabled`, on since 4.0). This
+sample deliberately turns that **off** in `application.properties`, so the UI opens straight into
+the debugger and the end-to-end suite can drive the REST API without signing in:
+
+```properties
+camelbee.auth-enabled = false
+```
+
+**That is a sample convenience, not the recommended setting.** In a real application leave
+authentication on, so that nobody who can reach the port can read your traced traffic — or switch
+tracing on themselves, since the API is not read-only.
+
+To try the login flow here, flip it on and give it a password:
+
+```properties
+camelbee.auth-enabled = true
+camelbee.username = camelbee
+camelbee.password = s3cret
+```
+
+Without a password, one is generated at every start and written to the application log:
+
+```text
+WARN  CamelBee UI is protected. Generated password for user 'camelbee': f1d4a6a2-…
+```
+
+See the **Securing the CamelBee endpoints** section of the
+[Standalone core README](../../core/standalone-core/README.md#securing-the-camelbee-endpoints)
+for the full picture.
+
 ## Tests
 
 This sample doubles as the integration-test bed for the CamelBee core libraries. Its topology is

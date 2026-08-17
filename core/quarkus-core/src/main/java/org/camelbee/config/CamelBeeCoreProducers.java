@@ -18,10 +18,12 @@ package org.camelbee.config;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
+import java.util.Optional;
 import org.apache.camel.CamelContext;
 import org.camelbee.debugger.service.MessageService;
 import org.camelbee.debugger.service.RouteContextService;
 import org.camelbee.logging.LoggingService;
+import org.camelbee.security.AuthService;
 import org.camelbee.tracers.ExchangeCompletedEventTracer;
 import org.camelbee.tracers.ExchangeCreatedEventTracer;
 import org.camelbee.tracers.ExchangeSendingEventTracer;
@@ -130,5 +132,31 @@ public class CamelBeeCoreProducers {
       LoggingService loggingService) {
     return new TracerService(loggingEnabled, tracerEnabled, tracerIdleTime, createdTracer,
         sendingTracer, sentTracer, completedTracer, messageService, loggingService);
+  }
+
+  /**
+   * Builds the authentication gate.
+   *
+   * <p>Enabled by default. With no password configured, {@link AuthService} generates one and logs
+   * it rather than falling back to a fixed default - a documented default credential protects
+   * nobody while looking as though it does.
+   *
+   * @param enabled  whether the endpoints require a token.
+   * @param username the login name.
+   * @param password the password; empty means "generate one and log it".
+   * @param timeout  the idle window in milliseconds.
+   * @return the auth service.
+   */
+  @Produces
+  @ApplicationScoped
+  AuthService authService(
+      @ConfigProperty(name = "camelbee.auth-enabled", defaultValue = "true") boolean enabled,
+      @ConfigProperty(name = "camelbee.username", defaultValue = "camelbee") String username,
+      @ConfigProperty(name = "camelbee.password") Optional<String> password,
+      @ConfigProperty(name = "camelbee.session-timeout", defaultValue = "120000") long timeout) {
+    // Optional rather than a blank defaultValue: Quarkus rejects an empty default for a String.
+    return enabled
+        ? new AuthService(true, username, password.orElse(null), timeout)
+        : AuthService.disabled();
   }
 }

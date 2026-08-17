@@ -40,6 +40,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 
 /**
@@ -59,10 +60,19 @@ import org.springframework.test.context.TestPropertySource;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @SpringBootApplication
+/*
+ Closed rather than cached: CamelBeeAuthIntegrationTest starts a second web context in the same JVM,
+ and Camel refuses two CamelServlets with the same name. Leaving this context open makes whichever
+ test class runs second fail to start.
+*/
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @TestPropertySource(properties = {
     "camelbee.context-enabled=true",
     "camelbee.tracer-enabled=true",
     "camelbee.notifier-enabled=true",
+    // Authentication defaults ON. Switched off here so each assertion below is about the API it
+    // names rather than about logging in; CamelBeeAuthIntegrationTest covers the gate itself.
+    "camelbee.auth-enabled=false",
     "spring.main.allow-bean-definition-overriding=true",
 })
 class CamelBeeHttpApiIntegrationTest {

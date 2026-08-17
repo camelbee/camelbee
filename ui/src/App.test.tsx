@@ -9,9 +9,12 @@ describe('App', () => {
     vi.unstubAllGlobals();
   });
 
-  it('renders the nav bar and the settings route', () => {
+  it('renders the nav bar and the settings route', async () => {
+    // Async now: AuthGate asks the server whether a login is required before rendering anything,
+    // so nothing is on screen until that resolves.
+    installApiMock();
     renderWithProviders(<App />, { route: '/settings' });
-    expect(screen.getByText('CAMEL BEE')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText('CAMEL BEE')).toBeInTheDocument());
     expect(screen.getByText('theme')).toBeInTheDocument();
   });
 

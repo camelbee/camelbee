@@ -21,6 +21,7 @@ import org.apache.camel.CamelContext;
 import org.camelbee.debugger.service.MessageService;
 import org.camelbee.debugger.service.RouteContextService;
 import org.camelbee.logging.LoggingService;
+import org.camelbee.security.AuthService;
 import org.camelbee.tracers.ExchangeCompletedEventTracer;
 import org.camelbee.tracers.ExchangeCreatedEventTracer;
 import org.camelbee.tracers.ExchangeSendingEventTracer;
@@ -133,5 +134,27 @@ public class CamelBeeCoreBeans {
       LoggingService loggingService) {
     return new TracerService(loggingEnabled, tracerEnabled, tracerIdleTime, createdTracer,
         sendingTracer, sentTracer, completedTracer, messageService, loggingService);
+  }
+
+  /**
+   * Builds the authentication gate.
+   *
+   * <p>Enabled by default. With no password configured, {@link AuthService} generates one and logs
+   * it rather than falling back to a fixed default - a documented default credential protects
+   * nobody while looking as though it does.
+   *
+   * @param enabled  whether the endpoints require a token.
+   * @param username the login name.
+   * @param password the password; empty means "generate one and log it".
+   * @param timeout  the idle window in milliseconds.
+   * @return the auth service.
+   */
+  @Bean
+  AuthService authService(
+      @Value("${camelbee.auth-enabled:true}") boolean enabled,
+      @Value("${camelbee.username:camelbee}") String username,
+      @Value("${camelbee.password:}") String password,
+      @Value("${camelbee.session-timeout:120000}") long timeout) {
+    return enabled ? new AuthService(true, username, password, timeout) : AuthService.disabled();
   }
 }

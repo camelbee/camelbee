@@ -15,6 +15,7 @@
 - [Using CamelBee in Production](#using-camelbee-in-production)
   - [Redacting Sensitive Data](#redacting-sensitive-data)
   - [Tracing a Single Transaction](#tracing-a-single-transaction)
+  - [Signing In](#signing-in)
   - [Restricting Who Can Reach CamelBee](#restricting-who-can-reach-camelbee)
   - [One More Way Traced Data Leaves the Application](#one-more-way-traced-data-leaves-the-application)
 - [Metrics Page](#metrics-page)
@@ -168,8 +169,8 @@ The grips also respond to the arrow keys once focused. Sizes are remembered acro
 
 CamelBee's tracer is designed to be safe to switch on outside development: it starts **off**, and it
 **disarms itself** after a period of inactivity (`camelbee.tracer-max-idle-time`). Two further
-features exist specifically for production use, and a third section covers the one decision CamelBee
-cannot make for you — who is allowed to reach it.
+features exist specifically for production use, and the sections after them cover who is allowed to
+reach it in the first place.
 
 ### Redacting Sensitive Data
 
@@ -205,38 +206,50 @@ CamelBee records **only the flow that contains it**:
 Press **Enter** to apply the filter while tracing is already running; it is also applied
 automatically when you press **Start Tracing**. Changing it starts a fresh investigation.
 
+### Signing In
+
+From 4.0, CamelBee asks for a username and password before showing you anything. Authentication is
+**on by default** (`camelbee.auth-enabled`), so opening the UI on a protected application presents a
+login form rather than the debugger.
+
+- The default user name is **`camelbee`**.
+- If the application has no password configured, **one is generated when it starts and written to the
+  application log**, next to a line telling you to set your own. On your own machine that is where to
+  look for it.
+- Your session lasts as long as you are using it. Each request extends it, and it ends after two
+  minutes of inactivity (`camelbee.session-timeout`) — so a tab left open on a shared screen stops
+  being a way in.
+- The session belongs to the browser tab. Closing the tab signs you out.
+
+If an application runs with `camelbee.auth-enabled: false` — as the CamelBee samples do — no login
+form appears and the debugger opens directly.
+
+**Why the login exists even though CamelBee is a debugging tool.** The API is not read-only: anyone
+who can reach it can *switch tracing on* and then read the traffic that flows through the
+application. Redaction decides what is recorded; the login decides who can read it.
+
 ### Restricting Who Can Reach CamelBee
 
-Redaction and the capture filter decide **what CamelBee records**. They do not decide **who can read
-it**. That is a separate decision, and it is yours to make — CamelBee does not authenticate its own
-endpoints, so on a running application the UI and its API are available to anyone who can reach the
-port they are served on.
+Signing in is one layer, and it is not a reason to publish a debugging interface to the internet.
+Two things remain worth knowing:
 
-It is worth knowing what that exposes, because it is more than a read-only page:
+- The **topology** is available to anyone who signs in, even when tracing has never been switched on.
+  It lists every route and endpoint URI, which typically includes internal hostnames and queue names.
+  Credentials inside a URI are redacted.
+- **One shared credential is a gate, not an identity.** There is no per-user audit, and no way to
+  revoke a session before it expires. That is the right weight for a debugging tool, not for a system
+  of record.
 
-- The **topology** is available even when tracing has never been switched on. It lists every route
-  and every endpoint URI, which typically includes internal hostnames and queue names.
-- **Tracing can be switched on by whoever opens the UI.** There is no separate permission for
-  arming capture; the toggle is part of the interface.
-- Once tracing is on, **captured bodies, headers, timings and error text** are readable, protected
-  only by redaction — which is exact for headers and best-effort for bodies.
+> **Keep CamelBee inside your network perimeter.** Reach it over an internal address, a VPN or a
+> port-forward, with the login as the second line of defence rather than the only one. And serve it
+> over HTTPS — the password and the session token are readable in transit otherwise.
 
-> **CamelBee is an internal debugging tool. It should not be published through a public gateway,
-> ingress or load balancer.** In production, keep it inside your network perimeter — reachable over
-> an internal address, a VPN or a port-forward — or protect it with authentication, or leave it
-> disabled and enable it only for the duration of an investigation.
-
-None of this requires changes to CamelBee itself: each runtime has a supported way to require
-authentication on the `/camelbee` path, and a way to remove the endpoints altogether. The exact
-configuration, and the caveats specific to each runtime, are in the **Securing the CamelBee
-endpoints** section of the core README for
-[Quarkus](../core/quarkus-core/README.md#securing-the-camelbee-endpoints),
+If your organisation needs single sign-on or an audit trail, turn CamelBee's own login off
+(`camelbee.auth-enabled: false`) and put your framework's security in front of `/camelbee` instead.
+The configuration for each runtime is in the **Securing the CamelBee endpoints** section of the core
+README for [Quarkus](../core/quarkus-core/README.md#securing-the-camelbee-endpoints),
 [Spring Boot](../core/springboot-core/README.md#securing-the-camelbee-endpoints) and
 [Standalone](../core/standalone-core/README.md#securing-the-camelbee-endpoints).
-
-Used this way — inside the perimeter, armed only when needed, redacting by default and recording
-only the transaction under investigation — CamelBee is safe to leave installed in production. Used
-on a publicly reachable path, it is a disclosure risk regardless of how little it records.
 
 ### One More Way Traced Data Leaves the Application
 

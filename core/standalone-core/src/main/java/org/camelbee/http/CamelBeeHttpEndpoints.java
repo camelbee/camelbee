@@ -16,6 +16,7 @@
 
 package org.camelbee.http;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -36,6 +37,7 @@ import org.camelbee.debugger.model.route.CamelBeeContext;
 import org.camelbee.debugger.model.route.CamelRoute;
 import org.camelbee.debugger.service.MessageService;
 import org.camelbee.debugger.service.RouteContextService;
+import org.camelbee.security.AuthService;
 import org.camelbee.tracers.TracerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,10 +74,19 @@ public class CamelBeeHttpEndpoints {
   /** Classpath root the UI is bundled under (see the standalone-core pom resources copy). */
   private static final String UI_CLASSPATH_ROOT = "camelbee";
 
+  private static final String AUTHORIZATION_HEADER = "Authorization";
+
+  private static final String BEARER_PREFIX = "Bearer ";
+
+  /** Carries the rolling token back, so an active caller's idle window keeps moving. */
+  private static final String REFRESHED_TOKEN_HEADER = "X-CamelBee-Token";
+
   private final CamelContext camelContext;
   private final TracerService tracerService;
   private final MessageService messageService;
   private final RouteContextService routeContextService;
+  private final AuthService authService;
+  private final String corsAllowedOrigin;
   private final ObjectMapper objectMapper;
 
   /**
@@ -88,10 +99,29 @@ public class CamelBeeHttpEndpoints {
    */
   public CamelBeeHttpEndpoints(CamelContext camelContext, TracerService tracerService,
       MessageService messageService, RouteContextService routeContextService) {
+    this(camelContext, tracerService, messageService, routeContextService, AuthService.disabled(), null);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param camelContext        the context.
+   * @param tracerService       the tracer.
+   * @param messageService      the message store.
+   * @param routeContextService the topology service.
+   * @param authService         guards every endpoint except login and the UI shell.
+   * @param corsAllowedOrigin   a single allowed origin for the UI dev server, or null for none.
+   */
+  @SuppressWarnings("java:S107")
+  public CamelBeeHttpEndpoints(CamelContext camelContext, TracerService tracerService,
+      MessageService messageService, RouteContextService routeContextService,
+      AuthService authService, String corsAllowedOrigin) {
     this.camelContext = camelContext;
     this.tracerService = tracerService;
     this.messageService = messageService;
     this.routeContextService = routeContextService;
+    this.authService = authService;
+    this.corsAllowedOrigin = corsAllowedOrigin;
     // serialize java.time.Instant (MessageListInfo) as ISO strings, matching the REST cores
     this.objectMapper = new ObjectMapper()
         .registerModule(new JavaTimeModule())
@@ -127,16 +157,43 @@ public class CamelBeeHttpEndpoints {
   }
 
   private void registerApi(VertxPlatformHttpRouter router) {
-    // Permissive CORS so the UI dev server (a different origin during development) can call the API.
-    // In a packaged build the UI and API are same-origin on the management port, so this is a no-op.
-    CorsHandler cors = CorsHandler.create()
-        .addRelativeOrigin(".*")
-        .allowedMethod(HttpMethod.GET)
-        .allowedMethod(HttpMethod.POST)
-        .allowedMethod(HttpMethod.DELETE)
-        .allowedMethod(HttpMethod.OPTIONS)
-        .allowedHeader("Content-Type");
-    router.route(BASE_PATH + "/*").handler(cors);
+    /*
+     CORS is closed unless an origin is configured. It used to allow every origin so the UI dev
+     server could call the API, but that is a browser-enforced control: with it wide open, ANY page
+     a developer visited could read this application's topology and traced messages, and POST to
+     tracer/status to start capture. In a packaged build the UI and API are same-origin, so nothing
+     needs it - camelbee.cors-allowed-origin exists for the dev-server case only.
+     */
+    if (corsAllowedOrigin != null && !corsAllowedOrigin.isBlank()) {
+      LOGGER.warn("CamelBee CORS is open to origin '{}'. Intended for the UI dev server; "
+          + "do not set this in a deployed application.", corsAllowedOrigin);
+      CorsHandler cors = CorsHandler.create()
+          .addOrigin(corsAllowedOrigin)
+          .allowedMethod(HttpMethod.GET)
+          .allowedMethod(HttpMethod.POST)
+          .allowedMethod(HttpMethod.DELETE)
+          .allowedMethod(HttpMethod.OPTIONS)
+          .allowedHeader("Content-Type")
+          .allowedHeader(AUTHORIZATION_HEADER)
+          .exposedHeader(REFRESHED_TOKEN_HEADER)
+          .allowCredentials(true);
+      router.route(BASE_PATH + "/*").handler(cors);
+    }
+
+    // Public: the caller has no token yet, and the UI shell has to be loadable to show a login form.
+    router.post(BASE_PATH + "/auth/login")
+        .handler(BodyHandler.create())
+        .handler(this::login);
+    router.get(BASE_PATH + "/auth/status").handler(this::authStatus);
+
+    /*
+     Everything below is guarded. Registered before the handlers it protects, because Vert.x runs
+     route handlers in registration order - a guard added afterwards would run after the data had
+     already been written.
+     */
+    router.route(BASE_PATH + "/routes").handler(this::requireToken);
+    router.route(BASE_PATH + "/messages").handler(this::requireToken);
+    router.route(BASE_PATH + "/tracer/*").handler(this::requireToken);
 
     router.get(BASE_PATH + "/routes").handler(this::getRoutes);
     router.get(BASE_PATH + "/messages").handler(this::getMessages);
@@ -298,5 +355,82 @@ public class CamelBeeHttpEndpoints {
     } catch (NumberFormatException e) {
       return defaultValue;
     }
+  }
+
+  /**
+   * Rejects a request that carries no valid token, and refreshes the token when it does.
+   *
+   * <p>Ends the request rather than delegating, so no handler further down the chain can write data
+   * to an unauthenticated caller.
+   *
+   * @param ctx the routing context.
+   */
+  void requireToken(RoutingContext ctx) {
+    if (!authService.isEnabled()) {
+      ctx.next();
+      return;
+    }
+
+    final String header = ctx.request().getHeader(AUTHORIZATION_HEADER);
+    final String token = header != null && header.startsWith(BEARER_PREFIX)
+        ? header.substring(BEARER_PREFIX.length())
+        : null;
+
+    authService.verifyAndRefresh(token).ifPresentOrElse(
+        refreshed -> {
+          ctx.response().putHeader(REFRESHED_TOKEN_HEADER, refreshed);
+          ctx.next();
+        },
+        () -> ctx.response().setStatusCode(401)
+            .putHeader("Content-Type", "application/json")
+            .end("{\"error\":\"unauthorized\"}"));
+  }
+
+  /**
+   * Exchanges credentials for a token.
+   *
+   * @param ctx the routing context.
+   */
+  void login(RoutingContext ctx) {
+    if (!authService.isEnabled()) {
+      ctx.response().putHeader("Content-Type", "application/json").end("{\"token\":\"\"}");
+      return;
+    }
+
+    String user = null;
+    String pass = null;
+    try {
+      JsonNode body = objectMapper.readTree(ctx.body().asString());
+      user = body.path("username").asText(null);
+      pass = body.path("password").asText(null);
+    } catch (Exception e) {
+      // A malformed body is a failed login, not a server error - and it must not say which.
+      LOGGER.debug("CamelBee login: unreadable request body", e);
+    }
+
+    if (!authService.authenticate(user, pass)) {
+      // Deliberately identical for an unknown user and a wrong password, and no timing difference:
+      // AuthService compares both in constant time.
+      ctx.response().setStatusCode(401)
+          .putHeader("Content-Type", "application/json")
+          .end("{\"error\":\"invalid credentials\"}");
+      return;
+    }
+
+    ctx.response().putHeader("Content-Type", "application/json")
+        .end("{\"token\":\"" + authService.issueToken() + "\"}");
+  }
+
+  /**
+   * Tells the UI whether it needs to show a login form at all.
+   *
+   * <p>Public by necessity - the UI has to ask this before it has a token. It discloses only whether
+   * authentication is switched on, which an unauthenticated caller learns anyway from the first 401.
+   *
+   * @param ctx the routing context.
+   */
+  void authStatus(RoutingContext ctx) {
+    ctx.response().putHeader("Content-Type", "application/json")
+        .end("{\"authEnabled\":" + authService.isEnabled() + "}");
   }
 }

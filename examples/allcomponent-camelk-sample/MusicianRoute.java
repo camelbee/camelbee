@@ -13,6 +13,7 @@
 // camel-k: build-property=quarkus.smallrye-health.root-path=/health
 // camel-k: build-property=quarkus.micrometer.export.prometheus.path=/metrics
 // camel-k: property=camelbee.tracer-enabled=true
+// camel-k: property=camelbee.auth-enabled=false
 // camel-k: property=camelbee.masking-enabled=true
 // camel-k: property=camelbee.tracer-body-enabled=true
 // camel-k: property=camelbee.sample.self-url=http://localhost:8080

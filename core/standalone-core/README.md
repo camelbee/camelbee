@@ -124,6 +124,20 @@ camelbee.masking-enabled = true
 camelbee.masked-keys = password,token,authorization,apikey,creditcard,cvv,iban,ssn
 # when disabled no message body text is captured at all - the only hard guarantee (default: true)
 camelbee.tracer-body-enabled = true
+# --- Authentication (new in 4.0, ON by default) ---
+# when enabled the UI and REST API require a login (default: true)
+camelbee.auth-enabled = true
+# the login name; not a secret (default: camelbee)
+camelbee.username = camelbee
+# leave unset and one is GENERATED at startup and written to the log. There is deliberately no
+# default password: a documented one protects nobody while looking as though it does.
+#camelbee.password = ${CAMELBEE_PASSWORD:}
+# idle window in ms; each request re-issues the token, so an active session never expires (default: 120000)
+camelbee.session-timeout = 120000
+# a single allowed CORS origin for the UI dev server. Unset means CORS is CLOSED, which is what a
+# deployed application wants - an open origin lets any page a developer visits read this app's
+# topology and traces from their browser.
+#camelbee.cors-allowed-origin = http://localhost:5173
 ```
 
 ### Application and Management Ports
@@ -194,59 +208,93 @@ already recorded and already served. For production, the capture filter is the o
 
 ### Securing the CamelBee endpoints
 
-With `camelbee.context-enabled = true`, CamelBee publishes its UI and REST API on the management
-server. **They are not authenticated by default, and CamelBee does not authenticate them itself** —
-anything that can reach the management port can use them.
+With `camelbee.context-enabled` set, CamelBee publishes its UI and REST API under `/camelbee`.
+**Since 4.0 those endpoints require a login by default** — `camelbee.auth-enabled` defaults to
+`true`, and nothing is readable without a token.
 
-An unauthenticated caller can do more than read:
+That default exists because the API is not read-only:
 
 | Endpoint | What it gives away, or does |
 | --- | --- |
-| `GET /camelbee/routes` | The complete route topology: route ids, EIP structure and every endpoint URI — including hostnames, queue names and any credentials embedded in a URI. |
-| `POST /camelbee/tracer/status` | **Turns tracing on.** A caller does not have to wait for someone else to start a session; they can arm it themselves. |
-| `GET /camelbee/messages` | Every captured message — bodies, headers, timings and exception text — subject only to best-effort redaction. |
+| `GET /camelbee/routes` | The complete route topology: route ids, EIP structure and every endpoint URI — including hostnames and queue names. Credentials inside a URI are redacted. |
+| `POST /camelbee/tracer/status` | **Turns tracing on.** Without a gate, a caller does not have to wait for someone else to start a session — they can arm capture themselves and then read the traffic. |
+| `GET /camelbee/messages` | Every captured message — bodies, headers, timings and exception text — subject to redaction. |
 | `DELETE /camelbee/messages` | Discards the collected trace. |
 
-Redaction and the capture filter govern **what is recorded**. They do not govern **who may read it**,
-and they do not apply to the topology at all. Treat `/camelbee` as an internal debugging interface:
+Redaction and the capture filter govern **what is recorded**. Authentication governs **who may read
+it**. They are separate controls and you want both.
 
-> **Do not publish `/camelbee` through a public gateway, ingress or load balancer.** In production
-> it should be reachable only from inside your network perimeter — an internal address, a VPN, a
-> port-forward, or a route protected by the authentication below.
+#### Configuring the login
 
-Because the standalone core serves CamelBee on the **management** server rather than the application
-server, the simplest control is not to route that port publicly at all: `camel.server.port` carries
-your own routes and is what an ingress should expose; `camel.management.port` (default `8081`) is
-where CamelBee lives.
-
-**The properties that decide how much there is to expose.** All default to the safe value, so this
-is about what you turn on rather than what you must turn off:
-
-| Property | Default | Effect on exposure |
+| Property | Default | Meaning |
 | --- | --- | --- |
-| `camelbee.context-enabled` | `false` | Publishes the UI and the REST API. Nothing below matters until this is `true`. |
-| `camelbee.tracer-enabled` | `false` | Allows capture to be armed from the UI. With it `false`, `/camelbee/messages` stays empty however often tracing is toggled. |
-| `camelbee.logging-enabled` | `false` | **A second disclosure path — see the warning below.** |
-| `camelbee.masking-enabled` | **`true`** | Redacts configured keys before a value reaches the UI, the API *or* the log. |
-| `camelbee.masked-keys` | built-in list | Replaces that list **entirely** — a key you leave out is no longer redacted. |
-| `camelbee.tracer-body-enabled` | `true` | `false` captures no body text at all. The only hard guarantee; does not affect headers. |
-| `camelbee.tracer-max-idle-time` | `300000` (5 min) | How long capture stays armed with no UI activity before it disarms itself. Lower it to narrow the window. |
-| `camelbee.tracer-max-messages-count` | `1000` | How many messages, with full bodies, are held in heap until cleared. |
+| `camelbee.auth-enabled` | **`true`** | Require a login. Setting it `false` logs a warning at startup. |
+| `camelbee.username` | `camelbee` | The login name. Not a secret. |
+| `camelbee.password` | *(generated)* | Blank means one is generated at startup and written to the log. |
+| `camelbee.session-timeout` | `120000` (2 min) | Idle window. Each request re-issues the token, so an active session never expires and an abandoned one does. |
 
-> **`camelbee.logging-enabled = true` writes traced bodies and headers to the application log**, and
-> it is governed by none of the tracer's safety mechanisms: not the UI's Start/Stop Tracing toggle,
-> not `tracer-max-idle-time`, and not the capture filter. If it is on, every message is written, for
-> as long as the application runs. Values are redacted first, so masking still applies — but in a
-> production environment your logs are usually shipped to an aggregator with a different audience
-> and a much longer retention than a debugging session. Leave it `false` unless you specifically
-> want that.
+**There is deliberately no default password.** A published default — `camelbee/camelbee` in a README
+— protects nobody, because the value is in the documentation, while looking as though it does. With
+none configured, CamelBee generates one per start and logs it:
 
-**Requiring authentication.** `camel-platform-http-main` — already a dependency of the standalone
-starter — can protect the management server with HTTP Basic or JWT. No extra dependency is needed:
+```text
+WARN  CamelBee UI is protected. Generated password for user 'camelbee': f1d4a6a2-4478-49a9-90e7-…
+WARN  Set camelbee.password (or CAMELBEE_PASSWORD) to use your own. Note that each replica
+      generates its own, so a multi-instance deployment must configure one.
+```
+
+That is fine on a laptop, where you read it out of your own log. For anything shared, set one — and
+keep it out of the file:
 
 ```properties
+camelbee.auth-enabled = true
+camelbee.username = ${CAMELBEE_USERNAME:camelbee}
+camelbee.password = ${CAMELBEE_PASSWORD:}
+camelbee.session-timeout = 120000
+```
+
+**Limits worth knowing.**
+
+- **One shared credential is a gate, not an identity.** There is no per-user audit and no revocation
+  before the token expires. That is the right weight for a debugging tool; if you need SSO or an
+  audit trail, set `camelbee.auth-enabled=false` and put your host framework's own security in front
+  of `/camelbee/**` instead — see below.
+- **Use TLS.** The login carries the password and every later request carries a bearer token. Both
+  are readable in transit unless the endpoint is served over HTTPS.
+- **The UI shell is public by necessity.** `index.html` and its assets load without a token, because
+  a browser has to load the application before it can show a login form. Every byte of *data* sits
+  behind the guard.
+- **Health and metrics are not CamelBee's endpoints** and are not covered by this. They belong to
+  the host framework; protect them there if they matter.
+
+**Still keep it off the public edge.** Authentication is defence in depth, not a reason to publish a
+debugging interface to the internet:
+
+> Do not route `/camelbee` through a public gateway or ingress. Keep it on an internal address, a
+> VPN or a port-forward, with the login as the second line rather than the only one.
+
+**Turning the endpoints off entirely** remains the strongest control if CamelBee is present only for
+non-production environments — see below.
+
+#### Standalone specifics
+
+CamelBee is served on the **management** server, not the application server, so the simplest control
+is not to route that port publicly at all: `camel.server.port` carries your own routes and is what an
+ingress should expose; `camel.management.port` (default `8081`) is where CamelBee lives.
+
+**CORS is closed unless you open it.** `camelbee.cors-allowed-origin` exists for one case — running
+the UI dev server against a packaged application — and warns loudly when set. Leave it unset in a
+deployed application: a wide-open origin lets any page a developer visits read this application's
+topology and traced messages from their browser.
+
+**Host-level authentication instead.** `camel-platform-http-main` — already a dependency of the
+standalone starter — can protect the whole management server with HTTP Basic or JWT, which is the
+better fit if you want one credential store across several tools:
+
+```properties
+camelbee.auth-enabled = false
 camel.management.authenticationEnabled = true
-# scope authentication to CamelBee only, so /observe/health stays open for probes
+# scope it to CamelBee, so /observe/health stays open for probes
 camel.management.authenticationPath = /camelbee/*
 # a filesystem path - NOT a file: URL, which fails at startup
 camel.management.basicPropertiesFile = /etc/camelbee/users.properties
@@ -259,19 +307,8 @@ role.admin=access
 user.roles.admin=admin
 ```
 
-This protects the UI, its deep links (`/camelbee/settings`) and every API endpoint: unauthenticated
-and wrongly-authenticated requests are rejected with `401`. For JWT instead of Basic, use
-`camel.management.jwtKeystorePath`, `camel.management.jwtIssuer` and `camel.management.jwtAudience`
-— note that the embedded UI does not currently attach a bearer token, so JWT suits API clients
-rather than browser access.
-
-Set `camel.management.authenticationPath = /*` if the health and metrics endpoints should be
-protected too. Leaving them open is the right default for Kubernetes probes, but
-`/observe/metrics` does reveal route names and throughput.
-
 **Turning the endpoints off entirely.** `camelbee.context-enabled = false` unregisters both the API
-and the UI on this runtime, which is the strongest control if CamelBee is present only for
-non-production environments.
+and the UI on this runtime.
 
 ## Accessing the Embedded UI
 

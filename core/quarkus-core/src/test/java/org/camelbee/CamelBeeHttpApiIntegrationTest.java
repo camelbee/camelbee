@@ -75,7 +75,10 @@ class CamelBeeHttpApiIntegrationTest extends CamelQuarkusTestSupport {
     public Map<String, String> getConfigOverrides() {
       return Map.of(
           "camelbee.context-enabled", "true",
-          "camelbee.tracer-enabled", "true");
+          "camelbee.tracer-enabled", "true",
+          // Authentication defaults ON. Switched off here so each assertion below is about the API
+          // it names rather than about logging in; CamelBeeAuthIntegrationTest covers the gate.
+          "camelbee.auth-enabled", "false");
     }
   }
 
