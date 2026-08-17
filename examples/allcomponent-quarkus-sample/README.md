@@ -28,7 +28,7 @@ Once the library is in place, follow these steps to run the application:
 
 After launching the application, open a web browser and navigate to:
 
-`http://localhost:8080/camelbee/index.html`
+`http://localhost:8080/camelbee/`
 
 The embedded CamelBee UI provides route visualization, message tracing, debugging with timeline replay, filtering, and metrics directly in your browser.
 
