@@ -245,13 +245,11 @@ public class CamelBeeHttpEndpoints {
    * @param rc the routing context.
    */
   void spaFallback(RoutingContext rc) {
-    final String path = rc.request().path();
-    final String accept = rc.request().getHeader("Accept");
-    final boolean wantsHtml = accept != null && accept.contains("text/html");
-    final boolean looksLikeFile = path.substring(path.lastIndexOf('/') + 1).contains(".");
-
-    if (wantsHtml && !looksLikeFile) {
-      rc.reroute(BASE_PATH + "/index.html");
+    // The rule itself lives in UiPaths, shared with the Quarkus filter and the Spring Boot
+    // controller that do the same job on those runtimes - three copies of it would drift.
+    if (UiPaths.isClientRoute(rc.request().path())
+        && UiPaths.wantsHtml(rc.request().getHeader("Accept"))) {
+      rc.reroute(UiPaths.INDEX);
     } else {
       rc.next();
     }

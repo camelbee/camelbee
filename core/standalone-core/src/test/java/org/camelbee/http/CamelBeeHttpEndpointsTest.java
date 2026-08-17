@@ -264,10 +264,12 @@ class CamelBeeHttpEndpointsTest {
 
   @Test
   void spaFallbackShouldLeaveAMissingAssetAs404() {
-    // returning HTML for a missing .js turns a broken asset into a parse error somewhere else
+    // returning HTML for a missing .js turns a broken asset into a parse error somewhere else.
+    // No Accept stub: the path rule rejects a file request before the header is ever consulted,
+    // which is deliberate - a browser navigating and an <script src> both send text/html-ish
+    // Accept values, so the extension is what has to decide here.
     when(routingContext.request()).thenReturn(request);
     when(request.path()).thenReturn("/camelbee/assets/main.js");
-    when(request.getHeader("Accept")).thenReturn("text/html,*/*");
 
     endpoints.spaFallback(routingContext);
 

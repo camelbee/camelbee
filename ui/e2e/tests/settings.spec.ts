@@ -67,6 +67,19 @@ test.describe('settings', () => {
     await expect(page.getByLabel('max characters in a text field')).toHaveValue('30000');
   });
 
+  /**
+   * A client-side route asked for directly, rather than reached by clicking. The UI is a
+   * BrowserRouter, so /camelbee/settings is a real URL with no file behind it: without the
+   * single-page-app fallback in the core, a bookmark, a shared link or a plain reload answers 404 for
+   * a page the user is looking straight at.
+   */
+  test('can be opened directly by URL, not only by clicking', async ({ page }) => {
+    await page.goto('/camelbee/settings');
+
+    await expect(page.getByLabel('health url')).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByLabel('metrics url')).toBeVisible();
+  });
+
   test('a changed metrics url is the one actually polled', async ({ page }) => {
     // the point of the page: not that the field holds a string, but that the string is used
     const requested: string[] = [];

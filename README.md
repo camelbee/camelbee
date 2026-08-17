@@ -518,7 +518,7 @@ public class YourApplication {
 
 Wiring and `application.properties` configuration are the same as in Option 1 above — attach CamelBee explicitly with `CamelBee.register(main)` before the context starts.
 
-Once your application is running, the CamelBee UI is available at: `http://localhost:8080/camelbee/index.html` (Quarkus/Spring Boot) or `http://localhost:8081/camelbee` (Standalone, served on the camel-main management server).
+Once your application is running, the CamelBee UI is available at: `http://localhost:8080/camelbee/` (Quarkus/Spring Boot) or `http://localhost:8081/camelbee/` (Standalone, served on the camel-main management server). Its pages can be bookmarked, shared and reloaded — every runtime answers a client-side route such as `/camelbee/settings` with the application itself.
 
 ### Running CamelBee Outside Development
 

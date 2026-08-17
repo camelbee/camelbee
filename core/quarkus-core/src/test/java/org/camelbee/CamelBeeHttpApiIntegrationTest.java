@@ -125,6 +125,13 @@ class CamelBeeHttpApiIntegrationTest extends CamelQuarkusTestSupport {
     return send(HttpRequest.newBuilder(url(path)).GET().build());
   }
 
+  /** A browser navigation: the Accept header is what separates a page request from a fetch. */
+  private HttpResponse<String> navigate(String path) throws Exception {
+    return send(HttpRequest.newBuilder(url(path))
+        .header("Accept", "text/html,application/xhtml+xml")
+        .GET().build());
+  }
+
   private void post(String path, String contentType, String body) throws Exception {
     send(HttpRequest.newBuilder(url(path))
         .header("Content-Type", contentType)
@@ -261,4 +268,42 @@ class CamelBeeHttpApiIntegrationTest extends CamelQuarkusTestSupport {
     assertThat(response.statusCode()).isEqualTo(200);
     assertThat(response.body()).contains("<div id=\"root\"");
   }
+
+  @Test
+  @DisplayName("serves the single page for a client-side route, so a reload does not 404")
+  void servesTheSpaFallback() throws Exception {
+    // /camelbee/settings exists only in the browser's router; clicking to it works either way, but
+    // reloading, bookmarking or sharing the link asks the server for a file that is not there
+    HttpResponse<String> response = navigate("/camelbee/settings");
+
+    assertThat(response.statusCode()).isEqualTo(200);
+    assertThat(response.body()).contains("<div id=\"root\"");
+  }
+
+  @Test
+  @DisplayName("still 404s a missing asset rather than answering it with the page")
+  void doesNotSwallowMissingAssets() throws Exception {
+    // the failure mode the fallback must not introduce: HTML returned with status 200 for a .js
+    // request shows up much later as a syntax error in a file the developer never wrote
+    assertThat(navigate("/camelbee/assets/does-not-exist.js").statusCode()).isEqualTo(404);
+  }
+
+  @Test
+  @DisplayName("leaves an unknown API path failing as an API path")
+  void doesNotSwallowUnknownApiPaths() throws Exception {
+    assertThat(navigate("/camelbee/routes/nope").statusCode()).isNotEqualTo(200);
+  }
+
+  @Test
+  @DisplayName("polls messages with only an index, as a caller that has seen no versions yet does")
+  void messagesAreReadableWithoutVersionParameters() throws Exception {
+    // Cross-core parity, not a convenience: JAX-RS defaults a missing @QueryParam long to 0, so the
+    // Quarkus core has always accepted this call, while Spring Boot answered 400 until its two
+    // version parameters were given defaults. One API, two implementations - this is the assertion
+    // that keeps them the same one.
+    HttpResponse<String> response = get("/camelbee/messages?index=0");
+
+    assertThat(response.statusCode()).isEqualTo(200);
+  }
+
 }

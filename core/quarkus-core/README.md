@@ -346,7 +346,11 @@ the production build, or block the path at the edge.
 
 Once your application is running, the embedded CamelBee UI is available at:
 
-`http://localhost:8080/camelbee/index.html`
+`http://localhost:8080/camelbee/`
+
+Deep links work: `/camelbee/settings` and `/camelbee/metrics` are client-side routes with no file behind
+them, and the core answers them with the application, so a bookmark, a shared link or a plain reload
+lands on the page it names rather than a 404. A missing asset still 404s, deliberately.
 
 This provides route visualization, message tracing, debugging with timeline replay, filtering, and metrics directly in your browser.
 
