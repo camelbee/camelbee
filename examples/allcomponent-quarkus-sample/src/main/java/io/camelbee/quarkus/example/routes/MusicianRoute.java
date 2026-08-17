@@ -23,6 +23,7 @@ import io.camelbee.quarkus.example.model.jpa.SongEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.Map;
 import org.apache.camel.Exchange;
+import org.apache.camel.ExchangePattern;
 import org.apache.camel.builder.RouteBuilder;
 import org.camelbee.config.CamelBeeRouteConfigurer;
 
@@ -144,7 +145,16 @@ public class MusicianRoute extends RouteBuilder {
     from("direct:invokeRabbitMq").routeId("invokeRabbitMqRoute")
         .setBody(exchangeProperty(Constants.ORIGINAL_BODY))
         .convertBodyTo(String.class)
-        .to("rabbitmq:cheese?routingKey=songs&durable=false&declare=false&autoDelete=false")
+        /*
+         InOnly explicitly. The REST entry point is InOut and that pattern propagates all the way
+         down the pipeline, which makes camel-rabbitmq's producer do RPC: it declares a temporary
+         reply queue and blocks for replyTimeout (20s) waiting for an answer. Nothing answers -
+         this is a southbound publish, and the only consumer here binds routingKey=musicians
+         rather than songs - so every request stalled 20s per delivery attempt, three times over
+         with the error handler's redeliveries, and then failed.
+        */
+        .to(ExchangePattern.InOnly,
+            "rabbitmq:cheese?routingKey=songs&durable=false&declare=false&autoDelete=false")
         .id("rabbitMqEndpoint");
 
     from("direct:invokeMongoDb").routeId("invokeMongoDbRoute")
