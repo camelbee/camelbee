@@ -44,6 +44,10 @@ To enable your Camel microservices to work with CamelBee, follow the setup instr
 - **Standalone (plain Camel / `camel-main`):** [CamelBee Standalone Core README](https://github.com/camelbee/camelbee/tree/main/core/standalone-core)
 - **Camel K:** runs on the Camel Quarkus runtime, but pins an older Camel — use `camelbee-quarkus-core-camelk` and see the [Camel K Sample README](https://github.com/camelbee/camelbee/tree/main/examples/allcomponent-camelk-sample)
 
+Every `RouteBuilder` must also call `camelBeeRouteConfigurer.configureRoute(this)` as its first statement (on Quarkus and Spring Boot) - it installs the intercept strategies behind per-node tracing and `poll()` hops. On standalone, `CamelBee.register(main)` does the same. See the core READMEs.
+
+For how the tracing actually works inside your application - the event notifier, the intercept strategies, and how the UI reads them - see [How CamelBee works](how-it-works.md).
+
 For working examples, see the [camelbee-examples](https://github.com/camelbee/camelbee-examples) repository.
 
 Once your application is running, the CamelBee UI is available at:

@@ -18,6 +18,7 @@ package io.camelbee.coreonly.quarkus;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.camel.builder.RouteBuilder;
+import org.camelbee.config.CamelBeeRouteConfigurer;
 
 /**
  * Two small routes, enough to give CamelBee a topology with a hop in it. Infrastructure-free on
@@ -26,8 +27,19 @@ import org.apache.camel.builder.RouteBuilder;
 @ApplicationScoped
 public class PingRoute extends RouteBuilder {
 
+  private final CamelBeeRouteConfigurer camelBeeRouteConfigurer;
+
+  public PingRoute(CamelBeeRouteConfigurer camelBeeRouteConfigurer) {
+    this.camelBeeRouteConfigurer = camelBeeRouteConfigurer;
+  }
+
   @Override
   public void configure() {
+    // Required in every RouteBuilder: installs the intercept strategies that record per-node hops
+    // and poll()/pollEnrich() edges, plus stream caching and the MDC unit of work. It has to run
+    // before the routes below are reified, so keep it first.
+    camelBeeRouteConfigurer.configureRoute(this);
+
     from("timer:ping?period={{coreonly.timer-period:60000}}&delay={{coreonly.timer-delay:3600000}}")
         .routeId("pingRoute")
         .setBody(constant("ping"))

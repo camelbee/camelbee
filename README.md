@@ -89,6 +89,7 @@ The project is structured as follows:
 camelbee/
 |-- common/                              # Shared build config (checkstyle, spotbugs, formatter)
 |-- core/
+|   |-- shared-core/                     # camelbee-core: the framework-neutral engine
 |   |-- quarkus-core/                    # Quarkus-specific core module
 |   |   |-- README.md
 |   |-- springboot-core/                 # Spring Boot-specific core module
@@ -130,6 +131,7 @@ camelbee/
 
 - `common`: Shared build configuration (Checkstyle, SpotBugs, formatter profiles) unpacked by the parent POM during the build.
 - `core`: Contains the core modules for CamelBee that provide route tracing, event notification, and REST endpoints.
+  - `shared-core` (`camelbee-core`): The framework-neutral engine — tracer, event notifier, intercept strategies, topology extraction, redaction and structured logging. It has no DI or HTTP layer of its own and scopes Camel as `provided`; the three runtime cores below depend on it and add only the wiring. See [How CamelBee works](docs/how-it-works.md).
   - `quarkus-core`: Quarkus-specific core module.
   - `springboot-core`: Spring Boot-specific core module.
   - `standalone-core`: Core module for plain standalone Camel applications (`camel-main`, no Spring Boot or Quarkus).
@@ -161,6 +163,10 @@ camelbee/
   is what keeps the version table above honest. See their READMEs.
 
 Each subproject has its own README file for detailed information specific to that project.
+
+> **Curious what it actually does inside your application?**
+> [How CamelBee works](docs/how-it-works.md) covers the event notifier, the intercept strategies,
+> what is stored and what never is, and how the UI reads it.
 
 ## Getting Started
 
@@ -211,6 +217,16 @@ camelbee:
   tracer-max-idle-time: 60000
   tracer-max-messages-count: 10000
   logging-enabled: true
+  # A login is required by default. Set a password (or CAMELBEE_PASSWORD), or set
+  # auth-enabled: false to leave it open (see Securing the CamelBee Endpoints).
+  auth-enabled: true
+  username: camelbee
+  password: change-me
+  # Sensitive values are redacted at the point of capture. Replace the built-in key
+  # list if yours differs; set tracer-body-enabled: false to never capture bodies at all.
+  masking-enabled: true
+  # masked-keys: password,token,authorization,apikey,creditcard,cvv,iban,ssn
+  tracer-body-enabled: true
 
 quarkus:
   http:
@@ -256,6 +272,16 @@ camelbee:
   tracer-max-idle-time: 60000
   tracer-max-messages-count: 10000
   logging-enabled: true
+  # A login is required by default. Set a password (or CAMELBEE_PASSWORD), or set
+  # auth-enabled: false to leave it open (see Securing the CamelBee Endpoints).
+  auth-enabled: true
+  username: camelbee
+  password: change-me
+  # Sensitive values are redacted at the point of capture. Replace the built-in key
+  # list if yours differs; set tracer-body-enabled: false to never capture bodies at all.
+  masking-enabled: true
+  # masked-keys: password,token,authorization,apikey,creditcard,cvv,iban,ssn
+  tracer-body-enabled: true
 
 management:
   server:
@@ -327,6 +353,16 @@ camelbee.tracer-max-idle-time = 60000
 camelbee.tracer-max-messages-count = 10000
 camelbee.metrics-enabled = true
 camelbee.logging-enabled = false
+# A login is required by default. Set a password (or CAMELBEE_PASSWORD), or set
+# auth-enabled = false to leave it open (see Securing the CamelBee Endpoints).
+camelbee.auth-enabled = true
+camelbee.username = camelbee
+camelbee.password = change-me
+# Sensitive values are redacted at the point of capture. Replace the built-in key
+# list if yours differs; set tracer-body-enabled = false to never capture bodies at all.
+camelbee.masking-enabled = true
+# camelbee.masked-keys = password,token,authorization,apikey,creditcard,cvv,iban,ssn
+camelbee.tracer-body-enabled = true
 
 # the application's own platform-http server (your routes)
 camel.server.enabled = true
@@ -355,6 +391,32 @@ The REST/Jackson stack comes transitively with this core, so it does not need de
 The **default operator image works** — this core is built for JDK 17, so the `-21-jdk` operator flavour is no longer required.
 
 Run it with `kamel run YourRoute.java`, then expose the HTTP port (e.g. `kubectl port-forward svc/your-route 8080:80`) and open `http://localhost:8080/camelbee`. See the [Camel K sample](examples/allcomponent-camelk-sample/README.md) for a complete, cluster-verified integration and a full local setup walkthrough.
+
+**Then call the route configurer from every `RouteBuilder`.** This is required, not optional: it
+installs the intercept strategies that record per-node hops and `poll()` / `pollEnrich()` edges, and
+turns on stream caching and the MDC unit of work. It must run before the routes are reified, so make
+it the first statement in `configure()`. Without it CamelBee starts and draws the topology, but
+message tracing and the waterfall are incomplete.
+
+```java
+public class YourRoute extends RouteBuilder {
+
+  private final CamelBeeRouteConfigurer camelBeeRouteConfigurer;
+
+  public YourRoute(CamelBeeRouteConfigurer camelBeeRouteConfigurer) {
+    this.camelBeeRouteConfigurer = camelBeeRouteConfigurer;
+  }
+
+  @Override
+  public void configure() {
+    camelBeeRouteConfigurer.configureRoute(this);
+    // ... your routes
+  }
+}
+```
+
+> On **standalone** (`camel-main`) there is no configurer - `CamelBee.register(main)` does the same
+> work before the context starts.
 
 ### Option 2: Use a CamelBee Starter as Parent (New projects only)
 > **What you get.** The starter pins the whole stack — you do not choose these, and overriding them
@@ -392,6 +454,16 @@ camelbee:
   tracer-max-idle-time: 60000
   tracer-max-messages-count: 10000
   logging-enabled: true
+  # A login is required by default. Set a password (or CAMELBEE_PASSWORD), or set
+  # auth-enabled: false to leave it open (see Securing the CamelBee Endpoints).
+  auth-enabled: true
+  username: camelbee
+  password: change-me
+  # Sensitive values are redacted at the point of capture. Replace the built-in key
+  # list if yours differs; set tracer-body-enabled: false to never capture bodies at all.
+  masking-enabled: true
+  # masked-keys: password,token,authorization,apikey,creditcard,cvv,iban,ssn
+  tracer-body-enabled: true
 
 quarkus:
   http:
@@ -425,6 +497,16 @@ camelbee:
   tracer-max-idle-time: 60000
   tracer-max-messages-count: 10000
   logging-enabled: true
+  # A login is required by default. Set a password (or CAMELBEE_PASSWORD), or set
+  # auth-enabled: false to leave it open (see Securing the CamelBee Endpoints).
+  auth-enabled: true
+  username: camelbee
+  password: change-me
+  # Sensitive values are redacted at the point of capture. Replace the built-in key
+  # list if yours differs; set tracer-body-enabled: false to never capture bodies at all.
+  masking-enabled: true
+  # masked-keys: password,token,authorization,apikey,creditcard,cvv,iban,ssn
+  tracer-body-enabled: true
 
 management:
   server:
@@ -488,6 +570,16 @@ camelbee.tracer-max-idle-time = 60000
 camelbee.tracer-max-messages-count = 10000
 camelbee.metrics-enabled = true
 camelbee.logging-enabled = false
+# A login is required by default. Set a password (or CAMELBEE_PASSWORD), or set
+# auth-enabled = false to leave it open (see Securing the CamelBee Endpoints).
+camelbee.auth-enabled = true
+camelbee.username = camelbee
+camelbee.password = change-me
+# Sensitive values are redacted at the point of capture. Replace the built-in key
+# list if yours differs; set tracer-body-enabled = false to never capture bodies at all.
+camelbee.masking-enabled = true
+# camelbee.masked-keys = password,token,authorization,apikey,creditcard,cvv,iban,ssn
+camelbee.tracer-body-enabled = true
 
 # the application's own platform-http server (your routes)
 camel.server.enabled = true
@@ -526,6 +618,16 @@ camelbee:
   tracer-max-idle-time: 60000
   tracer-max-messages-count: 10000
   logging-enabled: true
+  # A login is required by default. Set a password (or CAMELBEE_PASSWORD), or set
+  # auth-enabled: false to leave it open (see Securing the CamelBee Endpoints).
+  auth-enabled: true
+  username: camelbee
+  password: change-me
+  # Sensitive values are redacted at the point of capture. Replace the built-in key
+  # list if yours differs; set tracer-body-enabled: false to never capture bodies at all.
+  masking-enabled: true
+  # masked-keys: password,token,authorization,apikey,creditcard,cvv,iban,ssn
+  tracer-body-enabled: true
 
 quarkus:
   http:
@@ -559,6 +661,16 @@ camelbee:
   tracer-max-idle-time: 60000
   tracer-max-messages-count: 10000
   logging-enabled: true
+  # A login is required by default. Set a password (or CAMELBEE_PASSWORD), or set
+  # auth-enabled: false to leave it open (see Securing the CamelBee Endpoints).
+  auth-enabled: true
+  username: camelbee
+  password: change-me
+  # Sensitive values are redacted at the point of capture. Replace the built-in key
+  # list if yours differs; set tracer-body-enabled: false to never capture bodies at all.
+  masking-enabled: true
+  # masked-keys: password,token,authorization,apikey,creditcard,cvv,iban,ssn
+  tracer-body-enabled: true
 
 management:
   server:
@@ -715,6 +827,7 @@ altogether, is in the **Securing the CamelBee endpoints** section of your core R
 
 ### Detailed Documentation
 
+- **How it works:** [How CamelBee works](https://github.com/camelbee/camelbee/blob/main/docs/how-it-works.md) — the event notifier, the intercept strategies, what is stored and what never is, and how the UI reads it
 - **User Guide:** [CamelBee User Guide](https://github.com/camelbee/camelbee/blob/main/docs/camelbee_userguide.md)
 - **Quarkus:** [CamelBee Quarkus Core README](https://github.com/camelbee/camelbee/blob/main/core/quarkus-core/README.md)
 - **Spring Boot:** [CamelBee SpringBoot Core README](https://github.com/camelbee/camelbee/blob/main/core/springboot-core/README.md)

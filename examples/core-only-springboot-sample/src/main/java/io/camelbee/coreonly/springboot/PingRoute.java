@@ -17,6 +17,7 @@
 package io.camelbee.coreonly.springboot;
 
 import org.apache.camel.builder.RouteBuilder;
+import org.camelbee.config.CamelBeeRouteConfigurer;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,8 +27,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class PingRoute extends RouteBuilder {
 
+  private final CamelBeeRouteConfigurer camelBeeRouteConfigurer;
+
+  public PingRoute(CamelBeeRouteConfigurer camelBeeRouteConfigurer) {
+    this.camelBeeRouteConfigurer = camelBeeRouteConfigurer;
+  }
+
   @Override
   public void configure() {
+    // Required in every RouteBuilder: installs the intercept strategies that record per-node hops
+    // and poll()/pollEnrich() edges, plus stream caching and the MDC unit of work. It has to run
+    // before the routes below are reified, so keep it first.
+    camelBeeRouteConfigurer.configureRoute(this);
+
     from("timer:ping?period={{coreonly.timer-period:60000}}&delay={{coreonly.timer-delay:1000}}")
         .routeId("pingRoute")
         .setBody(constant("ping"))

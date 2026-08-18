@@ -147,6 +147,29 @@ public class YourApplication {
 
 For working examples using the starter, see the [camelbee-examples](https://github.com/camelbee/camelbee-examples) repository.
 
+**Then call the route configurer from every `RouteBuilder`.** This is required, not optional: it
+installs the intercept strategies that record per-node hops and `poll()` / `pollEnrich()` edges, and
+turns on stream caching and the MDC unit of work. It must run before the routes are reified, so make
+it the first statement in `configure()`. Without it CamelBee starts and draws the topology, but
+message tracing and the waterfall are incomplete.
+
+```java
+public class YourRoute extends RouteBuilder {
+
+  private final CamelBeeRouteConfigurer camelBeeRouteConfigurer;
+
+  public YourRoute(CamelBeeRouteConfigurer camelBeeRouteConfigurer) {
+    this.camelBeeRouteConfigurer = camelBeeRouteConfigurer;
+  }
+
+  @Override
+  public void configure() {
+    camelBeeRouteConfigurer.configureRoute(this);
+    // ... your routes
+  }
+}
+```
+
 ### Option 3: Build a Custom Core Library (Custom Java/Camel Versions)
 
 If you need to customize Java and Camel Spring Boot versions, you can build and use `camelbee-springboot-core-custom` independently. This approach uses the provided `pom-custom.xml`, which allows you to adjust versions to match your existing project setup.
