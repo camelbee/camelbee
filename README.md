@@ -5,6 +5,22 @@ to visualize the topology within the **embedded CamelBee UI** served directly fr
 
 ![Debugger Page](images/debugger_page.png)
 
+## Why
+
+Integrations are increasingly written by AI agents, and a whole one now arrives in a single commit.
+Reading it line by line tells you what the code *says*; it does not tell you what actually crossed
+each route boundary, which endpoint was really called, or what your service sent to its backends.
+
+That is the gap CamelBee fills. Instead of reviewing route definitions, you watch the topology the
+running application reports, follow one request through every hop it spawned, and read the request
+and response of each backend call — with the timing of each. The same applies to inherited routes,
+where nobody left is sure what the flow does either.
+
+And because it is served from the application's own HTTP port, you can do this where it matters —
+SIT, UAT, a pod in the cluster — not only on a laptop. Tracing starts off, is armed from the UI
+without a restart, disarms itself when idle, and redacts sensitive values at the point of capture,
+so it is safe to leave in place.
+
 ## Features
 
 ### Route Visualization
@@ -79,9 +95,11 @@ camelbee/
 |   |   |-- README.md
 |   |-- standalone-core/                 # Plain Camel (camel-main) core module
 |   |   |-- README.md
+|   |-- quarkus-core-camelk/             # quarkus-core's sources, built against Camel K's platform
 |-- dependencies/
 |   |-- quarkus/                         # Quarkus BOM/dependency management
 |   |-- springboot/                      # Spring Boot BOM/dependency management
+|   |-- quarkus-camelk/                  # BOM pinned to the platform Camel K runs
 |   |-- standalone/                      # Standalone (camel-main) BOM/dependency management
 |-- examples/
 |   |-- allcomponent-quarkus-sample/     # Quarkus example project
@@ -91,6 +109,12 @@ camelbee/
 |   |-- allcomponent-standalone-sample/  # Standalone (camel-main) example project
 |   |   |-- README.md
 |   |-- allcomponent-camelk-sample/      # Camel K integration sample (kamel CLI, not a Maven module)
+|   |   |-- README.md
+|   |-- core-only-quarkus-sample/        # Option 1 wiring test, oldest supported Quarkus
+|   |   |-- README.md
+|   |-- core-only-springboot-sample/     # Option 1 wiring test, oldest supported Spring Boot
+|   |   |-- README.md
+|   |-- core-only-standalone-sample/     # Option 1 wiring test, oldest supported Camel
 |   |   |-- README.md
 |-- parent/                              # Parent POM with shared build config
 |-- security/
@@ -109,6 +133,7 @@ camelbee/
   - `quarkus-core`: Quarkus-specific core module.
   - `springboot-core`: Spring Boot-specific core module.
   - `standalone-core`: Core module for plain standalone Camel applications (`camel-main`, no Spring Boot or Quarkus).
+  - `quarkus-core-camelk`: Owns no sources — it recompiles `quarkus-core` and `shared-core` against the platform the Apache Camel K runtime pins (Quarkus 3.15.4 / Camel Quarkus 3.15.3), producing `camelbee-quarkus-core-camelk` for use from a Camel K integration modeline.
 - `dependencies`: BOM (Bill of Materials) modules for dependency version management.
 - `security`: Optional modules providing reusable JWT validation Camel routes (JWKS fetching/caching, token validation, authorization utilities).
   - `quarkus-security`: JWT validation routes for Camel Quarkus.
@@ -118,15 +143,31 @@ camelbee/
   - `camelbee-springboot-starter`: Spring Boot starter parent project.
   - `camelbee-standalone-starter`: Standalone starter parent project.
 - `ui`: Embedded React-based UI that is bundled into the core libraries and served directly from your application at the `/camelbee` path. Provides route visualization, message tracing, debugging with timeline replay, filtering, and metrics.
-- `examples`: Contains example projects demonstrating the usage of CamelBee.
-  - `allcomponent-quarkus-sample`: Quarkus example project which uses `camelbee-quarkus-starter` as parent.
-  - `allcomponent-springboot-sample`: Spring Boot example project which uses `camelbee-springboot-starter` as parent.
-  - `allcomponent-standalone-sample`: Standalone example project which uses `camelbee-standalone-starter` as parent.
-  - `allcomponent-camelk-sample`: Camel K integration sample run with the `kamel` CLI. Camel K runs on the Camel Quarkus runtime but pins an older Camel, so it uses `camelbee-quarkus-core-camelk` (same sources, built by `core/quarkus-core/pom-camelk.xml`). Same infra-free topology as the standalone sample, in a single integration file.
+- `examples`: Example projects demonstrating the usage of CamelBee. Two families, differing in **how
+  they integrate** and in **how much they show**:
+
+  | Sample | Integrates via | Stack | Shows |
+  |---|---|---|---|
+  | `allcomponent-quarkus-sample` | Starter as parent (Option 2) | This project's | A wide, EIP-rich topology across many Camel components |
+  | `allcomponent-springboot-sample` | Starter as parent (Option 2) | This project's | Same, for Spring Boot |
+  | `allcomponent-standalone-sample` | Starter as parent (Option 2) | This project's | Same, for plain `camel-main` |
+  | `allcomponent-camelk-sample` | `camelbee-quarkus-core-camelk` via modeline | Camel K's | The same infra-free topology as the standalone sample, in one integration file (`kamel` CLI, not a Maven module) |
+  | `core-only-quarkus-sample` | Core as a dependency (Option 1) | **Oldest supported** | Nothing — deliberately minimal. A wiring test |
+  | `core-only-springboot-sample` | Core as a dependency (Option 1) | **Oldest supported** | Same |
+  | `core-only-standalone-sample` | Core as a dependency (Option 1) | **Oldest supported** | Same |
+
+  The `allcomponent-*` samples are the ones to read to learn CamelBee. The `core-only-*` samples
+  exist to be *run*: they are the only coverage of the Option 1 path, and pinning them to the floor
+  is what keeps the version table above honest. See their READMEs.
 
 Each subproject has its own README file for detailed information specific to that project.
 
 ## Getting Started
+
+> **Configuration in one place:** the snippets below show the minimum to get running. Every property
+> CamelBee reads, with defaults, is listed in
+> [All configuration properties](#all-configuration-properties).
+
 
 There are three ways to integrate CamelBee into your project:
 
@@ -134,7 +175,20 @@ There are three ways to integrate CamelBee into your project:
 
 The recommended way for existing microservices. Add the CamelBee core library directly as a dependency from Maven Central — no local build needed, and it works alongside your existing parent POM.
 
-> **Note:** This library requires Quarkus 3.x+ and Camel Quarkus 3.x+ (or Spring Boot 3.x+ and Camel Spring Boot 4.x+, or a plain Camel application on `camel-main` 4.x+). Your existing BOMs should satisfy this — no changes needed if your project already targets these versions.
+> **Supported versions.** The core libraries are built for **JDK 17+** and declare their framework
+> dependencies as `provided`, so **your** BOM decides every Camel / Spring Boot / Quarkus version —
+> CamelBee adds nothing to your dependency graph but itself. You do not need to match the versions
+> this project is built against, and you do not need to build a custom jar to stay on an older stack.
+>
+> | Artifact | Minimum |
+> |---|---|
+> | `camelbee-springboot-core` | **Camel 4.8+** · Spring Boot as your Camel release pairs with it (4.8 → 3.3, 4.16 → 3.5, 4.22 → 4.1) |
+> | `camelbee-quarkus-core` | **Quarkus 3.15 LTS+** |
+> | `camelbee-standalone-core` | **Camel 4.12+** |
+> | all of the above | **JDK 17+** |
+>
+> Each is proved on every build by `examples/core-only-*-sample`, which pin exactly these versions.
+> Below them, see [Option 3](#option-3-build-a-custom-core-library-custom-javacamel-versions).
 
 **For Quarkus:**
 
@@ -173,12 +227,22 @@ quarkus:
 
 **For Spring Boot:**
 
-Add the CamelBee core dependency:
+Add the CamelBee core dependency. `spring-boot-starter-web` and `camel-spring-boot-starter` are
+`provided` — declare them yourself (at your own versions) if they aren't already in your POM:
 ```xml
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-springboot-core</artifactId>
   <version>4.0.0</version>
+</dependency>
+<!-- supplied by your application, at your versions -->
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+<dependency>
+  <groupId>org.apache.camel.springboot</groupId>
+  <artifactId>camel-spring-boot-starter</artifactId>
 </dependency>
 ```
 
@@ -288,11 +352,24 @@ Camel K runs integrations on the **Camel Quarkus** runtime, but pins an older Ca
 
 The REST/Jackson stack comes transitively with this core, so it does not need declaring. Declare every component you use explicitly, though: Camel K's auto-detection reads URIs at the `from(...)`/`to(...)` call site and misses any built from a constant, which then fails at runtime rather than at build time.
 
-Camel K also needs the **JDK 21 flavour of the operator** (`apache/camel-k:<version>-21-jdk`); the default JDK 17 image cannot load these classes.
+The **default operator image works** — this core is built for JDK 17, so the `-21-jdk` operator flavour is no longer required.
 
 Run it with `kamel run YourRoute.java`, then expose the HTTP port (e.g. `kubectl port-forward svc/your-route 8080:80`) and open `http://localhost:8080/camelbee`. See the [Camel K sample](examples/allcomponent-camelk-sample/README.md) for a complete, cluster-verified integration and a full local setup walkthrough.
 
 ### Option 2: Use a CamelBee Starter as Parent (New projects only)
+> **What you get.** The starter pins the whole stack — you do not choose these, and overriding them
+> is not supported:
+>
+> | Starter | Pins |
+> |---|---|
+> | `camelbee-springboot-starter` | Spring Boot 4.1.0 · Camel 4.22.0 |
+> | `camelbee-standalone-starter` | Camel 4.22.0 |
+> | `camelbee-quarkus-starter` | Quarkus 3.38.2 · Camel 4.21.0 (the platform decides the Camel version) |
+>
+> That is the trade-off against [Option 1](#option-1-add-the-core-library-as-a-dependency-recommended): the starter decides your framework versions, so
+> your stack moves when CamelBee releases. If you need to stay on your own versions, use the core as
+> a dependency instead.
+
 
 Only suitable for new projects without an existing parent POM. The starters are available on Maven Central and automatically include the core library, embedded UI, and all required dependencies — including all dependency version management. No local build needed.
 
@@ -422,7 +499,13 @@ For working examples using the starters, see the [camelbee-examples](https://git
 
 ### Option 3: Build a Custom Core Library (Custom Java/Camel Versions)
 
-If you need to customize Java or Camel versions, you can build the core library independently using the provided `pom-custom.xml` and add it as a dependency.
+**Most projects do not need this.** The published cores already run on JDK 17+ and across a wide
+Camel range (see the version table in [Option 1](#option-1-add-the-core-library-as-a-dependency-recommended)) —
+Option 1 works without building anything.
+
+Use this only if you are **below** the supported floor (JDK 16 or older, Camel older than 4.8, or
+older than 4.12 for standalone), or you need a patched build. Build the core independently with the
+provided `pom-custom.xml` and add it as a dependency.
 
 **For Quarkus:** build with `mvn -f pom-custom.xml clean install` in `core/quarkus-core/`, then add:
 ```xml
@@ -542,6 +625,37 @@ recorded, along with the branches that flow spawns.
 See [Using CamelBee in Production](https://github.com/camelbee/camelbee/blob/main/docs/camelbee_userguide.md#using-camelbee-in-production)
 in the User Guide, and the Configuration section of your runtime's core README, for what these
 guarantee and — just as importantly — what they do not.
+
+### All configuration properties
+
+Every property CamelBee reads, with its default. The snippets above show only what you need to get
+started; nothing else has to be set. Same names on all runtimes — `camelbee.*` in
+`application.properties`, or nested under `camelbee:` in `application.yaml`.
+
+| Property | Default | What it does |
+|---|---|---|
+| `camelbee.context-enabled` | `false` | Serves the topology API and the embedded UI. Turn on to use CamelBee at all. |
+| `camelbee.notifier-enabled` | `true` | Event notifier behind message tracing and the waterfall. |
+| `camelbee.route-configurer-enabled` | `true` | Attaches the interceptors that record hops. |
+| `camelbee.tracer-enabled` | `false` | Arms the tracer at startup. Off by design — arm it from the UI instead, no restart needed. |
+| `camelbee.tracer-max-idle-time` | `300000` | Milliseconds of inactivity before the tracer disarms itself. |
+| `camelbee.tracer-max-messages-count` | `1000` | Cap on retained traced messages; the UI warns when it is hit. |
+| `camelbee.tracer-body-enabled` | `true` | Set `false` to never capture body text at all — the only hard guarantee. |
+| `camelbee.masking-enabled` | `true` | Redacts sensitive values out of traced headers and bodies at the point of capture. |
+| `camelbee.masked-keys` | *(built-in list)* | Comma-separated keys replacing the built-in list (`password,token,authorization,apikey,creditcard,cvv,iban,ssn`). |
+| `camelbee.auth-enabled` | `true` | Requires a login for the UI and REST API. Leave on outside a laptop. |
+| `camelbee.username` | `camelbee` | Login user when authentication is on. |
+| `camelbee.password` | *(none)* | Login password. Set it, or via `CAMELBEE_PASSWORD`. No default — auth cannot be used until it is set. |
+| `camelbee.session-timeout` | `120000` | Milliseconds a UI session stays valid. |
+| `camelbee.logging-enabled` | `false` | Structured request/response logging alongside tracing. |
+| `camelbee.metrics-enabled` | `true` | Standalone only — exposes the Prometheus scrape on the management server. |
+| `camelbee.cors-allowed-origin` | *(none)* | Standalone only — allows a browser origin other than the app's own. |
+
+JWT validation for **your own** routes is a separate, optional module with its own
+`camelbee.security.*` properties — see the [security README](security/README.md).
+
+The **capture filter** ("Only trace containing…") is deliberately not a property: it is set at
+runtime from the UI or the REST API, so you can narrow to one transaction without a restart.
 
 ### Securing the CamelBee Endpoints
 

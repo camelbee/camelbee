@@ -72,7 +72,7 @@ kubectl get camelcatalog -o jsonpath='{.items[0].spec.runtime.metadata}'
 
 On Camel K 2.10.1 that reports `camel-quarkus 3.15.3 / camel 4.8.5 / quarkus 3.15.4`, whereas
 CamelBee's main build targets Camel 4.21. Hence a second artifact, built from the *same sources* by
-[`core/quarkus-core/pom-camelk.xml`](../../core/quarkus-core/pom-camelk.xml):
+[`core/quarkus-core-camelk`](../../core/quarkus-core-camelk/pom.xml):
 
 | | `camelbee-quarkus-core` | `camelbee-quarkus-core-camelk` |
 |---------------------|-------------------------|--------------------------------|
@@ -81,8 +81,10 @@ CamelBee's main build targets Camel 4.21. Hence a second artifact, built from th
 | `cxf-soap` | `provided` | absent (unused by the core) |
 | Jandex index format | v13 | v12 (Camel K's reader caps at v12) |
 
-CamelBee's source needs **no changes** to run on 4.8.5 — 155 of its 157 tests pass there unmodified.
-The two exclusions are characterization tests that pin 4.21's exact output; the pom documents them.
+CamelBee's source needs **no changes** to run on 4.8.5 — the `quarkus-core-camelk` module rebuilds
+both the engine and the Quarkus wiring against that baseline and runs **280 of their 282 tests**
+there unmodified (46 test classes: 239 engine + 43 wiring, less 2). The two exclusions are
+characterization tests that pin 4.21's exact output; the pom documents them.
 
 **Known difference on Camel K:** `.description()` binds to the *route* on Camel 4.8.5 rather than to
 the node, so route and node description text is wrong in the UI here. Cosmetic, but real. Everything
@@ -95,11 +97,12 @@ The **starters are not usable on Camel K**: `camelbee-quarkus-starter` pulls the
 
 - A Kubernetes cluster with the **Camel K operator** installed, and the `kamel` CLI — if you have
   neither, [Running it locally](#running-it-locally) below sets both up from scratch on minikube.
-- **The JDK 21 flavour of the operator** (`apache/camel-k:<version>-21-jdk`). The default image
-  builds and runs integrations on JDK 17, and the core needs 21 (`ExchangeUtils` uses pattern
-  matching in `switch`), so on a stock operator the integration dies with
-  `UnsupportedClassVersionError`. See
-  [the Camel K JDK docs](https://camel.apache.org/camel-k/2.10.x/installation/advanced/jdk-version.html).
+- **The default operator image is fine.** This used to require the JDK 21 flavour
+  (`apache/camel-k:<version>-21-jdk`) because the core was compiled for 21 and the stock image
+  builds and runs on JDK 17, so the integration died with `UnsupportedClassVersionError`. Since
+  4.0.0 the core is built for JDK 17 (`core/quarkus-core-camelk` sets `java.version` to 17), so the
+  stock image works. If you ever raise that back to 21, restore the `-21-jdk` requirement here and
+  see [the Camel K JDK docs](https://camel.apache.org/camel-k/2.10.x/installation/advanced/jdk-version.html).
 - **An operator whose runtime matches the published core.** `camelbee-quarkus-core-camelk:4.0.0` is
   on Maven Central, built against the runtime Camel K 2.10.1 ships (`camel-quarkus 3.15.3` /
   Camel 4.8.5), so the operator resolves it in-cluster with nothing for you to build or host. On an
@@ -152,12 +155,11 @@ pull secret in step 2.
 
 ### 2. Install the operator
 
-Install the **`-21-jdk`** image (see [Prerequisites](#prerequisites)):
+The stock image is enough — see [Prerequisites](#prerequisites):
 
 ```sh
 helm repo add camel-k https://apache.github.io/camel-k/charts/
-helm install camel-k camel-k/camel-k \
-  --set operator.image=docker.io/apache/camel-k:2.10.1-21-jdk
+helm install camel-k camel-k/camel-k
 ```
 
 The registry is **not** a Helm value — the chart has no `platform.build.registry.*` keys. Configure
@@ -249,12 +251,21 @@ Failures actually hit while validating this sample, and what each means:
 - **`Checksum validation failed, no checksums available`** — you are serving a *local* Maven
   repository directly. `mvn install` never writes `.sha1`/`.md5`, and Maven rejects remote artifacts
   without them. Use `deploy:deploy-file` as shown below, which generates them.
+- **Maven resolution timing out against your served repo, or a pod-side `curl` returning `000`** —
+  you used `host.minikube.internal`. Pods cannot resolve it; use the IP (see
+  [Serving the core from your machine](#serving-the-core-from-your-machine)).
+- **`Could not find artifact io.camelbee:camelbee-quarkus-camelk-dependencies:pom:4.0.0`** — you
+  served the core's jar and POM but not its parent chain. See
+  [Serving the core from your machine](#serving-the-core-from-your-machine), step 3b.
 - **The same resolution error repeating after you fixed it** — the operator caches failed lookups
   and never re-checks a *release* artifact. Clear it:
   `kubectl exec deploy/camel-k-operator -- rm -rf /etc/maven/m2/io/camelbee`
-- **`org.jboss.jandex.UnsupportedVersion: Can't read index version 13`** — the core was built with a
-  Jandex newer than the runtime's. `pom-camelk.xml` pins the matching one; rebuild with it.
-- **`UnsupportedClassVersionError`** — the operator is not the `-21-jdk` image.
+- **`org.jboss.jandex.UnsupportedVersion: Can't read index version 13`** — the core wrote a Jandex
+  index format newer than this runtime's Jandex (3.2.3) can read. `core/quarkus-core-camelk` pins
+  `<indexVersion>12</indexVersion>` for exactly this; rebuild with that module.
+- **`UnsupportedClassVersionError`** — the core was built for a newer JDK than the operator runs.
+  Since 4.0.0 it targets JDK 17, which the stock image runs; check `java.version` in
+  `core/quarkus-core-camelk/pom.xml` if you see this.
 - **`NoSuchEndpointException`** at startup, kit built fine — a component is missing from the
   modeline; see [How it works](#how-it-works).
 - **Image push failures** — the registry address in step 2 is wrong or not reachable in-cluster.
@@ -278,7 +289,7 @@ cached that exact coordinate and will happily reuse the old jar, so clear its Ma
 between — this is the step that catches people out:
 
 ```sh
-mvn -f ../../core/quarkus-core/pom-camelk.xml clean install
+mvn -pl core/quarkus-core-camelk -am install   # or just: mvn install (repo root)
 # re-publish into the served repository (steps 2-3 of "Serving the core from your machine")
 kubectl exec deploy/camel-k-operator -- rm -rf /etc/maven/m2/io/camelbee
 kamel delete musician-route
@@ -313,6 +324,44 @@ helm uninstall camel-k
 minikube delete
 ```
 
+## Rebuilding the core for a different Camel K runtime
+
+`camelbee-quarkus-core-camelk` is built against one specific Camel K runtime. If your operator
+reports a different one, the published artifact is the wrong build and you have to make your own.
+
+Read what your operator actually runs:
+
+```sh
+kubectl get camelcatalog -o jsonpath='{.items[0].spec.runtime.metadata}'
+```
+
+That reports `camel-k-runtime`, `camel-quarkus`, `camel` and `quarkus` versions. Put the
+`camel-quarkus` and `quarkus` ones into `dependencies/quarkus-camelk/pom.xml`:
+
+```xml
+<quarkus.version>3.15.4</quarkus.version>
+<camel-quarkus.version>3.15.3</camel-quarkus.version>
+```
+
+That BOM is the only place these versions live — `core/quarkus-core-camelk` inherits them. Then
+rebuild from the repo root:
+
+```sh
+mvn -pl core/quarkus-core-camelk -am install
+```
+
+Two settings in `core/quarkus-core-camelk/pom.xml` are tied to the runtime rather than to CamelBee,
+so check them if the integration fails to build or start:
+
+- `<indexVersion>12</indexVersion>` — the Jandex index format. The reader is the runtime's, and it
+  is backward but not forward compatible: Quarkus 3.15–3.21 bundle Jandex 3.2.x, which stops at v12.
+  A newer runtime can read v12 too, so raising this is rarely necessary.
+- `<java.version>17</java.version>` — must not exceed the JDK the operator image runs, or the
+  integration dies with `UnsupportedClassVersionError`. The stock image is JDK 17.
+
+The rebuilt jar is only in your `~/.m2`, which the operator cannot see — it builds in-cluster. Serve
+it as described next.
+
 ## Serving the core from your machine
 
 **Not needed for the normal case** — the published core resolves from Maven Central by itself. This
@@ -323,16 +372,25 @@ change to the core.
 
 The operator builds in-cluster and cannot see your `~/.m2`, and a local repository has no checksums
 so it cannot be served as-is. Publish into a throwaway repository *with* checksums, serve that over
-HTTP, and point `kamel run` at it:
+HTTP, and point `kamel run` at it.
+
+**Publish the parent POMs too, not just the jar.** Since 4.0.0 the core's POM has a `<parent>`
+(`camelbee-quarkus-camelk-dependencies`, which holds the platform versions), and Maven has to
+resolve that whole chain before it can read the POM. Serving only the jar and its own POM fails with
+`Could not find artifact io.camelbee:camelbee-quarkus-camelk-dependencies:pom:4.0.0`. The chain is
+`camelbee-quarkus-camelk-dependencies` -> `dependencies` -> `parent` -> `camelbee`.
 
 ```sh
-# 1. build the Camel K variant (from core/quarkus-core)
-mvn -f pom-camelk.xml clean install
+# 1. build the Camel K variant (from the repo root)
+mvn -pl core/quarkus-core-camelk -am install
 
 # 2. copy the artifacts out of ~/.m2 - deploy:deploy-file refuses to publish from inside it
 mkdir -p /tmp/camelbee-stage /tmp/camelbee-repo
 cp ~/.m2/repository/io/camelbee/camelbee-quarkus-core-camelk/4.0.0/camelbee-quarkus-core-camelk-4.0.0.{jar,pom} \
    /tmp/camelbee-stage/
+for a in camelbee-quarkus-camelk-dependencies dependencies parent camelbee; do
+  cp ~/.m2/repository/io/camelbee/$a/4.0.0/$a-4.0.0.pom /tmp/camelbee-stage/
+done
 
 # 3. publish into a real repository layout (this is what generates the checksums)
 mvn org.apache.maven.plugins:maven-deploy-plugin:3.1.2:deploy-file \
@@ -341,23 +399,36 @@ mvn org.apache.maven.plugins:maven-deploy-plugin:3.1.2:deploy-file \
   -DpomFile=/tmp/camelbee-stage/camelbee-quarkus-core-camelk-4.0.0.pom \
   -Durl=file:///tmp/camelbee-repo -DrepositoryId=local-m2
 
+# 3b. and the four parent POMs, or the operator cannot read the POM above
+for a in camelbee-quarkus-camelk-dependencies dependencies parent camelbee; do
+  mvn org.apache.maven.plugins:maven-deploy-plugin:3.1.2:deploy-file \
+    -DgroupId=io.camelbee -DartifactId=$a -Dversion=4.0.0 -Dpackaging=pom \
+    -Dfile=/tmp/camelbee-stage/$a-4.0.0.pom \
+    -Durl=file:///tmp/camelbee-repo -DrepositoryId=local-m2
+done
+
 # 4. serve it (leave this running)
 cd /tmp/camelbee-repo && python3 -m http.server 8000 --bind 0.0.0.0
 ```
 
-Then run the integration against it. `host.minikube.internal` is how pods reach your machine:
+Then run the integration against it. The build runs inside the **operator pod**, so that is what has
+to reach your machine.
+
+**Use the IP, not `host.minikube.internal`.** That name is only in the *node's* `/etc/hosts`; pods
+resolve through cluster DNS and cannot see it, so a pod-side `curl` to it just returns `000`
+(verified on Docker Desktop / macOS, minikube 1.38, Camel K 2.10.1). Resolve it on the node and pass
+the address:
 
 ```sh
-kamel run MusicianRoute.java --maven-repository "http://host.minikube.internal:8000@id=local-m2"
-```
+HOSTIP=$(minikube ssh -- getent hosts host.minikube.internal | awk '{print $1}')
+echo "$HOSTIP"   # e.g. 192.168.65.254
 
-Check reachability first if it fails — the build runs inside the operator pod, so that is what has
-to reach you:
-
-```sh
+# confirm the operator pod can actually reach you - this must print 200
 kubectl exec deploy/camel-k-operator -- \
   curl -s -o /dev/null -w '%{http_code}\n' \
-  http://host.minikube.internal:8000/io/camelbee/camelbee-quarkus-core-camelk/4.0.0/camelbee-quarkus-core-camelk-4.0.0.pom
+  http://$HOSTIP:8000/io/camelbee/camelbee-quarkus-core-camelk/4.0.0/camelbee-quarkus-core-camelk-4.0.0.pom
+
+kamel run MusicianRoute.java --maven-repository "http://$HOSTIP:8000@id=local-m2"
 ```
 
 Remember to clear the operator's Maven cache (see [step 5](#5-when-something-goes-wrong)) after

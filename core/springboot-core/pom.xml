@@ -31,6 +31,13 @@
     <packaging>jar</packaging>
 
     <properties>
+        <!--
+          Published for consumers still on JDK 17 (Quarkus 3.15 LTS / Spring Boot 3.3-3.4 shops
+          commonly are). The parent compiles with <release>, so touching a post-17 JDK API fails
+          the build here rather than at runtime on the consumer's JVM. Starters and samples stay
+          on 21 - only the artifacts people put on their own classpath need to be 17.
+        -->
+        <java.version>17</java.version>
         <!-- Line coverage ~80%; gate held at 0.80. -->
         <jacoco.line.coverage.minimum>0.80</jacoco.line.coverage.minimum>
     </properties>
@@ -43,9 +50,21 @@
             <artifactId>camelbee-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!--
+          'provided', matching camelbee-core and the Quarkus/standalone cores: a Spring Boot + Camel
+          application already supplies both, at its own versions. At compile scope this module's POM
+          would advertise the Spring Boot / Camel versions of THIS build as transitives, which a
+          consumer on an older stack then has to out-manage. Provided keeps them off the consumer's
+          graph entirely, so their BOM is the only thing deciding.
+
+          Consequence: core-as-a-dependency users must declare spring-boot-starter-web and
+          camel-spring-boot-starter themselves - documented in README Option 1. Users of
+          camelbee-springboot-starter are unaffected; the starter declares both.
+        -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -57,6 +76,7 @@
         <dependency>
             <groupId>org.apache.camel.springboot</groupId>
             <artifactId>camel-spring-boot-starter</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

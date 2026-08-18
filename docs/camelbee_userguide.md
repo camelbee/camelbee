@@ -30,6 +30,13 @@
 
 CamelBee is an Apache Camel library for microservices monitoring and debugging. It provides an **embedded React UI** served directly from your application, offering route visualization, message tracing, debugging, and real-time metrics.
 
+**Two ways to add it.** Use a **starter as your parent POM** for a new project (CamelBee then decides
+your Camel/Spring Boot/Quarkus versions), or add the **core as a plain dependency** to a service you
+already have (your BOM decides — the core declares its framework dependencies as `provided`).
+
+The core path works on **Camel 4.8+ / Quarkus 3.15 LTS+ / JDK 17+**, so an existing service does not
+need to upgrade its stack to run the current CamelBee. Each core README states the exact floor.
+
 To enable your Camel microservices to work with CamelBee, follow the setup instructions in the core library READMEs:
 
 - **Spring Boot:** [CamelBee SpringBoot Core README](https://github.com/camelbee/camelbee/tree/main/core/springboot-core)
@@ -41,7 +48,7 @@ For working examples, see the [camelbee-examples](https://github.com/camelbee/ca
 
 Once your application is running, the CamelBee UI is available at:
 
-`http://localhost:8080/camelbee/index.html`
+`http://localhost:8080/camelbee/`
 
 > For the Standalone core, the UI is served on the separate camel-main management server instead, at `http://localhost:8081/camelbee` by default.
 

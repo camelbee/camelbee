@@ -27,6 +27,11 @@ camelbee.security.clock-skew = 30
 
 ## Installation
 
+Add it alongside the matching core — it works with either integration path (core as a dependency, or
+a starter as parent), and follows the same version rules: framework dependencies are `provided`, so
+your BOM decides the Camel / Spring Boot / Quarkus versions. See the
+[core READMEs](../core) for the supported floors.
+
 ```xml
 <dependency>
   <groupId>io.camelbee</groupId>

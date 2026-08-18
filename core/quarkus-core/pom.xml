@@ -31,6 +31,13 @@
 	<packaging>jar</packaging>
 
 	<properties>
+		<!--
+		  Published for consumers still on JDK 17 (Quarkus 3.15 LTS / Spring Boot 3.3-3.4 shops
+		  commonly are). The parent compiles with <release>, so touching a post-17 JDK API fails
+		  the build here rather than at runtime on the consumer's JVM. Starters and samples stay
+		  on 21 - only the artifacts people put on their own classpath need to be 17.
+		-->
+		<java.version>17</java.version>
 		<!-- Line coverage ~80%; gate held at 0.80. -->
 		<jacoco.line.coverage.minimum>0.80</jacoco.line.coverage.minimum>
 	</properties>
@@ -130,6 +137,30 @@
 						<goals>
 							<goal>jandex</goal>
 						</goals>
+						<configuration>
+							<!--
+							  Write the OLDEST index format every supported Quarkus can read, not the
+							  newest this plugin can emit. Jandex readers are backward but not forward
+							  compatible, and the reader is the CONSUMER's, bundled with their Quarkus:
+
+							    Quarkus 3.15 LTS - 3.21  ship Jandex 3.2.x, which reads up to v12
+							    Quarkus 3.22+            ship Jandex 3.3.0+, which also reads v13
+
+							  This is load-bearing, not defensive. Verified 2026-08-18 by setting it to
+							  13: examples/core-only-quarkus-sample then fails on Quarkus 3.15.4 with
+
+							    ApplicationArchiveBuildStep#build ...
+							    org.jboss.jandex.UnsupportedVersion: Can't read index version 13
+
+							  Leaving it unpinned would silently cut the supported floor from Quarkus
+							  3.15 LTS to 3.22. Raise it only when the README version table says so.
+
+							  Note the failure needs the PACKAGE phase - augmentation runs in
+							  quarkus-maven-plugin:build, so 'mvn test' on the sample passes even with a
+							  broken index. Always verify a change here with 'mvn install'.
+							-->
+							<indexVersion>12</indexVersion>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>

@@ -25,8 +25,8 @@ The production build output (`ui/dist/`) is copied into each core library's jar 
 
 | Runtime | Copied into | Served at |
 |---------|-------------|-----------|
-| Quarkus | `META-INF/resources/camelbee` | `http://localhost:8080/camelbee/index.html` |
-| Spring Boot | `static/camelbee` | `http://localhost:8080/camelbee/index.html` |
+| Quarkus | `META-INF/resources/camelbee` | `http://localhost:8080/camelbee/` |
+| Spring Boot | `static/camelbee` | `http://localhost:8080/camelbee/` |
 | Standalone (`camel-main`) | `camelbee` (classpath root) | `http://localhost:8081/camelbee` (management server) |
 
 Because the copy happens at core build time, **build the UI before building the core libraries** (running `mvn clean install` from the repository root handles this ordering).

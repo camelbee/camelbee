@@ -21,8 +21,12 @@ Once the library is in place, follow these steps to run the application:
 
 `mvn clean compile quarkus:dev`
 
-> **Note:** Quarkus 3.x requires **Maven 3.9+** (and Java 21). With an older Maven you will get
+> **Note:** Quarkus 3.x requires **Maven 3.9+**. With an older Maven you will get
 > `Detected Maven Version (x.y.z) is not supported, it must be in [3.9.0,)`.
+>
+> This sample builds at **Java 21**, but that is the sample's own target, not a CamelBee
+> requirement — `camelbee-quarkus-core` is published for **JDK 17+**. See the
+> [Quarkus Core README](../../core/quarkus-core/README.md) for the supported versions.
 
 ## Visualizing with the Embedded UI
 

@@ -12,7 +12,17 @@ Unlike the Quarkus and Spring Boot cores, the standalone runtime has no dependen
 
 There are three ways to integrate CamelBee into your standalone Camel project:
 
+> **Which option?** Unlike the Quarkus and Spring Boot cores — where adding the dependency is the
+> recommended path — a standalone project usually has no parent POM of its own, so the starter is
+> simpler here. If you *do* have a parent POM already, use [Option 2](#option-2-add-the-core-library-as-a-dependency);
+> it is the same library, and the version floors below apply to it.
+
 ### Option 1: Use CamelBee Starter as Parent (Recommended)
+> **What you get.** The starter pins the whole stack — Camel **4.22.0** — and overriding it is not
+> supported. That is the trade-off against
+> [Option 2](#option-2-add-the-core-library-as-a-dependency): the starter decides your Camel version,
+> so your stack moves when CamelBee releases.
+
 
 The simplest path. Use `camelbee-standalone-starter` as your project's parent POM — it automatically includes the core library, the embedded UI, `camel-platform-http-main` (required to expose the management endpoints), and Micrometer/Prometheus metrics, including all dependency version management:
 
@@ -41,6 +51,18 @@ For projects with an existing parent POM. Add the CamelBee core library directly
 ```
 
 > **Note:** If `camel-platform-http-main` is not on the classpath, CamelBee starts but logs a warning and does not expose its UI/API endpoints.
+
+> **Supported versions.** The core declares its framework dependencies as `provided`, so **your**
+> BOM decides every version — CamelBee adds nothing to your dependency graph but itself. You do not
+> need to match the versions this project is built against, and you do not need a custom build to
+> stay on an older stack.
+>
+> - **Camel 4.12+**
+> - **JDK 17+**
+>
+> Below those, see [Option 3](#option-3-build-a-custom-core-library-custom-javacamel-versions).
+> A minimal runnable example is
+> [`examples/core-only-standalone-sample`](../../examples/core-only-standalone-sample).
 
 ### Option 3: Build a Custom Core Library (Custom Java/Camel Versions)
 
@@ -98,6 +120,10 @@ camelContext.start();
 ## Configuration
 
 ### Enable CamelBee Features
+> These are the properties you need to get started. For the full list with defaults — authentication,
+> redaction, session timeout, tracer limits — see
+> [All configuration properties](../../README.md#all-configuration-properties).
+
 
 CamelBee reads the same `camelbee.*` keys as the other runtimes from Camel's `PropertiesComponent`, so they can be set in `application.properties`, system properties, or environment variables:
 

@@ -6,7 +6,7 @@
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee</artifactId>
   <packaging>pom</packaging>
-  <version>3.3.1</version>
+  <version>4.0.0</version>
 
 
   <name>CamelBee</name>
@@ -44,7 +44,7 @@
     <module>core</module>
     <module>security</module>
     <module>starters</module>
-    <module>core/quarkus-core/pom-camelk.xml</module>
+    <module>core/quarkus-core-camelk</module>
   </modules>
 
   <distributionManagement>

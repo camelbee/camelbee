@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2023 Rahmi Ege Karaosmanoglu
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.camelbee</groupId>
+        <artifactId>dependencies</artifactId>
+        <version>4.0.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <name>CamelBee Quarkus (Camel K runtime) Dependencies</name>
+    <artifactId>camelbee-quarkus-camelk-dependencies</artifactId>
+    <packaging>pom</packaging>
+    <description>Dependency management for the Camel K flavour of the Quarkus core: the platform
+        the Apache Camel K runtime pins, which trails the one camelbee-quarkus-dependencies
+        targets.</description>
+
+    <properties>
+        <!--
+          Read these off a live operator rather than guessing, and change them when the operator's
+          catalog reports something else:
+
+              kubectl get camelcatalog -o jsonpath='{.items[0].spec.runtime.metadata}'
+
+          On Camel K 2.10.1 that reports:
+              camel-k-runtime 3.15.3 / camel-quarkus 3.15.3 / camel 4.8.5 / quarkus 3.15.4
+        -->
+        <quarkus.version>3.15.4</quarkus.version>
+        <camel-quarkus.version>3.15.3</camel-quarkus.version>
+
+        <!--
+          Deliberately older than the sibling camelbee-quarkus-dependencies, which tracks the
+          current platform. Nothing here should be bumped to "catch up" - the whole point of this
+          BOM is to pin what Camel K actually runs.
+        -->
+        <commons-lang3.version>3.17.0</commons-lang3.version>
+        <mockito-junit-jupiter.version>5.14.2</mockito-junit-jupiter.version>
+        <assertj-core.version>3.27.7</assertj-core.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!--
+              Camel K composes these two BOMs directly rather than using the io.quarkus.platform
+              aggregate, which is why the two versions differ. Mirroring that here keeps the
+              resolved tree the same as an integration's.
+            -->
+            <dependency>
+                <groupId>io.quarkus</groupId>
+                <artifactId>quarkus-bom</artifactId>
+                <version>${quarkus.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.camel.quarkus</groupId>
+                <artifactId>camel-quarkus-bom</artifactId>
+                <version>${camel-quarkus.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>

@@ -70,8 +70,9 @@
         <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
         <maven-surefire-plugin.version>3.5.6</maven-surefire-plugin.version>
         <maven-surefire-report-plugin.version>3.5.6</maven-surefire-report-plugin.version>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <!-- Derived from java.version so a module overriding it moves source/target with it. -->
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
 
         <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>
         <maven.compiler.testTarget>${maven.compiler.target}</maven.compiler.testTarget>
@@ -382,8 +383,13 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <!--
+                      'release' rather than source/target: it also pins the JDK API surface, so a
+                      module that lowers ${java.version} (the published cores use 17, see their
+                      POMs) fails the build if it touches an API newer than that release, instead of
+                      compiling here and throwing NoSuchMethodError on the consumer's older JVM.
+                    -->
+                    <release>${java.version}</release>
                     <annotationProcessorPaths>
                         <!-- mapstruct annotation processor -->
                         <path>

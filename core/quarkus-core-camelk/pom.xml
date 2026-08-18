@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2023 Rahmi Ege Karaosmanoglu
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!--
+  Builds CamelBee's Quarkus core against the platform the Apache Camel K runtime pins, so the jar
+  can be consumed from a Camel K integration modeline.
+
+  Platform versions live in the parent, dependencies/quarkus-camelk - read them off a live operator
+  rather than guessing, and change them there.
+
+  This module owns no sources: it compiles quarkus-core's and shared-core's sources (see
+  sourceDirectory / testSourceDirectory / build-helper below) against the Camel K baseline, so both
+  jars are built from exactly the same code.
+
+  WHY IT EXISTS. Not the Camel or Quarkus version - camelbee-quarkus-core supports Quarkus 3.15 LTS,
+  which is what Camel K runs. Every remaining reason is about PACKAGING, and each was verified
+  against the built jars on 2026-08-18:
+
+  a. Scopes. camel-quarkus-rest, camel-quarkus-jackson and quarkus-resteasy-jackson are 'provided'
+     in pom.xml, which is right for an ordinary consumer but fatal here: a modeline pulls only
+     TRANSITIVE dependencies, so the REST/Jackson stack never arrives and the CamelBee endpoints are
+     missing at runtime. They are compile scope in this file.
+  b. Shape. pom.xml consumes camelbee-core as a separate artifact, and that jar carries no Jandex
+     index of its own; ordinary Quarkus users cover that with a quarkus.index-dependency entry,
+     which is awkward to express from a modeline. This build inlines the engine sources, so one
+     indexed jar holds everything.
+  c. No camel-quarkus-cxf-soap. It is 'provided' in pom.xml because the core never references CXF;
+     making it transitive here would drag the whole SOAP stack into every integration, inflating
+     the in-cluster build and the resulting image.
+
+  Not a reason any more, but easy to regress: the Jandex index format. Both this build and pom.xml
+  pin <indexVersion>12</indexVersion>, because Quarkus 3.15-3.21 - Camel K's platform among them -
+  bundle Jandex 3.2.x, whose reader stops at v12. Raising it in either POM breaks augmentation with
+  org.jboss.jandex.UnsupportedVersion.
+
+  Retire this file when (a), (b) and (c) all stop being true.
+
+  WHY A DIRECTORY, not core/quarkus-core/pom-camelk.xml: Quarkus's BootstrapMavenContext treats
+  every <module> entry as a DIRECTORY and appends /pom.xml. A module pointing straight at a POM file
+  - which plain Maven accepts - makes every @QuarkusTest in the workspace fail to bootstrap with
+  "Failed to load POM from .../pom-camelk.xml/pom.xml". A real directory is what lets this join the
+  main reactor, so `mvn clean install` builds it and the ordinary release publishes it.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>io.camelbee</groupId>
+		<artifactId>camelbee-quarkus-camelk-dependencies</artifactId>
+		<version>4.0.0</version>
+		<relativePath>../../dependencies/quarkus-camelk/pom.xml</relativePath>
+	</parent>
+
+	<name>CamelBee Quarkus Core (Camel K runtime)</name>
+	<artifactId>camelbee-quarkus-core-camelk</artifactId>
+	<packaging>jar</packaging>
+
+	<description>CamelBee Quarkus core built against the Camel Quarkus version used by the Apache
+		Camel K runtime, for consumption from a Camel K integration modeline. Same sources and
+		version as camelbee-quarkus-core, different Camel baseline.</description>
+
+	<properties>
+		<!--
+		  Platform versions (Quarkus / Camel Quarkus) and the Camel K-era test library versions live in
+		  the parent, dependencies/quarkus-camelk. Only what is specific to building THIS jar is here.
+		-->
+
+		<!--
+		  17, so the DEFAULT operator image works - its build/run base is JDK 17 and cannot load 21
+		  bytecode. This used to have to be 21 (forcing apache/camel-k:<version>-21-jdk) because
+		  ExchangeUtils used pattern matching in switch; that is now an instanceof chain and the whole
+		  core builds at 17. If you raise it, restore the -21-jdk operator note in the README.
+		-->
+		<java.version>17</java.version>
+
+		<!-- Sources are shared with quarkus-core, which holds the coverage gate; no second gate here. -->
+		<jacoco.line.coverage.minimum>0.00</jacoco.line.coverage.minimum>
+
+		<build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
+	</properties>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.apache.camel.quarkus</groupId>
+			<artifactId>camel-quarkus-microprofile-health</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.camel.quarkus</groupId>
+			<artifactId>camel-quarkus-rest</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.camel.quarkus</groupId>
+			<artifactId>camel-quarkus-direct</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.camel.quarkus</groupId>
+			<artifactId>camel-quarkus-log</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.camel.quarkus</groupId>
+			<artifactId>camel-quarkus-jackson</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-resteasy-jackson</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.camel.quarkus</groupId>
+			<artifactId>camel-quarkus-bean</artifactId>
+		</dependency>
+
+		<!-- Used by MdcContext, ExchangeUtils, UuidResolver and ExchangeSendingEventTracer -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${commons-lang3.version}</version>
+		</dependency>
+
+		<!-- Used by RouteContextService to parse route YAML -->
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-junit5</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.camel.quarkus</groupId>
+			<artifactId>camel-quarkus-junit5</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
+			<version>${mockito-junit-jupiter.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>${assertj-core.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<!--
+		  The sources live in the sibling quarkus-core module; only the build output is local.
+		  shared-core's sources are added by build-helper below.
+		-->
+		<sourceDirectory>${project.basedir}/../quarkus-core/src/main/java</sourceDirectory>
+		<testSourceDirectory>${project.basedir}/../quarkus-core/src/test/java</testSourceDirectory>
+		<resources>
+			<resource>
+				<directory>${project.basedir}/../quarkus-core/src/main/resources</directory>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>${project.basedir}/../quarkus-core/src/test/resources</directory>
+			</testResource>
+		</testResources>
+
+		<plugins>
+			<!--
+			  The engine lives in camelbee-core, which the reactor compiles against Camel 4.21. This
+			  variant targets Camel 4.8.5, so it compiles those sources itself rather than depending
+			  on that jar - the same "rebuild the same sources against an older baseline" approach
+			  this whole POM exists for. It also means a 4.8-incompatible API added to the engine
+			  fails here at compile time instead of at runtime on a Camel K cluster.
+			-->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>${build-helper-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>add-shared-core-sources</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${project.basedir}/../shared-core/src/main/java</source>
+							</sources>
+						</configuration>
+					</execution>
+					<!--
+					  The engine's own tests, run against the Camel K baseline rather than the reactor's.
+					  Without this the module only runs quarkus-core's 43 wiring tests and nothing verifies
+					  the engine on 4.8.5 - which was the case between the 2026-08-17 engine extraction and
+					  2026-08-18, and also left the surefire exclusions below as dead config.
+					-->
+					<execution>
+						<id>add-shared-core-test-sources</id>
+						<phase>generate-test-sources</phase>
+						<goals>
+							<goal>add-test-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${project.basedir}/../shared-core/src/test/java</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven-surefire-plugin.version}</version>
+				<configuration>
+					<failIfNoTests>false</failIfNoTests>
+					<systemProperties>
+						<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+					</systemProperties>
+					<!--
+					  These two pin Camel 4.21 behaviour, so they fail here by design - the whole
+					  point of this pom is to build against Camel 4.8.5. Everything else passes
+					  unchanged, so the exclusions are kept to individual methods rather than the
+					  class. The 4.8.5 differences they catch:
+
+					    - recipes: 'To[mock:out]' / 'DynamicTo[mock:dynamic]'
+					      vs 4.21's 'to[mock:out]' / 'DynamicTo[toD[mock:dynamic]]'.
+					      Harmless for the UI: endpointParser.ts matches case-insensitively and
+					      treats the inner toD[] wrapper as optional.
+					    - descriptions: .description() after a node sets the ROUTE description on
+					      4.8.5 instead of the node's, so route/node description text is wrong in
+					      the UI on Camel K. Cosmetic, but real - do not assume it works there.
+
+					  If either stops failing, Camel K's runtime has moved; re-check and remove.
+					-->
+					<!-- Method-level filters are only honoured by <test>, not <excludes>. -->
+					<test>!RouteContextServiceTest#getCamelRoutes_characterization_exactOutputSerialization,
+						!RouteContextServiceTest#getCamelRoutes_populatesRouteAndNodeDescriptions</test>
+				</configuration>
+			</plugin>
+
+			<!-- Build a Jandex index so Quarkus/Arc auto-discovers CamelBee's CDI beans when this
+			     jar is used as a dependency (e.g. in a Camel K integration) WITHOUT requiring the
+			     consumer to add quarkus.index-dependency configuration. -->
+			<plugin>
+				<groupId>io.smallrye</groupId>
+				<artifactId>jandex-maven-plugin</artifactId>
+				<version>${jandex-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>make-index</id>
+						<goals>
+							<goal>jandex</goal>
+						</goals>
+						<configuration>
+							<!-- Camel K's Quarkus 3.15.4 bundles Jandex 3.2.3, which reads up to v12.
+							     Same value as core/quarkus-core; see the long note there. -->
+							<indexVersion>12</indexVersion>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>${maven-resources-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>copy-ui-dist</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.outputDirectory}/META-INF/resources/camelbee</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/../../ui/dist</directory>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<!--
+	  No distributionManagement and no sonatype-release profile here: both are inherited through
+	  dependencies/quarkus-camelk -> dependencies -> parent -> the root POM, which carries them at
+	  release time. This module used to duplicate the whole profile because it was parentless, and
+	  that copy had to be kept in sync with pom_maven_central.xml by hand.
+	-->
+
+</project>

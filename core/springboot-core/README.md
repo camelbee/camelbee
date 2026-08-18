@@ -14,16 +14,39 @@ There are three ways to integrate CamelBee into your Spring Boot project:
 
 The recommended way for existing microservices. Add the CamelBee core library directly as a dependency from Maven Central — no local build needed, and it works alongside your existing parent POM.
 
-> **Note:** This library requires Spring Boot 3.x+ and Camel Spring Boot 4.x+. Your existing BOMs should satisfy this — no changes needed if your project already targets these versions.
+> **Supported versions.** The core declares its framework dependencies as `provided`, so **your**
+> BOM decides every version — CamelBee adds nothing to your dependency graph but itself. You do not
+> need to match the versions this project is built against, and you do not need a custom build to
+> stay on an older stack.
+>
+> - **Camel 4.8+**
+> - **Spring Boot 3.3+** — whatever your Camel release pairs with (4.8 → 3.3, 4.16 → 3.5, 4.22 → 4.1)
+> - **JDK 17+**
+>
+> Below those, see [Option 3](#option-3-build-a-custom-core-library-custom-javacamel-versions).
 
-Add the CamelBee core dependency:
+Add the CamelBee core dependency. `spring-boot-starter-web` and `camel-spring-boot-starter` are
+`provided` — declare them yourself, at your own versions, if they aren't already in your POM:
 ```xml
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-springboot-core</artifactId>
   <version>4.0.0</version>
 </dependency>
+<!-- supplied by your application, at your versions -->
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+<dependency>
+  <groupId>org.apache.camel.springboot</groupId>
+  <artifactId>camel-spring-boot-starter</artifactId>
+</dependency>
 ```
+
+A minimal, runnable version of exactly this lives in
+[`examples/core-only-springboot-sample`](../../examples/core-only-springboot-sample) — pinned to the
+oldest supported stack, so it doubles as proof the floors above are real.
 
 Then add the following to your `application.yaml`:
 ```yaml
@@ -63,6 +86,17 @@ public class YourApplication {
 ```
 
 ### Option 2: Use CamelBee Starter as Parent (New projects only)
+> **What you get.** The starter pins the whole stack — you do not choose these, and overriding them
+> is not supported:
+>
+> | Starter | Pins |
+> |---|---|
+> | `camelbee-springboot-starter` | Spring Boot 4.1.0 · Camel 4.22.0 |
+>
+> That is the trade-off against [Option 1](#option-1-add-the-core-library-as-a-dependency-recommended): the starter decides your framework versions, so
+> your stack moves when CamelBee releases. If you need to stay on your own versions, use the core as
+> a dependency instead.
+
 
 Only suitable for new projects without an existing parent POM. Simply use `camelbee-springboot-starter` as your project's parent POM — it is available on Maven Central and automatically includes the core library, embedded UI, and all required dependencies — including all dependency version management. No local build needed:
 
@@ -173,6 +207,10 @@ public class YourApplication {
 ## Configuration
 
 ### Enable CamelBee Features
+> These are the properties you need to get started. For the full list with defaults — authentication,
+> redaction, session timeout, tracer limits — see
+> [All configuration properties](../../README.md#all-configuration-properties).
+
 
 To enable specific features of the CamelBee library, add/modify the following properties in your `application.yaml` file:
 

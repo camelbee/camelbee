@@ -14,7 +14,19 @@ There are three ways to integrate CamelBee into your Quarkus project:
 
 The recommended way for existing microservices. Add the CamelBee core library directly as a dependency from Maven Central — no local build needed, and it works alongside your existing parent POM.
 
-> **Note:** This library requires Quarkus 3.x+ and Camel Quarkus 3.x+. Your existing BOMs should satisfy this — no changes needed if your project already targets these versions.
+> **Supported versions.** The core declares its framework dependencies as `provided`, so **your**
+> BOM decides every version — CamelBee adds nothing to your dependency graph but itself. You do not
+> need to match the versions this project is built against, and you do not need a custom build to
+> stay on an older stack.
+>
+> - **Quarkus 3.15 LTS+**
+> - **JDK 17+**
+>
+> Below those, see [Option 3](#option-3-build-a-custom-core-library-custom-javacamel-versions).
+
+A minimal, runnable version of exactly this lives in
+[`examples/core-only-quarkus-sample`](../../examples/core-only-quarkus-sample) — pinned to Quarkus
+3.15 LTS, so it doubles as proof the floor above is real.
 
 Add the CamelBee core dependency:
 ```xml
@@ -50,6 +62,17 @@ quarkus:
 ```
 
 ### Option 2: Use CamelBee Starter as Parent (New projects only)
+> **What you get.** The starter pins the whole stack — you do not choose these, and overriding them
+> is not supported:
+>
+> | Starter | Pins |
+> |---|---|
+> | `camelbee-quarkus-starter` | Quarkus 3.38.2 · Camel 4.21.0 (the platform decides the Camel version) |
+>
+> That is the trade-off against [Option 1](#option-1-add-the-core-library-as-a-dependency-recommended): the starter decides your framework versions, so
+> your stack moves when CamelBee releases. If you need to stay on your own versions, use the core as
+> a dependency instead.
+
 
 Only suitable for new projects without an existing parent POM. Simply use `camelbee-quarkus-starter` as your project's parent POM — it is available on Maven Central and automatically includes the core library, embedded UI, and all required dependencies — including all dependency version management. No local build needed:
 
@@ -134,6 +157,10 @@ quarkus:
 ## Configuration
 
 ### Enable CamelBee Features
+> These are the properties you need to get started. For the full list with defaults — authentication,
+> redaction, session timeout, tracer limits — see
+> [All configuration properties](../../README.md#all-configuration-properties).
+
 
 To enable specific features of the CamelBee library, add/modify the following properties in your `application.yml` file:
 
@@ -373,4 +400,4 @@ camelbee/
 - [CamelBee User Guide](../../docs/camelbee_userguide.md) — a tour of the UI's pages and features
 - Using Spring Boot? See the [Spring Boot Core README](../springboot-core/README.md)
 - Using plain Camel (`camel-main`)? See the [Standalone Core README](../standalone-core/README.md)
-- Running on Camel K? Camel K pins an older Camel than this build, so use `camelbee-quarkus-core-camelk` — the same sources built by [`pom-camelk.xml`](./pom-camelk.xml) — and see the [Camel K sample](../../examples/allcomponent-camelk-sample/README.md)
+- Running on Camel K? Camel K pins an older Camel than this build, so use `camelbee-quarkus-core-camelk` — the same sources built by [`core/quarkus-core-camelk`](../quarkus-core-camelk/pom.xml) — and see the [Camel K sample](../../examples/allcomponent-camelk-sample/README.md)

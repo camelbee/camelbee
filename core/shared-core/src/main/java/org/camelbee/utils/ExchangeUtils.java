@@ -182,14 +182,24 @@ public class ExchangeUtils {
   /**
    * Converts known scalar body types to String without side effects.
    * Returns null for unknown types so callers can apply their own fallback.
+   *
+   * <p>Written with {@code instanceof} rather than a pattern switch so this module compiles at
+   * {@code release=17}: the cores are published for consumers still on JDK 17 (see the
+   * {@code java.version} note in this module's POM). It also makes a null item return null instead
+   * of throwing - a pattern switch without a {@code case null} label throws NPE on a null selector,
+   * which {@link #buildListString} could hit on a list containing nulls.</p>
    */
   private static String itemToString(Object item) {
-    return switch (item) {
-      case String str -> str;
-      case byte[] bytes -> new String(bytes, StandardCharsets.UTF_8);
-      case ByteBuffer bb -> readByteBuffer(bb);
-      default -> null;
-    };
+    if (item instanceof String str) {
+      return str;
+    }
+    if (item instanceof byte[] bytes) {
+      return new String(bytes, StandardCharsets.UTF_8);
+    }
+    if (item instanceof ByteBuffer bb) {
+      return readByteBuffer(bb);
+    }
+    return null;
   }
 
   private static String readByteBuffer(ByteBuffer buffer) {
