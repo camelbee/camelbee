@@ -6,7 +6,7 @@
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee</artifactId>
   <packaging>pom</packaging>
-  <version>3.2.1</version>
+  <version>4.0.0</version>
 
   <name>CamelBee</name>
 
@@ -16,6 +16,15 @@
     <module>dependencies</module>
     <module>ui</module>
     <module>core</module>
+    <!--
+      The Camel K flavour of the Quarkus core: same sources, built against the platform the Camel K
+      runtime pins (Quarkus 3.15.4 / Camel Quarkus 3.15.3). Kept in the everyday build so a change
+      to shared-core or quarkus-core can't silently break it between releases.
+
+      Must come after 'ui': it copies the built UI from ui/dist as a plain directory, so there is no
+      dependency for Maven to order it by - only this declaration.
+    -->
+    <module>core/quarkus-core-camelk</module>
     <module>security</module>
     <module>starters</module>
     <module>examples</module>

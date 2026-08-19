@@ -21,6 +21,21 @@
     <Class name="~.*\.*Impl"/>
   </Match>
 
+  <!--
+    AuthService derives its signing key in the constructor, and that derivation rethrows a
+    NoSuchAlgorithmException for SHA-256 - which no conformant JVM can raise. SpotBugs flags the
+    throw because a partially constructed object is exposed to a finalizer attack, whose standard
+    remedy is to make the class final. That is not available here: the class is produced as an
+    @ApplicationScoped CDI bean on Quarkus, so ARC has to generate a client proxy subclass of it.
+    The attack it warns about also needs a finalizer to exist; this class declares none, is not
+    Serializable, and holds no resource a subclass could resurrect. Narrowed to the one class so the
+    check keeps running everywhere else.
+  -->
+  <Match>
+    <Class name="~.*\.security\.AuthService"/>
+    <Bug pattern="CT_CONSTRUCTOR_THROW"/>
+  </Match>
+
   <!-- === Generated Code Exclusions === -->
 
   <!-- Exclude all generated sources by source file path -->

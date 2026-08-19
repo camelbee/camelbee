@@ -1,9 +1,22 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { screen, fireEvent, waitFor } from '@testing-library/react';
+import { cloneElement, type ReactElement } from 'react';
 import { MetricsPage } from './MetricsPage';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import { installApiMock } from '@/test/mockApi';
 import { useMetricsStore } from '@/store/metricsStore';
+
+// ResponsiveContainer measures its parent, which is 0x0 in jsdom and would
+// render nothing. Replace it with the chart sized explicitly (the real
+// container injects width/height into its child the same way).
+vi.mock('recharts', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('recharts')>();
+  return {
+    ...actual,
+    ResponsiveContainer: ({ children }: { children: ReactElement<Record<string, unknown>> }) =>
+      cloneElement(children, { width: 400, height: 200 }),
+  };
+});
 
 describe('MetricsPage', () => {
   beforeEach(() => {

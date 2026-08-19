@@ -21,7 +21,7 @@
     <parent>
         <groupId>io.camelbee</groupId>
         <artifactId>dependencies</artifactId>
-        <version>3.2.1</version>
+        <version>4.0.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -30,15 +30,15 @@
     <packaging>pom</packaging>
 
     <properties>
-        <camel.version>4.20.0</camel.version>
-        <jackson-jsr310.version>2.22.0</jackson-jsr310.version>
+        <camel.version>4.22.0</camel.version>
+        <jackson-jsr310.version>2.22.2</jackson-jsr310.version>
         <micrometer.version>1.17.0</micrometer.version>
-        <rest-assured.version>6.0.0</rest-assured.version>
+        <rest-assured.version>6.0.1</rest-assured.version>
         <!-- Test libraries + the runtime logging backend, centralized here (consumed by
              standalone-core and the standalone sample via their parent chain). -->
         <assertj-core.version>3.27.7</assertj-core.version>
         <mockito-junit-jupiter.version>5.23.0</mockito-junit-jupiter.version>
-        <logback-classic.version>1.5.37</logback-classic.version>
+        <logback-classic.version>1.6.3</logback-classic.version>
     </properties>
 
     <dependencyManagement>

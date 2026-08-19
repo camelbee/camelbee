@@ -22,7 +22,7 @@
     <parent>
         <groupId>io.camelbee</groupId>
         <artifactId>camelbee-standalone-dependencies</artifactId>
-        <version>3.2.1</version>
+        <version>4.0.0</version>
         <relativePath>../../dependencies/standalone/pom.xml</relativePath>
     </parent>
 
@@ -31,11 +31,25 @@
     <packaging>jar</packaging>
 
     <properties>
+        <!--
+          Published for consumers still on JDK 17 (Quarkus 3.15 LTS / Spring Boot 3.3-3.4 shops
+          commonly are). The parent compiles with <release>, so touching a post-17 JDK API fails
+          the build here rather than at runtime on the consumer's JVM. Starters and samples stay
+          on 21 - only the artifacts people put on their own classpath need to be 17.
+        -->
+        <java.version>17</java.version>
         <!-- Match the Quarkus/Spring Boot cores' coverage gate. -->
         <jacoco.line.coverage.minimum>0.80</jacoco.line.coverage.minimum>
     </properties>
 
     <dependencies>
+        <!-- The framework-neutral CamelBee engine: tracing, topology, redaction, logging.
+             DI wiring and the HTTP layer stay in this module. -->
+        <dependency>
+            <groupId>io.camelbee</groupId>
+            <artifactId>camelbee-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- Camel engine + standalone bootstrap -->
         <dependency>
             <groupId>org.apache.camel</groupId>

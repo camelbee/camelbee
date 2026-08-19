@@ -3,7 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { createQueryWrapper } from '@/test/queryWrapper';
 import { useRoutes } from './routes';
 import { useMetrics } from './metrics';
-import { useMessages, useTraceStatus, useDeleteMessages } from './messages';
+import { useMessages, useTraceStatus, useDeleteMessages, useCaptureFilter } from './messages';
 import { useHealth } from './health';
 
 function stubFetch(impl: (url: string, init?: RequestInit) => unknown) {
@@ -97,5 +97,24 @@ describe('mutations', () => {
       '/camelbee/messages',
       expect.objectContaining({ method: 'DELETE' }),
     );
+  });
+});
+
+describe('useCaptureFilter', () => {
+  it('POSTs the filter as raw text, not JSON', async () => {
+    const fetchMock = stubFetch(() => 'capture filter set.');
+    const { wrapper } = createQueryWrapper();
+
+    const { result } = renderHook(() => useCaptureFilter(), { wrapper });
+    result.current.mutate('order-42');
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+
+    const [url, init] = fetchMock.mock.calls[0]!;
+    expect(url).toBe('/camelbee/tracer/filter');
+    expect(init?.method).toBe('POST');
+    // raw text: JSON-quoting an arbitrary payload fragment would change what the server matches on
+    expect(init?.body).toBe('order-42');
+    expect((init?.headers as Record<string, string>)['Content-Type']).toBe('text/plain');
   });
 });

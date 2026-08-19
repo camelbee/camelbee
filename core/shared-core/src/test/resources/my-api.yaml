@@ -1,0 +1,55 @@
+openapi: 3.0.3
+info:
+  title: Widget API
+  version: 1.0.0
+paths:
+  /widgets:
+    summary: The widget collection
+    description: A path item may carry these next to its operations.
+    parameters:
+      - name: tenant
+        in: query
+        schema:
+          type: string
+    get:
+      operationId: getWidgets
+      responses:
+        '200':
+          description: ok
+    post:
+      operationId: createWidget
+      responses:
+        '201':
+          description: created
+    options:
+      responses:
+        '200':
+          description: no operationId, so no route can be linked to it
+  /widgets/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: getWidgetById
+      responses:
+        '200':
+          description: ok
+  /widgets/search:
+    get:
+      operationId: getWidgets
+      responses:
+        '200':
+          description: same operationId again
+  /legacy:
+    $ref: '#/components/pathItems/legacy'
+components:
+  pathItems:
+    legacy:
+      get:
+        operationId: legacyOperation
+        responses:
+          '200':
+            description: ok

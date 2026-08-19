@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2023 Rahmi Ege Karaosmanoglu
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.camelbee</groupId>
+        <artifactId>parent</artifactId>
+        <version>4.0.0</version>
+        <relativePath>../../parent/pom.xml</relativePath>
+    </parent>
+
+    <name>CamelBee Core</name>
+    <artifactId>camelbee-core</artifactId>
+    <packaging>jar</packaging>
+    <description>Framework-neutral CamelBee engine: tracing, topology, redaction and logging,
+        shared by the Quarkus, Spring Boot and standalone cores.</description>
+
+    <properties>
+        <!--
+          Published for consumers still on JDK 17 (Quarkus 3.15 LTS / Spring Boot 3.3-3.4 shops
+          commonly are). The parent compiles with <release>, so touching a post-17 JDK API fails
+          the build here rather than at runtime on the consumer's JVM. Starters and samples stay
+          on 21 - only the artifacts people put on their own classpath need to be 17.
+        -->
+        <java.version>17</java.version>
+        <!--
+          Compiled against the LOWEST Camel version any in-reactor core uses (quarkus-core, via the
+          Quarkus platform). Compiling against the floor rather than the newest is deliberate: a
+          class compiled against 4.22 that used a 4.22-only method would link fine here and fail at
+          runtime on Quarkus with NoSuchMethodError. This way the build fails instead.
+
+          Camel K is a separate matter - it runs Camel 4.8.5 and is built out of reactor by
+          quarkus-core-camelk, which recompiles these sources from source against that
+          baseline rather than consuming this jar. See that file.
+        -->
+        <shared.camel.version>4.21.0</shared.camel.version>
+        <jacoco.line.coverage.minimum>0.80</jacoco.line.coverage.minimum>
+
+        <!-- Test-only versions. Declared here rather than inherited: this module's parent is
+             'parent', not one of the per-runtime dependencies POMs that define them. -->
+        <assertj-core.version>3.27.7</assertj-core.version>
+        <mockito-junit-jupiter.version>5.23.0</mockito-junit-jupiter.version>
+        <logback-classic.version>1.6.3</logback-classic.version>
+        <jackson-annotations.version>2.22</jackson-annotations.version>
+    </properties>
+
+    <dependencies>
+        <!--
+          'provided': every consumer already brings its own Camel, at its own version. This module
+          must never drag a Camel version onto a runtime core's classpath.
+        -->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-core</artifactId>
+            <version>${shared.camel.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--
+          Version alignment, not a new capability. Camel brings jackson-databind 2.22, but 'parent'
+          declares jackson-databind-nullable directly, whose jackson-annotations 2.20 wins on depth
+          and leaves databind missing classes it expects (JsonSerializeAs). The per-runtime cores do
+          not hit this because their parent chain imports a BOM that pins the pair together.
+        -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson-annotations.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Tests -->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-test-junit5</artifactId>
+            <version>${shared.camel.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito-junit-jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj-core.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- A backend with a real MDCAdapter, required to exercise MdcContext. -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback-classic.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

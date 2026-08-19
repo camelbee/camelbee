@@ -85,4 +85,35 @@ describe('debuggerStore', () => {
     expect(get().selectedEdgeId).toBeNull();
     expect(get().messages).toHaveLength(0);
   });
+
+  // Roadmap #12 (message-cap warning): capReached mirrors the server flag.
+  it('defaults capReached to false and sets it from appendMessages', () => {
+    expect(get().capReached).toBe(false);
+    get().appendMessages([makeMessage({ exchangeEventType: 'SENDING' })], 1, 0, true);
+    expect(get().capReached).toBe(true);
+  });
+
+  it('clears capReached back to false on the next non-capped append', () => {
+    get().appendMessages([makeMessage({ exchangeEventType: 'SENDING' })], 1, 0, true);
+    expect(get().capReached).toBe(true);
+    get().appendMessages([makeMessage({ exchangeEventType: 'SENT' })], 2, 0, false);
+    expect(get().capReached).toBe(false);
+  });
+
+  it('resets capReached on clearMessages', () => {
+    get().appendMessages([makeMessage({ exchangeEventType: 'SENDING' })], 1, 0, true);
+    get().clearMessages();
+    expect(get().capReached).toBe(false);
+  });
+
+  // DebuggerPage and RouteGraph hold the synthesized dynamic edges/nodes in component state and
+  // drop them when this counter changes. Without the bump, ghost edges would outlive the
+  // messages they describe.
+  it('bumps clearGeneration on every clearMessages', () => {
+    const before = get().clearGeneration;
+    get().clearMessages();
+    expect(get().clearGeneration).toBe(before + 1);
+    get().clearMessages();
+    expect(get().clearGeneration).toBe(before + 2);
+  });
 });

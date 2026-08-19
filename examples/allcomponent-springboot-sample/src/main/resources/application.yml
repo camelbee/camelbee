@@ -15,6 +15,10 @@ server:
   port: 8080
 
 camelbee:
+  # Sample only: the UI and API are left unauthenticated so the sample can be opened without
+  # credentials. CamelBee defaults this to TRUE - a real deployment should leave it on and set
+  # camelbee.password (or CAMELBEE_PASSWORD).
+  auth-enabled: false
   # when enabled it allows the CamelBe WebGL application to fetch the topology of the Camel Context.
   context-enabled: true
   # tracer-enabled SHOULD BE ONLY ENABLED FOR DEVELOPMENT PURPOSES, NOT FOR PRODUCTION.
@@ -24,8 +28,22 @@ camelbee:
   tracer-max-idle-time: 60000
   # maximum collected trace messages
   tracer-max-messages-count: 10000
-  # when enabled it logs the messages exchanged between endpoints
+  # when enabled it logs the messages exchanged between endpoints.
+  # NOTE: this writes traced bodies and headers to the application log. It is NOT affected by the
+  # UI's Start/Stop Tracing toggle, by tracer-max-idle-time, or by the capture filter - if it is on,
+  # every message is logged. Values are redacted first, subject to the limits below.
   logging-enabled: true
+  # when enabled redacts configured keys out of traced headers and bodies before they reach the UI,
+  # the API or the log (default: true - this is the one camelbee.* switch that defaults to on)
+  masking-enabled: true
+  # comma-separated key names to redact. Leave unset to keep the built-in list:
+  #   password, passwd, secret, token, authorization, auth, apikey, accesskey, privatekey,
+  #   credential, creditcard, cardnumber, cardno, cvv, cvc, iban, ssn, pin, otp
+  # Setting it REPLACES that list entirely, so an entry left out is no longer redacted.
+  # masked-keys: password,token,authorization,apikey,creditcard,cvv,iban,ssn,customerRef
+  # when disabled no message body text is captured at all - the only hard guarantee, since body
+  # redaction is best-effort pattern matching. Does not affect headers (default: true)
+  tracer-body-enabled: true
 
 spring:
   main:
@@ -58,7 +76,7 @@ spring:
     hibernate:
       # To be updated in real production usage!
       ddl-auto: none
-    database-platform: org.hibernate.dialect.MariaDB106Dialect
+    database-platform: org.hibernate.dialect.MariaDBDialect
     show-sql: false
   # Spring JMS configuration
   artemis:
@@ -138,9 +156,10 @@ camel:
     consumer-property:
       bridgeErrorHandler: true
   # jackson properties
+  # (no object-mapper reference: since Spring Boot 4 the auto-configured mapper is Jackson 3,
+  # which camel-jackson (Jackson 2) cannot reuse — Camel creates its own mapper instead)
   dataformat:
     jackson:
-      object-mapper: jacksonObjectMapper
       disable-features: FAIL_ON_EMPTY_BEANS
       pretty-print: true
       include: NON_NULL

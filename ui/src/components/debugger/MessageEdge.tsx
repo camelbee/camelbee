@@ -210,6 +210,39 @@ function MessageEdgeInner(props: Props) {
         </g>
       )}
 
+      {/* Retry indicator (roadmap #18): messageCount is a distinct-exchange/throughput count, so
+          a redelivered edge still shows 1 there - this small badge is the "it took N attempts"
+          signal, visible on the graph without having to open the message panel. */}
+      {hasMessages && data?.retryCount !== undefined && (
+        <g
+          transform={`translate(${labelX + 13}, ${labelY - 13})`}
+          style={{ cursor: 'pointer' }}
+        >
+          <circle r={8} fill="#f59e0b" stroke={textStroke} strokeWidth={1.5} />
+          <text
+            textAnchor="middle"
+            dominantBaseline="central"
+            className="text-[8px] font-bold"
+            fill="white"
+          >
+            {`↻${data.retryCount}`}
+          </text>
+        </g>
+      )}
+
+      {/* Latency badge (roadmap #9) */}
+      {hasMessages && data?.avgTimeTaken !== undefined && (
+        <text
+          x={labelX}
+          y={labelY + 22}
+          textAnchor="middle"
+          className="text-[9px] font-medium"
+          fill={isDark ? '#9ca3af' : '#6b7280'}
+        >
+          {`${data.avgTimeTaken}ms avg / ${data.maxTimeTaken}ms max`}
+        </text>
+      )}
+
       {/* Animated flow dots */}
       {visibleFlows.map((flow) => (
         <FlowDot

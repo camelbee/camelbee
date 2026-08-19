@@ -1,3 +1,4 @@
+import pkg from './package.json' with { type: 'json' };
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
@@ -13,7 +14,7 @@ function mockPlugin() {
     name: 'mock-api',
     configureServer(server: import('vite').ViteDevServer) {
       server.middlewares.use((req, res, next) => {
-        const mockDir = path.resolve(__dirname, 'mock');
+        const mockDir = path.resolve(import.meta.dirname, 'mock');
 
         if (req.url?.startsWith('/camelbee/routes')) {
           res.setHeader('Content-Type', 'application/json');
@@ -74,16 +75,20 @@ function mockPlugin() {
 }
 
 export default defineConfig({
+  // Single source for the version shown in the UI. It used to be hardcoded in NavBar as
+  // well as declared here, and nothing kept the two in step across a release.
+  define: { __APP_VERSION__: JSON.stringify(pkg.version) },
   plugins: [react(), ...(useMock ? [mockPlugin()] : [])],
   base: '/camelbee/',
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src'),
+      '@': path.resolve(import.meta.dirname, 'src'),
     },
   },
   build: {
     outDir: 'dist',
     sourcemap: false,
+    chunkSizeWarningLimit: 1000,
   },
   server: {
     ...(!useMock && {

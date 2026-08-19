@@ -22,12 +22,12 @@
     <parent>
         <groupId>io.camelbee</groupId>
         <artifactId>camelbee-standalone-starter</artifactId>
-        <version>3.2.1</version>
+        <version>4.0.0</version>
         <relativePath>../../starters/camelbee-standalone-starter/pom.xml</relativePath>
     </parent>
 
     <artifactId>allcomponent-standalone-sample</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>4.0.0</version>
     <packaging>jar</packaging>
 
     <name>allcomponent-standalone-sample</name>
@@ -59,6 +59,18 @@
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-file</artifactId>
         </dependency>
+        <!-- in-memory queue: gives the topology a pollable, non-direct internal endpoint
+             (poll/pollEnrich targets) without needing a real broker -->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-seda</artifactId>
+        </dependency>
+        <!-- http producer used to call this application's own REST port, so the topology
+             contains a genuinely remote hop while staying infrastructure-free -->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-http</artifactId>
+        </dependency>
 
         <!-- Logging backend for the standalone app. Logback (not slf4j-simple) is used because it
              provides a working MDC adapter, which CamelBee's structured logging relies on to surface
@@ -67,6 +79,21 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback-classic.version}</version>
+        </dependency>
+
+        <!-- Integration tests. They boot this application in-process and drive the CamelBee HTTP
+             API, so no server, mocking or container framework is needed beyond JUnit + AssertJ. -->
+        <!-- brings JUnit 5, version-managed by camel-bom (same approach as standalone-core) -->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-test-junit5</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj-core.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

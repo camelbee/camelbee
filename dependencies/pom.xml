@@ -20,7 +20,7 @@
     <parent>
         <groupId>io.camelbee</groupId>
         <artifactId>parent</artifactId>
-        <version>3.2.1</version>
+        <version>4.0.0</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
@@ -32,6 +32,10 @@
 
   <modules>
       <module>quarkus</module>
+      <!-- The platform Camel K pins, which trails 'quarkus' above. Separate rather than a profile
+           because both are needed in the same reactor: core/quarkus-core builds against one and
+           core/quarkus-core-camelk against the other. -->
+      <module>quarkus-camelk</module>
       <module>springboot</module>
       <module>standalone</module>
   </modules>

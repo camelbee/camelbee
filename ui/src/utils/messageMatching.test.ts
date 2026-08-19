@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { MessageEdge, MessageEdgeData } from './routeGraph';
-import { matchMessageToEdge, buildInteractionsForEdge } from './messageMatching';
+import { matchMessageToEdge, buildInteractionsForEdge, computeEdgeStats } from './messageMatching';
 import { makeMessage } from '@/test/factories';
 
 function edge(data: Partial<MessageEdgeData>, id = 'e1'): MessageEdge {
@@ -67,9 +67,121 @@ describe('matchMessageToEdge', () => {
     expect(matchMessageToEdge(m, [e])).toBe(e);
   });
 
+  /**
+   * Roadmap #3, message side. The producer sends to `direct:x?block=true` while the consumer's
+   * input is `direct:x`, so neither exact equality nor the query-reordering comparison matches.
+   * This only bites when endpointId is absent — which is every redelivered attempt, since Camel
+   * reports the node id on the first send only.
+   */
+  it('matches across a query string on the producer side when endpointId is absent', () => {
+    const m = makeMessage({
+      endpointId: null,
+      routeId: 'direct://invokeFlaky',
+      endpoint: 'direct://flakyTarget?block=true',
+    });
+    const e = edge({
+      outputId: 'flakyEndpoint',
+      sourceRouteId: 'invokeFlakyRoute',
+      sourceInputUri: 'direct:invokeFlaky',
+      targetRouteId: 'flakyTargetRoute',
+      targetInputUri: 'direct:flakyTarget',
+    });
+    expect(matchMessageToEdge(m, [e])).toBe(e);
+  });
+
+  it('ignores case when comparing query-stripped endpoints', () => {
+    const m = makeMessage({
+      endpointId: null,
+      routeId: 'route1',
+      endpoint: 'DIRECT://Target?block=true',
+    });
+    const e = edge({ outputId: 'other', sourceRouteId: 'route1', targetInputUri: 'direct:target' });
+    expect(matchMessageToEdge(m, [e])).toBe(e);
+  });
+
+  it('does not match a different endpoint just because query strings are stripped', () => {
+    const m = makeMessage({ endpointId: null, routeId: 'route1', endpoint: 'direct:other?block=true' });
+    const e = edge({ outputId: 'x', sourceRouteId: 'route1', targetInputUri: 'direct:target' });
+    expect(matchMessageToEdge(m, [e])).toBeNull();
+  });
+
   it('returns null when nothing matches', () => {
     const m = makeMessage({ endpointId: 'nope', routeId: 'routeX', endpoint: 'kafka:none' });
     expect(matchMessageToEdge(m, [edge({ sourceRouteId: 'route1', targetUri: 'kafka:orders' })])).toBeNull();
+  });
+});
+
+/**
+ * Pass precedence. The node id and the endpoint are each insufficient alone, so the matcher resolves
+ * in passes; these pin which pass wins when they disagree.
+ */
+describe('matchMessageToEdge — pass precedence', () => {
+  it('separates the edges of a fan-out node by endpoint', () => {
+    // one recipientList node targeting three routes produces three edges sharing an outputId
+    const toA = edge({ outputId: 'recipientList1', sourceInputUri: 'direct:main', targetInputUri: 'direct:a' }, 'eA');
+    const toB = edge({ outputId: 'recipientList1', sourceInputUri: 'direct:main', targetInputUri: 'direct:b' }, 'eB');
+    const toC = edge({ outputId: 'recipientList1', sourceInputUri: 'direct:main', targetInputUri: 'direct:c' }, 'eC');
+
+    const m = makeMessage({ endpointId: 'recipientList1', routeId: 'direct:main', endpoint: 'direct:b' });
+
+    // without the endpoint check this returns whichever edge is scanned first
+    expect(matchMessageToEdge(m, [toA, toB, toC])).toBe(toB);
+  });
+
+  it('still matches a fan-out edge across a query string on the producer side', () => {
+    const toA = edge({ outputId: 'rl1', sourceInputUri: 'direct:main', targetInputUri: 'direct:a' }, 'eA');
+    const toB = edge({ outputId: 'rl1', sourceInputUri: 'direct:main', targetInputUri: 'direct:b' }, 'eB');
+
+    const m = makeMessage({ endpointId: 'rl1', routeId: 'direct:main', endpoint: 'direct:b?block=true' });
+
+    expect(matchMessageToEdge(m, [toA, toB])).toBe(toB);
+  });
+
+  it('matches on node id plus source when the edge target is an unresolved expression', () => {
+    // toD("direct:invokeMock${exchangeProperty.target}") - the traced endpoint is the resolved
+    // value, so it can never equal the expression stored on the edge
+    const dynamic = edge({
+      outputId: 'toD2',
+      sourceInputUri: 'direct:main',
+      targetUri: 'direct:invokeMock${exchangeProperty.target}',
+    });
+    const m = makeMessage({ endpointId: 'toD2', routeId: 'direct:main', endpoint: 'direct:invokeMockD' });
+
+    expect(matchMessageToEdge(m, [dynamic])).toBe(dynamic);
+  });
+
+  it('prefers route plus endpoint over a node id that agrees with neither', () => {
+    // a node id can survive across a route boundary and name a node in another route entirely;
+    // route + endpoint is the better evidence at that point
+    const stale = edge({ outputId: 'toD1', sourceInputUri: 'direct:inner', targetInputUri: 'direct:seda' }, 'stale');
+    const real = edge({ outputId: 'to9', sourceInputUri: 'direct:outer', targetInputUri: 'direct:main' }, 'real');
+
+    const m = makeMessage({ endpointId: 'toD1', routeId: 'direct:outer', endpoint: 'direct:main' });
+
+    expect(matchMessageToEdge(m, [stale, real])).toBe(real);
+  });
+
+  it('falls back to the node id alone when nothing else agrees', () => {
+    // routingSlip/dynamicRouter continuations: the tracer names the previous callee as the source,
+    // so the source check fails, but the node id still identifies the EIP that owns the hop
+    const slip = edge({ outputId: 'routingSlip1', sourceInputUri: 'direct:main', targetInputUri: 'direct:d' });
+    const m = makeMessage({ endpointId: 'routingSlip1', routeId: 'direct:c', endpoint: 'direct:d' });
+
+    expect(matchMessageToEdge(m, [slip])).toBe(slip);
+  });
+
+  it('keeps error-handler edges ahead of every other pass', () => {
+    const handler = edge({
+      isErrorHandler: true,
+      outputId: 'errorHandler-main',
+      sourceRouteId: 'route1',
+      targetRouteId: 'direct:dlq',
+    }, 'handler');
+    const other = edge({ outputId: 'to1', sourceRouteId: 'route1', targetInputUri: 'direct:dlq' }, 'other');
+
+    const m = makeMessage({ endpointId: 'to1', routeId: 'route1', endpoint: 'direct:dlq' });
+
+    expect(matchMessageToEdge(m, [other, handler])).toBe(handler);
   });
 });
 
@@ -113,5 +225,180 @@ describe('buildInteractionsForEdge', () => {
       e,
     );
     expect(interactions).toHaveLength(0);
+  });
+
+  // Roadmap #18 (loop/retry-safe interactions): Camel redeliveries reuse the
+  // same exchangeId for every attempt. A new REQUEST must start a new pair
+  // instead of overwriting the previous attempt's request/response.
+  it('keeps every retry attempt as its own interaction for the same exchangeId', () => {
+    const e = edge({ outputId: 'out-1' });
+    const messages = [
+      makeMessage({ exchangeId: 'A', endpointId: 'out-1', messageType: 'REQUEST', messageBody: 'req-1' }),
+      makeMessage({ exchangeId: 'A', endpointId: 'out-1', messageType: 'ERROR_RESPONSE', messageBody: 'timeout-1' }),
+      makeMessage({ exchangeId: 'A', endpointId: 'out-1', messageType: 'REQUEST', messageBody: 'req-2' }),
+      makeMessage({ exchangeId: 'A', endpointId: 'out-1', messageType: 'ERROR_RESPONSE', messageBody: 'timeout-2' }),
+      makeMessage({ exchangeId: 'A', endpointId: 'out-1', messageType: 'REQUEST', messageBody: 'req-3' }),
+      makeMessage({ exchangeId: 'A', endpointId: 'out-1', messageType: 'RESPONSE', messageBody: 'success-3' }),
+    ];
+
+    const interactions = buildInteractionsForEdge(messages, e);
+
+    expect(interactions).toHaveLength(3);
+    expect(interactions.every((i) => i.exchangeId === 'A')).toBe(true);
+
+    expect(interactions[0]!.request?.messageBody).toBe('req-1');
+    expect(interactions[0]!.response?.messageBody).toBe('timeout-1');
+    expect(interactions[0]!.isError).toBe(true);
+
+    expect(interactions[1]!.request?.messageBody).toBe('req-2');
+    expect(interactions[1]!.response?.messageBody).toBe('timeout-2');
+    expect(interactions[1]!.isError).toBe(true);
+
+    expect(interactions[2]!.request?.messageBody).toBe('req-3');
+    expect(interactions[2]!.response?.messageBody).toBe('success-3');
+    expect(interactions[2]!.isError).toBe(false);
+  });
+
+  it('interleaves retries on multiple edges without cross-contamination', () => {
+    // Two different exchanges, each retried once, sharing the edge.
+    const e = edge({ outputId: 'out-1' });
+    const messages = [
+      makeMessage({ exchangeId: 'A', endpointId: 'out-1', messageType: 'REQUEST', messageBody: 'A-req-1' }),
+      makeMessage({ exchangeId: 'B', endpointId: 'out-1', messageType: 'REQUEST', messageBody: 'B-req-1' }),
+      makeMessage({ exchangeId: 'A', endpointId: 'out-1', messageType: 'ERROR_RESPONSE', messageBody: 'A-fail-1' }),
+      makeMessage({ exchangeId: 'B', endpointId: 'out-1', messageType: 'RESPONSE', messageBody: 'B-ok-1' }),
+      makeMessage({ exchangeId: 'A', endpointId: 'out-1', messageType: 'REQUEST', messageBody: 'A-req-2' }),
+      makeMessage({ exchangeId: 'A', endpointId: 'out-1', messageType: 'RESPONSE', messageBody: 'A-ok-2' }),
+    ];
+
+    const interactions = buildInteractionsForEdge(messages, e);
+    expect(interactions).toHaveLength(3);
+
+    const aInteractions = interactions.filter((i) => i.exchangeId === 'A');
+    expect(aInteractions).toHaveLength(2);
+    expect(aInteractions[0]!.response?.messageBody).toBe('A-fail-1');
+    expect(aInteractions[1]!.response?.messageBody).toBe('A-ok-2');
+
+    const bInteractions = interactions.filter((i) => i.exchangeId === 'B');
+    expect(bInteractions).toHaveLength(1);
+    expect(bInteractions[0]!.response?.messageBody).toBe('B-ok-1');
+  });
+  /**
+   * Two edges of a fan-out node share a source and a target, so each could match the other's
+   * messages in isolation. The interactions of an edge are therefore the messages the whole graph
+   * awards to it, not the messages it could conceivably claim on its own.
+   */
+  it('does not claim the messages of a sibling fan-out edge', () => {
+    const viaMulticast = edge({ outputId: 'to5', sourceInputUri: 'direct:main', targetInputUri: 'direct:a' }, 'mc');
+    const viaRecipientList = edge({ outputId: 'rl1', sourceInputUri: 'direct:main', targetInputUri: 'direct:a' }, 'rl');
+    const all = [viaMulticast, viaRecipientList];
+
+    const messages = [
+      makeMessage({ exchangeId: 'X', endpointId: 'to5', routeId: 'direct:main', endpoint: 'direct:a', messageType: 'REQUEST' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'to5', routeId: 'direct:main', endpoint: 'direct:a', messageType: 'RESPONSE' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'rl1', routeId: 'direct:main', endpoint: 'direct:a', messageType: 'REQUEST' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'rl1', routeId: 'direct:main', endpoint: 'direct:a', messageType: 'RESPONSE' }),
+    ];
+
+    expect(buildInteractionsForEdge(messages, viaMulticast, all)).toHaveLength(1);
+    expect(buildInteractionsForEdge(messages, viaRecipientList, all)).toHaveLength(1);
+  });
+
+  it('still works when called without the surrounding graph', () => {
+    const e = edge({ outputId: 'out-1' });
+    const messages = [makeMessage({ exchangeId: 'A', endpointId: 'out-1', messageType: 'REQUEST' })];
+
+    expect(buildInteractionsForEdge(messages, e)).toHaveLength(1);
+  });
+});
+
+describe('computeEdgeStats', () => {
+  /**
+   * The bug this whole suite guards: mock:C and mock:D in the sample route are each targeted by
+   * TWO different EIPs (a routingSlip AND a dynamicRouter/toD), so the SAME exchange legitimately
+   * sends two clean REQUESTs to the SAME edge with no failure at all. A naive "requestCount >
+   * exchangeCount" heuristic flags that as a retry; it must not be.
+   */
+  it('does not flag a clean multi-hit edge (same exchange, two EIPs, no error) as a retry', () => {
+    const e = edge({ outputId: 'out-1' });
+    const messages = [
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'REQUEST' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'RESPONSE' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'REQUEST' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'RESPONSE' }),
+    ];
+
+    const stats = computeEdgeStats(messages, [e]);
+
+    expect(stats.get('e1')).toMatchObject({ messageCount: 1, hasError: false, retryCount: undefined });
+  });
+
+  it('flags a genuine redelivery (same exchange, a failure then a retry) with the attempt count', () => {
+    const e = edge({ outputId: 'out-1' });
+    const messages = [
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'REQUEST' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'ERROR_RESPONSE' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'REQUEST' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'ERROR_RESPONSE' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'REQUEST' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'RESPONSE' }),
+    ];
+
+    const stats = computeEdgeStats(messages, [e]);
+
+    expect(stats.get('e1')).toMatchObject({ messageCount: 1, hasError: true, retryCount: 3 });
+  });
+
+  it('does not flag a single clean REQUEST as a retry', () => {
+    const e = edge({ outputId: 'out-1' });
+    const messages = [
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'REQUEST' }),
+      makeMessage({ exchangeId: 'X', endpointId: 'out-1', messageType: 'RESPONSE' }),
+    ];
+
+    expect(computeEdgeStats(messages, [e]).get('e1')?.retryCount).toBeUndefined();
+  });
+
+  it('ignores an error on a DIFFERENT exchange when deciding whether another exchange retried', () => {
+    const e = edge({ outputId: 'out-1' });
+    const messages = [
+      // Exchange A: one clean hit.
+      makeMessage({ exchangeId: 'A', endpointId: 'out-1', messageType: 'REQUEST' }),
+      makeMessage({ exchangeId: 'A', endpointId: 'out-1', messageType: 'RESPONSE' }),
+      // Exchange B: fails once, no retry attempted (e.g. exhausted redeliveries).
+      makeMessage({ exchangeId: 'B', endpointId: 'out-1', messageType: 'REQUEST' }),
+      makeMessage({ exchangeId: 'B', endpointId: 'out-1', messageType: 'ERROR_RESPONSE' }),
+    ];
+
+    const stats = computeEdgeStats(messages, [e]);
+
+    expect(stats.get('e1')).toMatchObject({ messageCount: 2, hasError: true, retryCount: undefined });
+  });
+
+  it('computes avg/max timing only from SENT messages with a positive timeTaken', () => {
+    const e = edge({ outputId: 'out-1' });
+    const messages = [
+      makeMessage({
+        exchangeId: 'A',
+        endpointId: 'out-1',
+        messageType: 'RESPONSE',
+        exchangeEventType: 'SENT',
+        timeTaken: 20,
+      }),
+      makeMessage({
+        exchangeId: 'B',
+        endpointId: 'out-1',
+        messageType: 'RESPONSE',
+        exchangeEventType: 'SENT',
+        timeTaken: 60,
+      }),
+    ];
+
+    expect(computeEdgeStats(messages, [e]).get('e1')).toMatchObject({ avgTimeTaken: 40, maxTimeTaken: 60 });
+  });
+
+  it('returns no entry for an edge nothing matched', () => {
+    const e = edge({ outputId: 'out-1' });
+    expect(computeEdgeStats([], [e]).get('e1')).toBeUndefined();
   });
 });

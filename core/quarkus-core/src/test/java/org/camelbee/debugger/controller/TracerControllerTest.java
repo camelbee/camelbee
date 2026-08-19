@@ -19,10 +19,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import jakarta.ws.rs.core.Response;
+import java.lang.reflect.Method;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -163,6 +165,37 @@ class TracerControllerTest {
     assertEquals(200, response.getStatus());
     assertEquals("deleted.", response.getEntity());
     verify(messageService).reset();
+  }
+
+  /**
+   * {@code TraceStatus} is a private nested enum, so {@code updateTraceStatus} - reflected onto by
+   * springboot-core's equivalent test - has to be invoked the same way here: get the method by its
+   * public signature, resolve the enum constants by name, invoke via reflection.
+   */
+  @Test
+  void updateTraceStatusShouldActivateAndDeactivateTracing() throws Exception {
+    Class<?> statusType = Class.forName("org.camelbee.debugger.controller.TracerController$TraceStatus");
+    Method update = TracerController.class.getMethod("updateTraceStatus", statusType);
+
+    Object active = enumValue(statusType, "ACTIVE");
+    Object inactive = enumValue(statusType, "INACTIVE");
+
+    Response activeResponse = (Response) update.invoke(tracerController, active);
+    assertEquals(200, activeResponse.getStatus());
+    assertEquals("tracing status updated as:ACTIVE", activeResponse.getEntity());
+    verify(tracerService).activateTracing(true);
+
+    Response inactiveResponse = (Response) update.invoke(tracerController, inactive);
+    assertEquals(200, inactiveResponse.getStatus());
+    assertEquals("tracing status updated as:INACTIVE", inactiveResponse.getEntity());
+    verify(tracerService).activateTracing(false);
+    // keepTracingActive is only called on the ACTIVE branch
+    verify(tracerService, times(1)).keepTracingActive();
+  }
+
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  private static Object enumValue(Class<?> type, String name) {
+    return Enum.valueOf((Class<Enum>) type.asSubclass(Enum.class), name);
   }
 
 }

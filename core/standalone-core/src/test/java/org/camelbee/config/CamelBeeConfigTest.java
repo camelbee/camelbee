@@ -54,7 +54,7 @@ class CamelBeeConfigTest {
   void shouldApplyDefaultsWhenNoPropertiesSet() {
     CamelBeeConfig config = configWith(null);
 
-    assertTrue(config.isContextEnabled());
+    assertFalse(config.isContextEnabled());
     assertFalse(config.isTracerEnabled());
     assertFalse(config.isLoggingEnabled());
     assertTrue(config.isNotifierEnabled());

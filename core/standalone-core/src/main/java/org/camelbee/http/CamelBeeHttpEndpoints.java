@@ -16,6 +16,7 @@
 
 package org.camelbee.http;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -36,6 +37,7 @@ import org.camelbee.debugger.model.route.CamelBeeContext;
 import org.camelbee.debugger.model.route.CamelRoute;
 import org.camelbee.debugger.service.MessageService;
 import org.camelbee.debugger.service.RouteContextService;
+import org.camelbee.security.AuthService;
 import org.camelbee.tracers.TracerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,10 +58,14 @@ import org.slf4j.LoggerFactory;
  * <li>GET /camelbee/messages - traced messages from an index (MessageListWithInfo)</li>
  * <li>DELETE /camelbee/messages - clear traced messages</li>
  * <li>POST /camelbee/tracer/status - ACTIVE/INACTIVE to toggle tracing</li>
+ * <li>POST /camelbee/tracer/filter - raw text every recorded message must contain, empty to clear</li>
  * <li>GET /camelbee[/...] - the embedded single-page UI</li>
  * </ul>
  */
 public class CamelBeeHttpEndpoints {
+
+  /** Reported to the UI. Runtime-specific, so it stays here rather than in the shared engine. */
+  private static final String FRAMEWORK = "Standalone";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CamelBeeHttpEndpoints.class);
 
@@ -68,10 +74,19 @@ public class CamelBeeHttpEndpoints {
   /** Classpath root the UI is bundled under (see the standalone-core pom resources copy). */
   private static final String UI_CLASSPATH_ROOT = "camelbee";
 
+  private static final String AUTHORIZATION_HEADER = "Authorization";
+
+  private static final String BEARER_PREFIX = "Bearer ";
+
+  /** Carries the rolling token back, so an active caller's idle window keeps moving. */
+  private static final String REFRESHED_TOKEN_HEADER = "X-CamelBee-Token";
+
   private final CamelContext camelContext;
   private final TracerService tracerService;
   private final MessageService messageService;
   private final RouteContextService routeContextService;
+  private final AuthService authService;
+  private final String corsAllowedOrigin;
   private final ObjectMapper objectMapper;
 
   /**
@@ -84,10 +99,29 @@ public class CamelBeeHttpEndpoints {
    */
   public CamelBeeHttpEndpoints(CamelContext camelContext, TracerService tracerService,
       MessageService messageService, RouteContextService routeContextService) {
+    this(camelContext, tracerService, messageService, routeContextService, AuthService.disabled(), null);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param camelContext        the context.
+   * @param tracerService       the tracer.
+   * @param messageService      the message store.
+   * @param routeContextService the topology service.
+   * @param authService         guards every endpoint except login and the UI shell.
+   * @param corsAllowedOrigin   a single allowed origin for the UI dev server, or null for none.
+   */
+  @SuppressWarnings("java:S107")
+  public CamelBeeHttpEndpoints(CamelContext camelContext, TracerService tracerService,
+      MessageService messageService, RouteContextService routeContextService,
+      AuthService authService, String corsAllowedOrigin) {
     this.camelContext = camelContext;
     this.tracerService = tracerService;
     this.messageService = messageService;
     this.routeContextService = routeContextService;
+    this.authService = authService;
+    this.corsAllowedOrigin = corsAllowedOrigin;
     // serialize java.time.Instant (MessageListInfo) as ISO strings, matching the REST cores
     this.objectMapper = new ObjectMapper()
         .registerModule(new JavaTimeModule())
@@ -123,16 +157,43 @@ public class CamelBeeHttpEndpoints {
   }
 
   private void registerApi(VertxPlatformHttpRouter router) {
-    // Permissive CORS so the UI dev server (a different origin during development) can call the API.
-    // In a packaged build the UI and API are same-origin on the management port, so this is a no-op.
-    CorsHandler cors = CorsHandler.create()
-        .addRelativeOrigin(".*")
-        .allowedMethod(HttpMethod.GET)
-        .allowedMethod(HttpMethod.POST)
-        .allowedMethod(HttpMethod.DELETE)
-        .allowedMethod(HttpMethod.OPTIONS)
-        .allowedHeader("Content-Type");
-    router.route(BASE_PATH + "/*").handler(cors);
+    /*
+     CORS is closed unless an origin is configured. It used to allow every origin so the UI dev
+     server could call the API, but that is a browser-enforced control: with it wide open, ANY page
+     a developer visited could read this application's topology and traced messages, and POST to
+     tracer/status to start capture. In a packaged build the UI and API are same-origin, so nothing
+     needs it - camelbee.cors-allowed-origin exists for the dev-server case only.
+     */
+    if (corsAllowedOrigin != null && !corsAllowedOrigin.isBlank()) {
+      LOGGER.warn("CamelBee CORS is open to origin '{}'. Intended for the UI dev server; "
+          + "do not set this in a deployed application.", corsAllowedOrigin);
+      CorsHandler cors = CorsHandler.create()
+          .addOrigin(corsAllowedOrigin)
+          .allowedMethod(HttpMethod.GET)
+          .allowedMethod(HttpMethod.POST)
+          .allowedMethod(HttpMethod.DELETE)
+          .allowedMethod(HttpMethod.OPTIONS)
+          .allowedHeader("Content-Type")
+          .allowedHeader(AUTHORIZATION_HEADER)
+          .exposedHeader(REFRESHED_TOKEN_HEADER)
+          .allowCredentials(true);
+      router.route(BASE_PATH + "/*").handler(cors);
+    }
+
+    // Public: the caller has no token yet, and the UI shell has to be loadable to show a login form.
+    router.post(BASE_PATH + "/auth/login")
+        .handler(BodyHandler.create())
+        .handler(this::login);
+    router.get(BASE_PATH + "/auth/status").handler(this::authStatus);
+
+    /*
+     Everything below is guarded. Registered before the handlers it protects, because Vert.x runs
+     route handlers in registration order - a guard added afterwards would run after the data had
+     already been written.
+     */
+    router.route(BASE_PATH + "/routes").handler(this::requireToken);
+    router.route(BASE_PATH + "/messages").handler(this::requireToken);
+    router.route(BASE_PATH + "/tracer/*").handler(this::requireToken);
 
     router.get(BASE_PATH + "/routes").handler(this::getRoutes);
     router.get(BASE_PATH + "/messages").handler(this::getMessages);
@@ -140,6 +201,9 @@ public class CamelBeeHttpEndpoints {
     router.post(BASE_PATH + "/tracer/status")
         .handler(BodyHandler.create())
         .handler(this::tracerStatus);
+    router.post(BASE_PATH + "/tracer/filter")
+        .handler(BodyHandler.create())
+        .handler(this::tracerFilter);
   }
 
   private void registerUi(VertxPlatformHttpRouter router) {
@@ -157,6 +221,38 @@ public class CamelBeeHttpEndpoints {
     });
     // Registered after the API routes, so /camelbee/routes etc. take precedence over static serving.
     router.route(BASE_PATH + "/*").handler(ui);
+
+    /*
+     Single-page-app fallback. The UI is a BrowserRouter with basename "/camelbee", so its routes are
+     real paths - /camelbee/settings, /camelbee/metrics. StaticHandler has no file for those, so a
+     reload or a bookmarked link 404s even though the same page reached by clicking works fine.
+     Serve index.html instead and let the router take it from there.
+
+     Only for navigations: a request that accepts HTML and has no file extension. A missing .js or
+     .png must stay a 404 rather than silently returning a page of HTML, which turns a broken asset
+     into a confusing parse error.
+    */
+    router.get(BASE_PATH + "/*").handler(this::spaFallback);
+  }
+
+  /**
+   * Serves {@code index.html} for a UI route that has no file behind it, so the router can take over.
+   *
+   * <p>Only for navigations: a request that accepts HTML and whose last path segment has no
+   * extension. A missing {@code .js} or {@code .png} must stay a 404 rather than silently returning
+   * a page of HTML, which turns a broken asset into a confusing parse error somewhere else.
+   *
+   * @param rc the routing context.
+   */
+  void spaFallback(RoutingContext rc) {
+    // The rule itself lives in UiPaths, shared with the Quarkus filter and the Spring Boot
+    // controller that do the same job on those runtimes - three copies of it would drift.
+    if (UiPaths.isClientRoute(rc.request().path())
+        && UiPaths.wantsHtml(rc.request().getHeader("Accept"))) {
+      rc.reroute(UiPaths.INDEX);
+    } else {
+      rc.next();
+    }
   }
 
   // The handler methods below are package-private (not private) so they can be unit-tested directly
@@ -172,7 +268,7 @@ public class CamelBeeHttpEndpoints {
 
     String camelVersion = camelContext.getVersion();
 
-    String framework = "%s - Camel %s".formatted(CamelBeeConstants.FRAMEWORK, camelVersion);
+    String framework = "%s - Camel %s".formatted(FRAMEWORK, camelVersion);
 
     String jvmInputParameters = ManagementFactory.getRuntimeMXBean().getInputArguments().stream()
         .collect(Collectors.joining(", "));
@@ -215,6 +311,22 @@ public class CamelBeeHttpEndpoints {
         .end("tracing status updated as:" + status);
   }
 
+  /**
+   * Sets the substring a message must contain to be recorded at all. An empty body clears it.
+   *
+   * <p>Taken as raw text rather than JSON: the filter is an arbitrary payload fragment - an order
+   * id, a customer reference - and quoting rules would only get in the way.
+   */
+  void tracerFilter(RoutingContext rc) {
+    String filter = rc.body() != null ? rc.body().asString() : null;
+    messageService.setCaptureFilter(filter);
+
+    rc.response().putHeader("content-type", "text/plain")
+        .end(messageService.getCaptureFilter() == null
+            ? "capture filter cleared."
+            : "capture filter set.");
+  }
+
   private void writeJson(RoutingContext rc, Object body) {
     try {
       rc.response().putHeader("content-type", "application/json")
@@ -241,5 +353,82 @@ public class CamelBeeHttpEndpoints {
     } catch (NumberFormatException e) {
       return defaultValue;
     }
+  }
+
+  /**
+   * Rejects a request that carries no valid token, and refreshes the token when it does.
+   *
+   * <p>Ends the request rather than delegating, so no handler further down the chain can write data
+   * to an unauthenticated caller.
+   *
+   * @param ctx the routing context.
+   */
+  void requireToken(RoutingContext ctx) {
+    if (!authService.isEnabled()) {
+      ctx.next();
+      return;
+    }
+
+    final String header = ctx.request().getHeader(AUTHORIZATION_HEADER);
+    final String token = header != null && header.startsWith(BEARER_PREFIX)
+        ? header.substring(BEARER_PREFIX.length())
+        : null;
+
+    authService.verifyAndRefresh(token).ifPresentOrElse(
+        refreshed -> {
+          ctx.response().putHeader(REFRESHED_TOKEN_HEADER, refreshed);
+          ctx.next();
+        },
+        () -> ctx.response().setStatusCode(401)
+            .putHeader("Content-Type", "application/json")
+            .end("{\"error\":\"unauthorized\"}"));
+  }
+
+  /**
+   * Exchanges credentials for a token.
+   *
+   * @param ctx the routing context.
+   */
+  void login(RoutingContext ctx) {
+    if (!authService.isEnabled()) {
+      ctx.response().putHeader("Content-Type", "application/json").end("{\"token\":\"\"}");
+      return;
+    }
+
+    String user = null;
+    String pass = null;
+    try {
+      JsonNode body = objectMapper.readTree(ctx.body().asString());
+      user = body.path("username").asText(null);
+      pass = body.path("password").asText(null);
+    } catch (Exception e) {
+      // A malformed body is a failed login, not a server error - and it must not say which.
+      LOGGER.debug("CamelBee login: unreadable request body", e);
+    }
+
+    if (!authService.authenticate(user, pass)) {
+      // Deliberately identical for an unknown user and a wrong password, and no timing difference:
+      // AuthService compares both in constant time.
+      ctx.response().setStatusCode(401)
+          .putHeader("Content-Type", "application/json")
+          .end("{\"error\":\"invalid credentials\"}");
+      return;
+    }
+
+    ctx.response().putHeader("Content-Type", "application/json")
+        .end("{\"token\":\"" + authService.issueToken() + "\"}");
+  }
+
+  /**
+   * Tells the UI whether it needs to show a login form at all.
+   *
+   * <p>Public by necessity - the UI has to ask this before it has a token. It discloses only whether
+   * authentication is switched on, which an unauthenticated caller learns anyway from the first 401.
+   *
+   * @param ctx the routing context.
+   */
+  void authStatus(RoutingContext ctx) {
+    ctx.response().putHeader("Content-Type", "application/json")
+        .end("{\"authEnabled\":" + authService.isEnabled() + "}");
   }
 }

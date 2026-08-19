@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2023 Rahmi Ege Karaosmanoglu
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!--
+  README Option 1 (core as a dependency) for Quarkus, pinned to the OLDEST supported platform.
+
+  Deliberately has NO <parent>: allcomponent-quarkus-sample inherits from camelbee-quarkus-starter,
+  which supplies the platform, the dependencies and the build plugins, so it cannot detect a problem
+  in the core-as-a-dependency path.
+
+  What it proves: camelbee-quarkus-core is built on Quarkus 3.38, and Quarkus bakes a great deal in
+  at build time, so "it compiles" says very little. This module actually augments and boots the
+  thing on 3.15.4.
+
+  It also guards the Jandex index format, which nothing else does. camelbee-quarkus-core pins
+  <indexVersion>12</indexVersion> because Quarkus 3.15-3.21 bundle Jandex 3.2.x, which cannot read
+  v13. Verified 2026-08-18 by flipping that pin to 13: this module then fails with
+  org.jboss.jandex.UnsupportedVersion out of ApplicationArchiveBuildStep.
+
+  That check needs the PACKAGE phase - augmentation runs in quarkus-maven-plugin:build, so
+  'mvn test' here passes even with a broken index. 'mvn install' is what catches it.
+
+  It pins the platform the Camel K runtime uses (3.15.4), so the download is shared with
+  core/quarkus-core-camelk rather than being an extra one.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.camelbee</groupId>
+    <artifactId>core-only-quarkus-sample</artifactId>
+    <version>4.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>core-only-quarkus-sample</name>
+    <description>Minimal Quarkus application using camelbee-quarkus-core directly, on the oldest
+        supported Quarkus platform</description>
+
+    <properties>
+        <!-- The floor from the README version table. Raising these defeats the point of the module. -->
+        <quarkus.version>3.15.4</quarkus.version>
+        <camel-quarkus.version>3.15.3</camel-quarkus.version>
+        <camelbee.version>4.0.0</camelbee.version>
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>3.2.1</maven-surefire-plugin.version>
+        <assertj-core.version>3.27.7</assertj-core.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- The consumer's own BOMs decide every Quarkus and Camel version. Composed the way
+                 Camel K composes them (quarkus-bom + camel-quarkus-bom) rather than via the
+                 io.quarkus.platform aggregate, which is why the two versions differ. -->
+            <dependency>
+                <groupId>io.quarkus</groupId>
+                <artifactId>quarkus-bom</artifactId>
+                <version>${quarkus.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.camel.quarkus</groupId>
+                <artifactId>camel-quarkus-bom</artifactId>
+                <version>${camel-quarkus.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.camelbee</groupId>
+            <artifactId>camelbee-quarkus-core</artifactId>
+            <version>${camelbee.version}</version>
+        </dependency>
+
+        <!-- Required by the core-only path: 'provided' in camelbee-quarkus-core, so the consuming
+             application supplies them at its own versions. See README Option 1. -->
+        <dependency>
+            <groupId>org.apache.camel.quarkus</groupId>
+            <artifactId>camel-quarkus-rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel.quarkus</groupId>
+            <artifactId>camel-quarkus-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-resteasy-jackson</artifactId>
+        </dependency>
+
+        <!-- Component used by the demo route -->
+        <dependency>
+            <groupId>org.apache.camel.quarkus</groupId>
+            <artifactId>camel-quarkus-timer</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-junit5</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj-core.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.quarkus</groupId>
+                <artifactId>quarkus-maven-plugin</artifactId>
+                <version>${quarkus.version}</version>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <systemProperties>
+                        <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

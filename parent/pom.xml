@@ -21,7 +21,7 @@
     <parent>
         <groupId>io.camelbee</groupId>
         <artifactId>camelbee</artifactId>
-        <version>3.2.1</version>
+        <version>4.0.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -38,11 +38,16 @@
              tested module overrides this with its baseline and ratchets toward 0.80. -->
         <jacoco.line.coverage.minimum>0.00</jacoco.line.coverage.minimum>
         <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
-        <camel-maven-plugin.version>4.20.0</camel-maven-plugin.version>
-        <checkstyle.version>13.6.0</checkstyle.version>
+        <camel-maven-plugin.version>4.22.0</camel-maven-plugin.version>
+        <!-- Version of io.camelbee:common unpacked for the shared checkstyle/spotbugs/formatter
+             configs. MUST stay a literal, not ${project.version}: this pom is also the inherited
+             grandparent of every generated microservice, where ${project.version} is the user's
+             own version (e.g. 1.0-SNAPSHOT) and the unpack fails. Bump with each release. -->
+        <camelbee.version>4.0.0</camelbee.version>
+        <checkstyle.version>14.0.0</checkstyle.version>
         <commons-io.version>2.22.0</commons-io.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
-        <cxf-core.version>4.2.2</cxf-core.version>
+        <cxf-core.version>4.2.3</cxf-core.version>
         <cxf-codegen-plugin.version>4.0.5</cxf-codegen-plugin.version>
         <cxf-xjc-plugin.version>4.0.2</cxf-xjc-plugin.version>
         <cxf-xjc-dv.version>4.0.2</cxf-xjc-dv.version>
@@ -51,10 +56,10 @@
         <impsort-maven-plugin.version>1.13.0</impsort-maven-plugin.version>
         <jandex-maven-plugin.version>3.6.0</jandex-maven-plugin.version>
         <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
-        <jackson-databind-nullable.version>0.2.10</jackson-databind-nullable.version>
+        <jackson-databind-nullable.version>0.2.11</jackson-databind-nullable.version>
         <!-- Shared by the generated microservices' MCP support (quarkus test + springboot
              dependencyManagement override); pinned to resolve the MCP SDK vs WireMock conflict. -->
-        <json-schema-validator.version>3.0.5</json-schema-validator.version>
+        <json-schema-validator.version>3.0.6</json-schema-validator.version>
         <java.version>21</java.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <lombok.version>1.18.46</lombok.version>
@@ -70,8 +75,9 @@
         <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
         <maven-surefire-plugin.version>3.5.6</maven-surefire-plugin.version>
         <maven-surefire-report-plugin.version>3.5.6</maven-surefire-report-plugin.version>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <!-- Derived from java.version so a module overriding it moves source/target with it. -->
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
 
         <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>
         <maven.compiler.testTarget>${maven.compiler.target}</maven.compiler.testTarget>
@@ -84,9 +90,9 @@
         <sonar.coverage.exclusions>**/*Test*.*, **/*Config*.*</sonar.coverage.exclusions>
         <sonar.projectKey>camelbee.${project.name}</sonar.projectKey>
         <sonar.qualitygate.wait>true</sonar.qualitygate.wait>
-        <spotbugs-annotations.version>4.10.2</spotbugs-annotations.version>
-        <spotbugs-maven-plugin.version>4.10.2.0</spotbugs-maven-plugin.version>
-        <spotbugs.version>4.10.2</spotbugs.version>
+        <spotbugs-annotations.version>4.10.3</spotbugs-annotations.version>
+        <spotbugs-maven-plugin.version>4.10.3.0</spotbugs-maven-plugin.version>
+        <spotbugs.version>4.10.3</spotbugs.version>
 
         <testcontainers-bom.version>2.0.5</testcontainers-bom.version>
         <junit-jupiter.version>1.21.4</junit-jupiter.version>
@@ -97,10 +103,10 @@
         <cxf-xjc-runtime.version>4.2.0</cxf-xjc-runtime.version>
         <cxf-xjc-ts.version>4.2.0</cxf-xjc-ts.version>
         <saaj-impl.version>3.0.6</saaj-impl.version>
-        <avro-maven-plugin.version>1.12.1</avro-maven-plugin.version>
+        <avro-maven-plugin.version>1.12.2</avro-maven-plugin.version>
         <maven-replacer-plugin.version>1.5.3</maven-replacer-plugin.version>
         <jakarta.xml.ws-api.version>4.0.3</jakarta.xml.ws-api.version>
-        <swagger-annotations-jakarta.version>2.2.52</swagger-annotations-jakarta.version>
+        <swagger-annotations-jakarta.version>2.2.54</swagger-annotations-jakarta.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
 
         <!-- ================================================================ -->
@@ -128,7 +134,7 @@
           → Use <dependencyManagement> to enforce versions
         -->
         <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
-        <proto-google-common-protos.version>2.72.0</proto-google-common-protos.version>
+        <proto-google-common-protos.version>2.74.0</proto-google-common-protos.version>
         <protoc.version>3.25.8</protoc.version>
         <protoc-gen-grpc-java.version>1.78.0</protoc-gen-grpc-java.version>
         <!-- ================================================================ -->
@@ -304,7 +310,7 @@
                                 <artifactItem>
                                     <groupId>io.camelbee</groupId>
                                     <artifactId>common</artifactId>
-                                    <version>3.2.1</version>
+                                    <version>${camelbee.version}</version>
                                     <type>jar</type>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
                                     <includes>config/**, formatter/**</includes>
@@ -379,8 +385,13 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <!--
+                      'release' rather than source/target: it also pins the JDK API surface, so a
+                      module that lowers ${java.version} (the published cores use 17, see their
+                      POMs) fails the build if it touches an API newer than that release, instead of
+                      compiling here and throwing NoSuchMethodError on the consumer's older JVM.
+                    -->
+                    <release>${java.version}</release>
                     <annotationProcessorPaths>
                         <!-- mapstruct annotation processor -->
                         <path>

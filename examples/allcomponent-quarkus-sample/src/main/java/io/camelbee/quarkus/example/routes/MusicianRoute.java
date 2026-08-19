@@ -16,12 +16,14 @@
 
 package io.camelbee.quarkus.example.routes;
 
+import io.camelbee.quarkus.example.bean.FlakyProcessor;
 import io.camelbee.quarkus.example.constants.Constants;
 import io.camelbee.quarkus.example.exception.ExceptionHandler;
 import io.camelbee.quarkus.example.model.jpa.SongEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.Map;
 import org.apache.camel.Exchange;
+import org.apache.camel.ExchangePattern;
 import org.apache.camel.builder.RouteBuilder;
 import org.camelbee.config.CamelBeeRouteConfigurer;
 
@@ -57,7 +59,13 @@ public class MusicianRoute extends RouteBuilder {
     from("direct:getMusician").routeId("getMusicianRoute")
         .to(MUSICIAN_PROCESSOR_ROUTE);
 
+    /*
+     The file consumer hands over a GenericFile body, which Jackson cannot serialize (it walks into
+     GenericFile#getBinding and fails). The pipeline marshals to json in invokeHttpBinRoute, so read
+     the file content out here - every other consumer already feeds the pipeline a serializable body.
+     */
     from("file://inputdir/?delete=true").routeId("fileListenerRoute")
+        .convertBodyTo(String.class)
         .to(MUSICIAN_PROCESSOR_ROUTE);
 
     from("timer://foo?fixedRate=true&period=500000").routeId("timerRoute")
@@ -105,7 +113,10 @@ public class MusicianRoute extends RouteBuilder {
         .dynamicRouter(method(this, "computeEndpoint"))
         .removeHeaders("*")
         .toD("direct:invokeRabbitMq")
+        // invokeJmsRoute put a message on this queue a few steps up, so the timeout is only a
+        // safety net - keep it short, every exchange in the pipeline waits on it
         .pollEnrich("jms:queue:camelbee-southhbound-queue", 1000, (original, resource) -> resource)
+        .to("direct:invokeFlaky").id("flakyBridgeEndpoint")
         .to("direct:invokeHttpBinError");
 
     from("direct:invokeHttpBin").routeId("invokeHttpBinRoute")
@@ -134,7 +145,16 @@ public class MusicianRoute extends RouteBuilder {
     from("direct:invokeRabbitMq").routeId("invokeRabbitMqRoute")
         .setBody(exchangeProperty(Constants.ORIGINAL_BODY))
         .convertBodyTo(String.class)
-        .to("rabbitmq:cheese?routingKey=songs&durable=false&declare=false&autoDelete=false")
+        /*
+         InOnly explicitly. The REST entry point is InOut and that pattern propagates all the way
+         down the pipeline, which makes camel-rabbitmq's producer do RPC: it declares a temporary
+         reply queue and blocks for replyTimeout (20s) waiting for an answer. Nothing answers -
+         this is a southbound publish, and the only consumer here binds routingKey=musicians
+         rather than songs - so every request stalled 20s per delivery attempt, three times over
+         with the error handler's redeliveries, and then failed.
+        */
+        .to(ExchangePattern.InOnly,
+            "rabbitmq:cheese?routingKey=songs&durable=false&declare=false&autoDelete=false")
         .id("rabbitMqEndpoint");
 
     from("direct:invokeMongoDb").routeId("invokeMongoDbRoute")
@@ -156,6 +176,20 @@ public class MusicianRoute extends RouteBuilder {
         .convertBodyTo(String.class)
         .to("file://outputdir")
         .id("fileEndpoint");
+
+    /*
+     Transient failure: the caller's dead-letter channel redelivers this send twice before it
+     succeeds, so a single exchange produces three request/response pairs on the same edge in the
+     CamelBee UI. Self-contained on purpose - it does not need one of the real backends to be down.
+     */
+    from("direct:invokeFlaky").routeId("invokeFlakyRoute")
+        .to("direct:flakyTarget?block=true").id("flakyEndpoint");
+
+    from("direct:flakyTarget").routeId("flakyTargetRoute")
+        // no error handler here, so the failure propagates to the caller and IT redelivers the send
+        .errorHandler(noErrorHandler())
+        .bean(FlakyProcessor.class, "maybeFail")
+        .to("mock:flaky").id("flakyMockEndpoint");
 
     from("direct:invokeMockA").routeId("invokeMockARoute")
         .setBody(constant("invokedMockABody"))

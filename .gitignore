@@ -5,6 +5,7 @@ pom_maven_central.xml
 
 _reference
 target/
+target-camelk/
 !**/src/main/**/target/
 !**/src/test/**/target/
 .gradle
@@ -36,3 +37,9 @@ target/
 
 # SDKMAN #
 .sdkmanrc
+
+# Camel file-component working directories created by the samples and their tests
+inputdir/
+outputdir/
+
+screenshot-demo/

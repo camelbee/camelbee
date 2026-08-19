@@ -13,6 +13,8 @@ export function makeMessage(overrides: Partial<Message> = {}): Message {
     messageType: 'REQUEST',
     exception: null,
     timeStamp: '2024-01-01T00:00:00Z',
+    timeTaken: 0,
+    parentExchangeId: null,
     ...overrides,
   };
 }

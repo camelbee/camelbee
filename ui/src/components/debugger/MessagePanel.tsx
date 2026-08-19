@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useDebuggerStore } from '@/store/debuggerStore';
+import { useSettingsStore } from '@/store/settingsStore';
+import { useDragResize } from '@/hooks/useDragResize';
 import { buildInteractionsForEdge, type Interaction } from '@/utils/messageMatching';
 import type { MessageEdge } from '@/utils/routeGraph';
 import type { Message } from '@/types';
@@ -7,6 +9,9 @@ import type { Message } from '@/types';
 interface MessagePanelProps {
   edges: MessageEdge[];
 }
+
+/** Leave the graph this much room however far the panel is dragged. */
+const MIN_GRAPH_PX = 240;
 
 export function MessagePanel({ edges }: MessagePanelProps) {
   const selectedEdgeId = useDebuggerStore((s) => s.selectedEdgeId);
@@ -16,6 +21,16 @@ export function MessagePanel({ edges }: MessagePanelProps) {
   const setTimelineIndex = useDebuggerStore((s) => s.setTimelineIndex);
 
   const [interactionIdx, setInteractionIdx] = useState(0);
+
+  const width = useSettingsStore((s) => s.messagePanelWidth);
+  const setWidth = useSettingsStore((s) => s.setMessagePanelWidth);
+
+  const { onMouseDown: onGripMouseDown, onKeyDown: onGripKeyDown } = useDragResize({
+    size: width,
+    setSize: setWidth,
+    axis: 'horizontal',
+    minRemaining: MIN_GRAPH_PX,
+  });
 
   const edge = useMemo(
     () => edges.find((e) => e.id === selectedEdgeId),
@@ -29,8 +44,8 @@ export function MessagePanel({ edges }: MessagePanelProps) {
 
   const interactions = useMemo(() => {
     if (!edge) return [];
-    return buildInteractionsForEdge(slicedMessages, edge);
-  }, [edge, slicedMessages]);
+    return buildInteractionsForEdge(slicedMessages, edge, edges);
+  }, [edge, edges, slicedMessages]);
 
   // Reset interaction index when edge changes
   useEffect(() => {
@@ -51,7 +66,30 @@ export function MessagePanel({ edges }: MessagePanelProps) {
   };
 
   return (
-    <div className="flex h-full w-[400px] flex-col border-l border-gray-300 bg-gray-50 transition-all dark:border-gray-700 dark:bg-gray-900">
+    <div
+      className="relative flex h-full shrink-0 flex-col border-l border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-900"
+      style={{ width: `${width}px` }}
+      data-testid="message-panel"
+    >
+      {/*
+        Resize grip on the LEFT edge, since the panel is docked right. Absolutely positioned so it
+        does not take a column out of the layout, and pulled slightly outside the border so the
+        cursor changes a pixel before the edge rather than a pixel after it.
+      */}
+      <div
+        role="separator"
+        aria-orientation="vertical"
+        aria-label="Resize message panel"
+        aria-valuenow={width}
+        tabIndex={0}
+        onMouseDown={onGripMouseDown}
+        onKeyDown={onGripKeyDown}
+        data-testid="message-panel-resize-handle"
+        className="group absolute -left-1 top-0 z-10 flex h-full w-2 cursor-col-resize items-center justify-center focus:outline-none"
+      >
+        <span className="h-10 w-0.5 rounded-full bg-gray-300 group-hover:bg-blue-500 group-focus:bg-blue-500 dark:bg-gray-600" />
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between border-b border-gray-300 px-3 py-2 dark:border-gray-700">
         <span className="text-xs font-semibold text-gray-800 dark:text-gray-200">
@@ -113,6 +151,11 @@ export function MessagePanel({ edges }: MessagePanelProps) {
               <span className="truncate text-[10px] text-gray-400 dark:text-gray-500">
                 {current.exchangeId}
               </span>
+              {!!current.response?.timeTaken && (
+                <span className="ml-auto shrink-0 text-[10px] tabular-nums text-gray-400 dark:text-gray-500">
+                  {current.response.timeTaken}ms
+                </span>
+              )}
             </div>
 
             {/* Request */}

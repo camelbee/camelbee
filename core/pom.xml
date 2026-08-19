@@ -19,7 +19,7 @@
   <parent>
     <groupId>io.camelbee</groupId>
     <artifactId>parent</artifactId>
-    <version>3.2.1</version>
+    <version>4.0.0</version>
     <relativePath>../parent/pom.xml</relativePath>
   </parent>
 
@@ -27,13 +27,15 @@
   <groupId>io.camelbee</groupId>
   <artifactId>core</artifactId>
   <packaging>pom</packaging>
-  <version>3.2.1</version>
+  <version>4.0.0</version>
 
 
   <name>CamelBee</name>
   <description>CamelBee Core Pom</description>
 
   <modules>
+      <!-- first: the other three depend on it -->
+      <module>shared-core</module>
       <module>quarkus-core</module>
       <module>springboot-core</module>
       <module>standalone-core</module>

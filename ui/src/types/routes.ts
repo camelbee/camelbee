@@ -16,6 +16,8 @@ export interface CamelRoute {
   outputs: CamelRouteOutput[];
   rest: boolean;
   errorHandler: string | null;
+  /** The route's <description> text (from getDescriptionText()), or null if unset. */
+  routeDescription?: string | null;
 }
 
 /** Matches Java: org.camelbee.debugger.model.route.CamelRouteOutput */
@@ -25,4 +27,6 @@ export interface CamelRouteOutput {
   delimiter: string | null;
   type: string;
   outputs: CamelRouteOutput[];
+  /** The processor's <description> text (from getDescriptionText()), or null if unset. */
+  nodeDescription?: string | null;
 }

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2023 Rahmi Ege Karaosmanoglu
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!--
+  README Option 1 (core as a dependency) for Spring Boot, pinned to the OLDEST supported stack.
+
+  Deliberately has NO <parent>: the allcomponent-springboot-sample inherits from
+  camelbee-springboot-starter, which supplies Spring Boot, Camel and the build plugins, so it
+  cannot detect a problem in the core-as-a-dependency path. This module stands alone the way a real
+  consuming project does.
+
+  Two things it exists to prove, neither of which any other module can:
+
+  1. The floor is real. Spring Boot 3.3.13 + Camel 4.8.0 is the oldest combination the README
+     claims, and camelbee-springboot-core is COMPILED against Spring Boot 4.1 / Camel 4.22 - so
+     this is the binary-compatibility check, not just a source-level one.
+  2. The README's dependency list is complete. camelbee-springboot-core scopes
+     spring-boot-starter-web and camel-spring-boot-starter as 'provided', so a consumer has to
+     declare them. They are declared below and nowhere else; drop either and this module fails.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.camelbee</groupId>
+    <artifactId>core-only-springboot-sample</artifactId>
+    <version>4.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>core-only-springboot-sample</name>
+    <description>Minimal Spring Boot application using camelbee-springboot-core directly, on the
+        oldest supported Spring Boot and Camel</description>
+
+    <properties>
+        <!-- The floor from the README version table. Raising these defeats the point of the module. -->
+        <spring-boot.version>3.3.13</spring-boot.version>
+        <camel.version>4.8.0</camel.version>
+        <camelbee.version>4.0.0</camelbee.version>
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>3.5.6</maven-surefire-plugin.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- The consumer's own BOMs decide every Spring Boot and Camel version. CamelBee
+                 contributes nothing here - that is the property this module exists to prove. -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.camel.springboot</groupId>
+                <artifactId>camel-spring-boot-bom</artifactId>
+                <version>${camel.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.camelbee</groupId>
+            <artifactId>camelbee-springboot-core</artifactId>
+            <version>${camelbee.version}</version>
+        </dependency>
+
+        <!-- Required by the core-only path: 'provided' in camelbee-springboot-core, so the
+             consuming application supplies them at its own versions. See README Option 1. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- Component used by the demo route -->
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-timer-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>

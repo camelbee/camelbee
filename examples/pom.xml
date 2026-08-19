@@ -20,7 +20,7 @@
     <parent>
       <groupId>io.camelbee</groupId>
       <artifactId>parent</artifactId>
-      <version>3.2.1</version>
+      <version>4.0.0</version>
       <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
@@ -34,6 +34,19 @@
       <module>allcomponent-quarkus-sample</module>
       <module>allcomponent-springboot-sample</module>
       <module>allcomponent-standalone-sample</module>
+      <!--
+        README Option 1 (core as a dependency), one per runtime, each pinned to the OLDEST stack the
+        version table claims. The allcomponent-* samples above all inherit from a CamelBee starter,
+        so they exercise Option 2 only - these are the sole coverage of the option the README calls
+        recommended, and the only thing that keeps the published version floors honest.
+
+        They are aggregated here but do NOT inherit from this POM: each stands alone with its own
+        BOMs and plugin versions, the way a real consuming project does. Aggregation and inheritance
+        are separate in Maven, and the independence is the point.
+      -->
+      <module>core-only-quarkus-sample</module>
+      <module>core-only-springboot-sample</module>
+      <module>core-only-standalone-sample</module>
   </modules>
 
 </project>

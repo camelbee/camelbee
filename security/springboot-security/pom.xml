@@ -22,7 +22,7 @@
     <parent>
         <groupId>io.camelbee</groupId>
         <artifactId>camelbee-springboot-dependencies</artifactId>
-        <version>3.2.1</version>
+        <version>4.0.0</version>
         <relativePath>../../dependencies/springboot/pom.xml</relativePath>
     </parent>
 
@@ -31,20 +31,30 @@
     <packaging>jar</packaging>
 
     <properties>
+        <!--
+          Published for consumers still on JDK 17 (Quarkus 3.15 LTS / Spring Boot 3.3-3.4 shops
+          commonly are). The parent compiles with <release>, so touching a post-17 JDK API fails
+          the build here rather than at runtime on the consumer's JVM. Starters and samples stay
+          on 21 - only the artifacts people put on their own classpath need to be 17.
+        -->
+        <java.version>17</java.version>
         <!-- Line coverage ~91%; gate held at 0.80. -->
         <jacoco.line.coverage.minimum>0.80</jacoco.line.coverage.minimum>
     </properties>
 
     <dependencies>
+        <!-- 'provided' for the same reason as in camelbee-springboot-core: the consuming
+             application supplies Spring Boot and Camel at its own versions. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>io.camelbee</groupId>
             <artifactId>camelbee-springboot-core</artifactId>
-            <version>3.2.1</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -56,6 +66,7 @@
         <dependency>
             <groupId>org.apache.camel.springboot</groupId>
             <artifactId>camel-spring-boot-starter</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

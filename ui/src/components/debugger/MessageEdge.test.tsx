@@ -53,6 +53,43 @@ describe('MessageEdge', () => {
     expect(getByText('5')).toBeInTheDocument();
   });
 
+  // Roadmap #9 (latency): avg/max badge next to the message count.
+  it('renders the avg/max latency badge when timing data is present', () => {
+    const { getByText } = render(
+      <MessageEdge
+        {...edgeProps(baseData({ messageCount: 3, avgTimeTaken: 42, maxTimeTaken: 100 }))}
+      />,
+      { wrapper: Svg },
+    );
+    expect(getByText('42ms avg / 100ms max')).toBeInTheDocument();
+  });
+
+  it('omits the latency badge when there is no timing data', () => {
+    const { queryByText } = render(
+      <MessageEdge {...edgeProps(baseData({ messageCount: 3 }))} />,
+      { wrapper: Svg },
+    );
+    expect(queryByText(/ms avg/)).not.toBeInTheDocument();
+  });
+
+  // Roadmap #18 (redelivery): messageCount stays a distinct-exchange count, so a retried edge
+  // needs its own badge to surface "this took N attempts" without opening the message panel.
+  it('renders the retry badge when retryCount is set', () => {
+    const { getByText } = render(
+      <MessageEdge {...edgeProps(baseData({ messageCount: 1, hasError: true, retryCount: 3 }))} />,
+      { wrapper: Svg },
+    );
+    expect(getByText('↻3')).toBeInTheDocument();
+  });
+
+  it('omits the retry badge when retryCount is not set', () => {
+    const { queryByText } = render(
+      <MessageEdge {...edgeProps(baseData({ messageCount: 1 }))} />,
+      { wrapper: Svg },
+    );
+    expect(queryByText(/↻/)).not.toBeInTheDocument();
+  });
+
   it('renders without data, as an error-handler, selected, and animated', () => {
     expect(() =>
       render(<MessageEdge {...edgeProps(undefined)} />, { wrapper: Svg }),

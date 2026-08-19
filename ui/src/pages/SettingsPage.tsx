@@ -46,6 +46,7 @@ export function SettingsPage() {
         <Row label="health url">
           <input
             type="text"
+            aria-label="health url"
             value={healthUrl}
             onChange={(e) => setHealthUrl(e.target.value)}
             className="w-72 rounded border border-gray-300 bg-gray-50 px-3 py-1.5 text-sm text-gray-800 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
@@ -58,6 +59,7 @@ export function SettingsPage() {
             type="number"
             min={2}
             max={10}
+            aria-label="health refresh rate"
             value={healthRefreshRate}
             onChange={(e) => setHealthRefreshRate(Number(e.target.value))}
             className="w-20 rounded border border-gray-300 bg-gray-50 px-3 py-1.5 text-sm text-gray-800 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
@@ -69,6 +71,7 @@ export function SettingsPage() {
         <Row label="metrics url">
           <input
             type="text"
+            aria-label="metrics url"
             value={metricsUrl}
             onChange={(e) => setMetricsUrl(e.target.value)}
             className="w-72 rounded border border-gray-300 bg-gray-50 px-3 py-1.5 text-sm text-gray-800 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
@@ -81,6 +84,7 @@ export function SettingsPage() {
             type="number"
             min={300}
             max={600}
+            aria-label="metrics history"
             value={metricsHistory}
             onChange={(e) => setMetricsHistory(Number(e.target.value))}
             className="w-20 rounded border border-gray-300 bg-gray-50 px-3 py-1.5 text-sm text-gray-800 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
@@ -94,6 +98,7 @@ export function SettingsPage() {
             type="number"
             min={2}
             max={10}
+            aria-label="metrics refresh rate"
             value={metricsRefreshRate}
             onChange={(e) => setMetricsRefreshRate(Number(e.target.value))}
             className="w-20 rounded border border-gray-300 bg-gray-50 px-3 py-1.5 text-sm text-gray-800 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
@@ -107,6 +112,7 @@ export function SettingsPage() {
             type="number"
             min={1000}
             max={30000}
+            aria-label="max characters in a text field"
             value={maxTextFieldChars}
             onChange={(e) => setMaxTextFieldChars(Number(e.target.value))}
             className="w-24 rounded border border-gray-300 bg-gray-50 px-3 py-1.5 text-sm text-gray-800 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"

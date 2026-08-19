@@ -1,0 +1,41 @@
+# CamelBee Security Modules
+
+Optional modules providing reusable JWT validation Camel routes for securing your Camel microservices:
+
+- `quarkus-security` — for Camel Quarkus applications
+- `springboot-security` — for Camel Spring Boot applications
+
+Both modules provide the same functionality:
+
+- A `direct:validateJWT` route that validates JWT bearer tokens (signature, issuer, audience, expiry with configurable clock skew) — call it from your own routes to protect endpoints.
+- A `direct:fetchJWKS` route that fetches and caches the JSON Web Key Set from your identity provider.
+- Authorization utilities for role/scope checks, and typed exceptions (`InvalidTokenException`, `TokenExpiredException`, `InsufficientPrivilegesException`, ...).
+
+## Configuration
+
+Configure via `camelbee.security.*` properties:
+
+```properties
+camelbee.security.enabled = true
+camelbee.security.issuer = https://your-idp/realms/your-realm
+camelbee.security.audience = your-audience
+camelbee.security.jwks-url = https://your-idp/realms/your-realm/protocol/openid-connect/certs
+camelbee.security.jwks-cache-duration = 3600
+camelbee.security.algorithm = RS256
+camelbee.security.clock-skew = 30
+```
+
+## Installation
+
+Add it alongside the matching core — it works with either integration path (core as a dependency, or
+a starter as parent), and follows the same version rules: framework dependencies are `provided`, so
+your BOM decides the Camel / Spring Boot / Quarkus versions. See the
+[core READMEs](../core) for the supported floors.
+
+```xml
+<dependency>
+  <groupId>io.camelbee</groupId>
+  <artifactId>camelbee-quarkus-security</artifactId> <!-- or camelbee-springboot-security -->
+  <version>4.0.0</version>
+</dependency>
+```

@@ -23,7 +23,7 @@ import {
   type ActiveFlow,
 } from '@/utils/routeGraph';
 import { extractInputUri, extractComponentType } from '@/utils/endpointParser';
-import { matchMessageToEdge } from '@/utils/messageMatching';
+import { matchMessageToEdge, computeEdgeStats } from '@/utils/messageMatching';
 import { useDebuggerStore } from '@/store/debuggerStore';
 import { useIsDark } from '@/hooks/useTheme';
 import { RouteNode } from './RouteNode';
@@ -47,12 +47,16 @@ export function RouteGraph({ context, onDynamicEdgeAdded }: RouteGraphProps) {
   // Keep a ref to the current graph edges for message matching
   const graphEdgesRef = useRef(graph.edges);
 
-  // When context changes, rebuild
+  // Rebuild from the static topology when it changes, and when the messages are cleared: the
+  // dynamic edges/nodes synthesized below describe hops seen in traffic, so once that traffic is
+  // gone they are stale. This also discards any manual node repositioning, which is acceptable
+  // for an explicit clear.
+  const clearGeneration = useDebuggerStore((s) => s.clearGeneration);
   useEffect(() => {
     setNodes(graph.nodes);
     setEdges(graph.edges);
     graphEdgesRef.current = graph.edges;
-  }, [graph, setNodes, setEdges]);
+  }, [graph, clearGeneration, setNodes, setEdges]);
 
   // Edge click → select edge for message panel
   const selectEdge = useDebuggerStore((s) => s.selectEdge);
@@ -98,6 +102,20 @@ export function RouteGraph({ context, onDynamicEdgeAdded }: RouteGraphProps) {
   /** Strip double slashes for comparison (tracer uses direct:// but routes use direct:) */
   const stripSlashes = (s: string) => s.replace(/\/\//g, '');
 
+  /**
+   * Node id -> the route that declares it. Lets a runtime-discovered hop be attributed to the route
+   * that owns the node which sent it, rather than to the endpoint the tracer last recorded.
+   */
+  const routeIdByNodeId = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const route of context.routes) {
+      for (const output of route.outputs ?? []) {
+        if (output.id) map.set(output.id, route.id);
+      }
+    }
+    return map;
+  }, [context]);
+
   const createDynamicEdge = useCallback(
     (msg: Message): MEdge | null => {
       if (!msg.routeId || !msg.endpoint || !context) return null;
@@ -105,18 +123,28 @@ export function RouteGraph({ context, onDynamicEdgeAdded }: RouteGraphProps) {
       const msgRouteId = stripSlashes(msg.routeId);
       const msgEndpoint = stripSlashes(msg.endpoint);
 
-      // Find the source route node by routeId or input URI
-      let sourceNodeId: string | null = null;
-      let sourceRouteId: string | null = null;
-      for (const route of context.routes) {
-        const inputUri = extractInputUri(route.input);
-        if (route.id === msgRouteId || stripSlashes(inputUri) === msgRouteId) {
-          sourceNodeId = makeNodeId(route.id);
-          sourceRouteId = route.id;
-          break;
+      // Find the route that owns this hop.
+      //
+      // Prefer the route that declares the node which performed the send. The tracer's routeId is
+      // the endpoint it most recently sent to, which is not the same thing: a routingSlip or
+      // dynamicRouter sends its next target from inside the previous target's continuation, so
+      // routeId still names that previous callee. Trusting it draws the arrow from the wrong node -
+      // a dynamicRouter hop appears to originate from whichever route ran just before it.
+      let sourceRouteId: string | null = msg.endpointId
+        ? (routeIdByNodeId.get(msg.endpointId) ?? null)
+        : null;
+
+      if (!sourceRouteId) {
+        for (const route of context.routes) {
+          const inputUri = extractInputUri(route.input);
+          if (route.id === msgRouteId || stripSlashes(inputUri) === msgRouteId) {
+            sourceRouteId = route.id;
+            break;
+          }
         }
       }
-      if (!sourceNodeId || !sourceRouteId) return null;
+      if (!sourceRouteId) return null;
+      const sourceNodeId = makeNodeId(sourceRouteId);
 
       // Find or create target node
       let targetNodeId: string | null = null;
@@ -176,6 +204,7 @@ export function RouteGraph({ context, onDynamicEdgeAdded }: RouteGraphProps) {
               label: truncateLabel(producerUri),
               componentType,
               kind: 'producer',
+              fullUri: producerUri,
             },
           };
           const sourceNode = nodes.find((n) => n.id === sourceNodeId);
@@ -213,7 +242,11 @@ export function RouteGraph({ context, onDynamicEdgeAdded }: RouteGraphProps) {
         target: targetNodeId,
         type: 'messageEdge',
         data: {
-          outputId: syntheticOutput.id,
+          // Carry the node that performed the send, so this edge is matched the same way a static
+          // one is. Without it the edge would rely on the tracer's routeId agreeing with its source
+          // - which is exactly the drift this edge is being sourced around, leaving it with no
+          // messages at all.
+          outputId: msg.endpointId ?? syntheticOutput.id,
           sourceRouteId,
           sourceInputUri: sourceInputUriVal,
           targetRouteId,
@@ -236,27 +269,22 @@ export function RouteGraph({ context, onDynamicEdgeAdded }: RouteGraphProps) {
 
       return newEdge;
     },
-    [context, nodes, setNodes, setEdges, onDynamicEdgeAdded],
+    [context, routeIdByNodeId, nodes, setNodes, setEdges, onDynamicEdgeAdded],
   );
 
   useEffect(() => {
     const sliced = filteredMessages.slice(0, timelineIndex);
 
-    // Build counts from the full slice
-    const counts = new Map<string, { exchanges: Set<string>; hasError: boolean }>();
+    // First pass: make sure every message in the slice has a matching edge, creating dynamic
+    // ones as needed (this mutates graphEdgesRef.current / React state, so it can't be pure).
     for (const msg of sliced) {
-      let matched = matchMessageToEdge(msg, graphEdgesRef.current);
-      // If no static edge matched, try to create a dynamic one
-      if (!matched) {
-        matched = createDynamicEdge(msg);
-      }
-      if (matched) {
-        const entry = counts.get(matched.id) ?? { exchanges: new Set(), hasError: false };
-        entry.exchanges.add(msg.exchangeId);
-        if (msg.messageType === 'ERROR_RESPONSE') entry.hasError = true;
-        counts.set(matched.id, entry);
+      if (!matchMessageToEdge(msg, graphEdgesRef.current)) {
+        createDynamicEdge(msg);
       }
     }
+
+    // Second pass: pure stats computation now that every message's edge exists.
+    const statsByEdge = computeEdgeStats(sliced, graphEdgesRef.current);
 
     // Detect new messages for flow animation (only when timeline actually changed)
     const newFlows = new Map<string, ActiveFlow[]>();
@@ -285,16 +313,18 @@ export function RouteGraph({ context, onDynamicEdgeAdded }: RouteGraphProps) {
 
     updateEdgeData((currentEdges) =>
       currentEdges.map((e) => {
-        const stats = counts.get(e.id);
-        const count = stats?.exchanges.size ?? 0;
+        const stats = statsByEdge.get(e.id);
         return {
           ...e,
           data: {
             ...e.data!,
-            messageCount: count,
+            messageCount: stats?.messageCount ?? 0,
             hasError: stats?.hasError ?? false,
-            animated: count > 0,
+            animated: (stats?.messageCount ?? 0) > 0,
             activeFlows: newFlows.get(e.id) ?? [],
+            avgTimeTaken: stats?.avgTimeTaken,
+            maxTimeTaken: stats?.maxTimeTaken,
+            retryCount: stats?.retryCount,
           },
         };
       }),

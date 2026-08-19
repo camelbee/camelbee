@@ -49,6 +49,13 @@ public class ExceptionHandler extends RouteBuilder {
     deadLetterChannelBuilder.setDeadLetterUri("direct:error");
     deadLetterChannelBuilder.logHandled(false);
     deadLetterChannelBuilder.useOriginalMessage();
+    /*
+     Retry a failed send twice before handing the exchange to direct:error. CamelBee traces every
+     attempt separately, so one failing exchange shows up as three request/response pairs on the
+     same edge - see the invokeFlakyRoute in MusicianRoute for a route that exercises this.
+     */
+    deadLetterChannelBuilder.maximumRedeliveries(2);
+    deadLetterChannelBuilder.redeliveryDelay(200);
     return deadLetterChannelBuilder;
   }
 

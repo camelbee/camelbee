@@ -26,12 +26,16 @@ import org.camelbee.debugger.service.MessageService;
 import org.camelbee.debugger.service.RouteContextService;
 import org.camelbee.logging.CamelBeeUnitOfWork;
 import org.camelbee.logging.LoggingService;
+import org.camelbee.masking.Masker;
 import org.camelbee.notifier.CamelBeeEventNotifier;
 import org.camelbee.tracers.ExchangeCompletedEventTracer;
 import org.camelbee.tracers.ExchangeCreatedEventTracer;
 import org.camelbee.tracers.ExchangeSendingEventTracer;
 import org.camelbee.tracers.ExchangeSentEventTracer;
+import org.camelbee.tracers.NodeIdInterceptStrategy;
+import org.camelbee.tracers.PollInterceptStrategy;
 import org.camelbee.tracers.TracerService;
+import org.camelbee.utils.ExchangeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,6 +108,16 @@ public final class CamelBee {
 
     final CamelBeeConfig config = CamelBeeConfig.from(camelContext);
 
+    /*
+     Applied before anything can be traced. ExchangeUtils starts out masking with the default keys,
+     so the window before this line is safe rather than open.
+     */
+    ExchangeUtils.configureMasking(
+        config.isMaskingEnabled()
+            ? new Masker(true, Masker.parseKeys(config.getMaskedKeys()))
+            : Masker.disabled(),
+        config.isTracerBodyEnabled());
+
     if (config.isRouteConfigurerEnabled()) {
       camelContext.setStreamCaching(true);
       camelContext.setUseMDCLogging(true);
@@ -125,6 +139,16 @@ public final class CamelBee {
         config.getTracerMaxIdleTime(), createdTracer, sendingTracer, sentTracer, completedTracer, messageService,
         loggingService);
 
+    // Both intercept strategies must be added before the routes are reified, which is why they live
+    // here rather than beside setStreamCaching/setUseMDCLogging above - they need tracerService, which
+    // doesn't exist yet at that point. NodeIdInterceptStrategy uses it to skip its per-node property
+    // work once isActive() is false; PollInterceptStrategy uses it to trace poll()/pollEnrich() hops,
+    // which Camel emits no events for.
+    if (config.isRouteConfigurerEnabled()) {
+      camelContext.getCamelContextExtension().addInterceptStrategy(new NodeIdInterceptStrategy(tracerService));
+      camelContext.getCamelContextExtension().addInterceptStrategy(new PollInterceptStrategy(tracerService));
+    }
+
     if (config.isNotifierEnabled()) {
       camelContext.getManagementStrategy().addEventNotifier(new CamelBeeEventNotifier(tracerService));
     } else {
@@ -137,8 +161,14 @@ public final class CamelBee {
       // when the context is fully started. Guarded so plain-core users without platform-http-main
       // are not forced onto the Vert.x classpath (mirrors the metrics guard below).
       if (isPresent("org.apache.camel.component.platform.http.main.ManagementHttpServer")) {
+        final org.camelbee.security.AuthService authService = config.isAuthEnabled()
+            ? new org.camelbee.security.AuthService(true, config.getAuthUsername(),
+                config.getAuthPassword(), config.getAuthSessionTimeout())
+            : org.camelbee.security.AuthService.disabled();
+
         final org.camelbee.http.CamelBeeHttpEndpoints endpoints = new org.camelbee.http.CamelBeeHttpEndpoints(
-            camelContext, tracerService, messageService, routeContextService);
+            camelContext, tracerService, messageService, routeContextService, authService,
+            config.getCorsAllowedOrigin());
         camelContext.addStartupListener((context, alreadyStarted) -> endpoints.register(context));
       } else {
         LOGGER.warn("CamelBee endpoints not exposed: camel-platform-http-main is not on the classpath. "

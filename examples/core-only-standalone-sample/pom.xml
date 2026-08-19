@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2023 Rahmi Ege Karaosmanoglu
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!--
+  README Option 1 (core as a dependency) for a plain camel-main application, pinned to the OLDEST
+  Camel this core supports.
+
+  Deliberately has NO <parent>. The allcomponent-* samples inherit from a CamelBee starter, which
+  supplies the Camel version, the dependencies and the build plugins - so they cannot detect a
+  problem in the core-as-a-dependency path. This one stands alone the way a real consuming project
+  does, and pins Camel 4.12.0 (the floor: camel-platform-http-main gained ManagementHttpServer in
+  4.12) so an accidental use of newer Camel API in the core fails here.
+
+  Not a demo of CamelBee's features - the allcomponent-* samples are that. This is a wiring test
+  with a README attached.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.camelbee</groupId>
+    <artifactId>core-only-standalone-sample</artifactId>
+    <version>4.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>core-only-standalone-sample</name>
+    <description>Minimal camel-main application using camelbee-standalone-core directly, on the
+        oldest supported Camel</description>
+
+    <properties>
+        <!-- The floor from the README version table. Raising this defeats the point of the module. -->
+        <camel.version>4.12.0</camel.version>
+        <camelbee.version>4.0.0</camelbee.version>
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <logback-classic.version>1.5.13</logback-classic.version>
+        <assertj-core.version>3.27.7</assertj-core.version>
+        <junit-jupiter.version>5.11.4</junit-jupiter.version>
+        <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>3.5.6</maven-surefire-plugin.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- The consumer's own BOM decides every Camel version. CamelBee contributes nothing
+                 here - that is the property this module exists to prove. -->
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-bom</artifactId>
+                <version>${camel.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.camelbee</groupId>
+            <artifactId>camelbee-standalone-core</artifactId>
+            <version>${camelbee.version}</version>
+        </dependency>
+
+        <!-- Required by the core-only path: standalone-core scopes this 'provided' because the
+             starter normally brings it. Without it CamelBee.attach degrades and serves no UI/API. -->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-platform-http-main</artifactId>
+        </dependency>
+
+        <!-- Components used by the demo route -->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-timer</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-direct</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-log</artifactId>
+        </dependency>
+
+        <!-- A backend with a real MDC adapter, which CamelBee's structured logging uses. -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback-classic.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit-jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj-core.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -6,6 +6,7 @@ import {
   extractComponentType,
   extractStaticEndpointsFromOutput,
   outputReferencesInput,
+  stripQuery,
 } from './endpointParser';
 
 /* ------------------------------------------------------------------ */
@@ -18,6 +19,15 @@ export interface RouteNodeData {
   kind: 'consumer' | 'internal' | 'producer' | 'error';
   routeId?: string;
   isCallable?: boolean;
+  /** Route's <description> text, for the hover tooltip (roadmap #1+15). */
+  description?: string;
+  /** Full input URI, for the hover tooltip. */
+  inputUri?: string;
+  /** Full, untruncated URI for a producer (external endpoint) node - the label is truncated. */
+  fullUri?: string;
+  /** Error-handler target input URI, for the hover tooltip. */
+  errorHandler?: string;
+  isRest?: boolean;
   [key: string]: unknown;
 }
 
@@ -39,6 +49,15 @@ export interface MessageEdgeData {
   animated: boolean;
   isErrorHandler: boolean;
   activeFlows: ActiveFlow[];
+  /** Average/max elapsed ms across SENT messages on this edge (roadmap #9). */
+  avgTimeTaken?: number;
+  maxTimeTaken?: number;
+  /**
+   * Number of individual REQUEST attempts on this edge, set only when it exceeds messageCount -
+   * i.e. a redelivery retried the same exchange (roadmap #18). messageCount stays a distinct-
+   * exchange/throughput count; this is the separate "there were retries here" signal.
+   */
+  retryCount?: number;
   [key: string]: unknown;
 }
 
@@ -136,11 +155,20 @@ function truncateLabel(label: string, max = 32): string {
   return label.length > max ? label.substring(0, max) + '…' : label;
 }
 
-/** Build a human-readable label for a route node. */
+/**
+ * Build a human-readable label for a route node.
+ *
+ * Roadmap #1+15 originally preferred the route's `<description>` here, with the id only on
+ * hover. Reverted (2026-08-15, user decision): a truncated description reads as an awkward
+ * prose fragment in a dense graph, and is harder to scan / cross-reference against the route id
+ * used in the Java source than the id itself. The id is now always the label; the description
+ * (when present) still shows in full on hover (see `buildTooltip` in RouteNode.tsx).
+ */
 function routeLabel(route: CamelRoute): string {
   const inputUri = extractInputUri(route.input);
   if (route.rest) return `REST ${route.id}`;
-  // If route ID is auto-generated (e.g. "route1", "route2"), use the input URI
+  // If route ID is auto-generated (e.g. "route1", "route2"), use the input URI instead - it's
+  // more identifying than a meaningless generated id.
   if (/^route\d+$/i.test(route.id)) return truncateLabel(inputUri);
   return truncateLabel(route.id);
 }
@@ -161,6 +189,16 @@ export function buildRouteGraph(context: CamelBeeContext): {
 
   for (const r of context.routes) {
     routeById.set(r.id, r);
+  }
+
+  /** Every route input URI, query-stripped and lowercased, for "is this endpoint a route?" checks. */
+  const routeInputUris = new Set(
+    context.routes.map((r) => stripQuery(extractInputUri(r.input)).toLowerCase()),
+  );
+
+  /** True when some route consumes this URI, i.e. step 1 has already drawn an edge to it. */
+  function isConsumedByRoute(uri: string): boolean {
+    return routeInputUris.has(stripQuery(uri).toLowerCase());
   }
 
   /* -- Node / Edge creation helpers -- */
@@ -187,6 +225,10 @@ export function buildRouteGraph(context: CamelBeeContext): {
         kind,
         routeId: route.id,
         isCallable: kind === 'consumer',
+        description: route.routeDescription ?? undefined,
+        inputUri,
+        errorHandler: route.errorHandler ?? undefined,
+        isRest: route.rest,
       },
     });
     return nodeId;
@@ -205,6 +247,7 @@ export function buildRouteGraph(context: CamelBeeContext): {
         label: truncateLabel(uri),
         componentType: extractComponentType(uri),
         kind: 'producer',
+        fullUri: uri,
       },
     });
     return nodeId;
@@ -283,10 +326,15 @@ export function buildRouteGraph(context: CamelBeeContext): {
         }
       }
 
-      // Step 2: Extract external endpoints
-      const externalEndpoints = extractStaticEndpointsFromOutput(output);
-      if (externalEndpoints) {
-        for (const uri of externalEndpoints) {
+      // Step 2: Everything the output targets that is NOT a route drawn by step 1 becomes a
+      // producer node. That covers external endpoints (kafka:, http:, mock:, log:, file:) and
+      // also internal direct:/seda: endpoints that no route consumes - a to("seda:x") drained
+      // only by poll()/pollEnrich() has no From[seda:x] to link to, and would otherwise vanish
+      // from the graph along with every message traced on it.
+      const targets = extractStaticEndpointsFromOutput(output, true);
+      if (targets) {
+        for (const uri of targets) {
+          if (isConsumedByRoute(uri)) continue;
           const producerNodeId = addProducerNode(uri);
           addEdge(sourceNodeId, producerNodeId, output, route.id, undefined, uri);
         }
@@ -402,4 +450,22 @@ export function buildRouteGraph(context: CamelBeeContext): {
   }
 
   return { nodes, edges };
+}
+
+/**
+ * Maps each route id to the component type of the endpoint it consumes from - `timer`, `rest`,
+ * `jms`, `file` and so on.
+ *
+ * Built from the same graph nodes the topology renders, so the label a route carries in the
+ * waterfall is by construction the one shown on its node. Deriving it separately from the route's
+ * input URI would be a second implementation of `extractComponentType`'s edge cases (rest verbs,
+ * dynamic endpoints) and the two would drift.
+ */
+export function buildRouteTypeIndex(nodes: RouteNode[]): Map<string, string> {
+  const index = new Map<string, string>();
+  for (const node of nodes) {
+    const { routeId, componentType } = node.data;
+    if (routeId && componentType) index.set(routeId, componentType);
+  }
+  return index;
 }

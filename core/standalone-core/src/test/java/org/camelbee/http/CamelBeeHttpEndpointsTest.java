@@ -37,6 +37,7 @@ import org.camelbee.constants.CamelBeeConstants;
 import org.camelbee.debugger.model.exchange.MessageListInfo;
 import org.camelbee.debugger.model.exchange.MessageListWithInfo;
 import org.camelbee.debugger.model.route.CamelRoute;
+import org.camelbee.debugger.model.route.CamelRouteOutput;
 import org.camelbee.debugger.service.MessageService;
 import org.camelbee.debugger.service.RouteContextService;
 import org.camelbee.tracers.TracerService;
@@ -113,6 +114,34 @@ class CamelBeeHttpEndpointsTest {
     assertTrue(json.contains("route1"), json);
     assertTrue(json.contains("4.20.0"), json);
     assertTrue(json.contains("Test Vendor - 21.0.1"), json);
+  }
+
+  /**
+   * The single {@code getRoutes} test above already covers {@code outputs=null}; this one proves
+   * the opposite edge - a nested output (an EIP like {@code choice} carrying its own child outputs)
+   * survives Jackson serialization, not just the flat top-level fields.
+   */
+  @Test
+  void getRoutesShouldSerializeNestedOutputs() {
+    List<CamelRouteOutput> nestedOutputs = List.of(
+        new CamelRouteOutput("nested1", "Nested Output 1", ",", "log", null));
+    List<CamelRouteOutput> outputs = List.of(
+        new CamelRouteOutput("output1", "First Output", "|", "direct", nestedOutputs));
+    List<CamelRoute> routes = List.of(
+        new CamelRoute("route1", "direct:start1", outputs, false, "direct:err1"));
+    when(routeContextService.getCamelRoutes()).thenReturn(routes);
+    when(camelContext.getName()).thenReturn("TestContext");
+    when(camelContext.getVersion()).thenReturn("4.20.0");
+    stubResponseChain();
+
+    endpoints.getRoutes(routingContext);
+
+    ArgumentCaptor<String> body = ArgumentCaptor.forClass(String.class);
+    verify(response).end(body.capture());
+    String json = body.getValue();
+    assertTrue(json.contains("output1"), json);
+    assertTrue(json.contains("nested1"), json);
+    assertTrue(json.contains("Nested Output 1"), json);
   }
 
   @Test
@@ -214,5 +243,62 @@ class CamelBeeHttpEndpointsTest {
     when(camelContext.hasService(ManagementHttpServer.class)).thenReturn(null);
 
     assertDoesNotThrow(() -> endpoints.register(camelContext));
+  }
+
+  /**
+   * The UI is a BrowserRouter with basename "/camelbee", so its pages are real paths that no file
+   * backs. Without a fallback, reloading or bookmarking anything but the root 404s even though the
+   * same page reached by clicking works - which is how this was found.
+   */
+  @Test
+  void spaFallbackShouldServeIndexForAUiRoute() {
+    when(routingContext.request()).thenReturn(request);
+    when(request.path()).thenReturn("/camelbee/settings");
+    when(request.getHeader("Accept")).thenReturn("text/html,application/xhtml+xml");
+
+    endpoints.spaFallback(routingContext);
+
+    verify(routingContext).reroute("/camelbee/index.html");
+    verify(routingContext, never()).next();
+  }
+
+  @Test
+  void spaFallbackShouldLeaveAMissingAssetAs404() {
+    // returning HTML for a missing .js turns a broken asset into a parse error somewhere else.
+    // No Accept stub: the path rule rejects a file request before the header is ever consulted,
+    // which is deliberate - a browser navigating and an <script src> both send text/html-ish
+    // Accept values, so the extension is what has to decide here.
+    when(routingContext.request()).thenReturn(request);
+    when(request.path()).thenReturn("/camelbee/assets/main.js");
+
+    endpoints.spaFallback(routingContext);
+
+    verify(routingContext, never()).reroute(anyString());
+    verify(routingContext).next();
+  }
+
+  @Test
+  void spaFallbackShouldIgnoreNonNavigationRequests() {
+    // an XHR that 404s must stay a 404; the caller is code, and it cannot use a page of HTML
+    when(routingContext.request()).thenReturn(request);
+    when(request.path()).thenReturn("/camelbee/whatever");
+    when(request.getHeader("Accept")).thenReturn("application/json");
+
+    endpoints.spaFallback(routingContext);
+
+    verify(routingContext, never()).reroute(anyString());
+    verify(routingContext).next();
+  }
+
+  @Test
+  void spaFallbackShouldIgnoreARequestWithNoAcceptHeader() {
+    when(routingContext.request()).thenReturn(request);
+    when(request.path()).thenReturn("/camelbee/settings");
+    when(request.getHeader("Accept")).thenReturn(null);
+
+    endpoints.spaFallback(routingContext);
+
+    verify(routingContext, never()).reroute(anyString());
+    verify(routingContext).next();
   }
 }

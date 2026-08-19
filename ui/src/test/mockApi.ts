@@ -11,10 +11,13 @@ export function installApiMock() {
       ok: true,
       status: 200,
       statusText: 'OK',
-      headers: { get: () => contentType },
+      headers: { get: (name: string) => (name.toLowerCase() === 'content-type' ? contentType : null) },
       text: () => Promise.resolve(typeof body === 'string' ? body : JSON.stringify(body)),
     });
 
+    // Answered before anything else: AuthGate asks this on mount, and until it resolves the app
+    // renders nothing at all.
+    if (url.startsWith('/camelbee/auth/status')) return respond({ authEnabled: false });
     if (url.startsWith('/camelbee/routes')) return respond(routesFixture);
     if (url.startsWith('/camelbee/messages')) {
       return respond({ messages: [], info: { count: 0, resetVersion: 0, addVersion: 0, lastModified: '0', lastResetTime: '0' } });
