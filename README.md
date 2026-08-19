@@ -1,20 +1,37 @@
-# CamelBee - Apache Camel Library for Microservices Monitoring and Debugging
+# CamelBee — Apache Camel monitoring and debugging, embedded in your application
 
-CamelBee java core libraries are engineered to extract the architecture of Camel Routes, pinpoint endpoints, and map out the interconnections among them
-to visualize the topology within the **embedded CamelBee UI** served directly from your application.
+CamelBee asks the running application what its Camel routes are — every endpoint, and how they connect —
+and draws it as a live topology in an **embedded UI, served from your application's own HTTP port**. Arm
+the tracer from that UI and the traffic becomes visible too: messages animate along the graph, every hop
+lands as a bar in a latency waterfall, and each request and response is there to read.
+
+One dependency. No agent, no collector, no external service — and tracing is armed and disarmed from the
+UI, without a redeploy. Works on **Quarkus**, **Spring Boot**, **Camel K** and **standalone Camel**, on
+your laptop and in SIT, UAT or a pod in the cluster.
+
+> **On Spring Boot or Quarkus, but not using Camel?** Your service almost certainly still does
+> integration work — REST clients, scheduled jobs, queue listeners, retries, mappers — spread across
+> classes with no picture of how they fit together, and nothing to show what actually flowed through them
+> last Tuesday. Written as Camel routes with CamelBee added, that same logic reports its own topology and
+> lets you replay any request hop by hop, in the environment where it broke, without standing up a
+> tracing backend first. Camel is the routing engine; CamelBee is what makes it something you can see.
 
 ![Debugger Page](images/debugger_page.png)
 
 ## Why
 
-Integrations are increasingly written by AI agents, and a whole one now arrives in a single commit.
-Reading it line by line tells you what the code *says*; it does not tell you what actually crossed
-each route boundary, which endpoint was really called, or what your service sent to its backends.
+Integrations are increasingly written by AI agents, and a whole one now arrives in a single commit —
+code you did not write, in a codebase you are still expected to own. Reading it line by line tells you
+what the code *says*, and slowly: it does not tell you what actually crossed each route boundary, which
+endpoint was really called, or what your service sent to its backends. Closing that cognitive gap by
+reading is the slow path.
 
-That is the gap CamelBee fills. Instead of reviewing route definitions, you watch the topology the
-running application reports, follow one request through every hop it spawned, and read the request
-and response of each backend call — with the timing of each. The same applies to inherited routes,
-where nobody left is sure what the flow does either.
+CamelBee closes it a different way. You look at the topology the running application reports and see how
+everything is wired at once. Then you ask the agent to trigger a scenario — and watch the messages flow
+through it: each hop as a bar in the waterfall, in the order it happened, with the request and response
+of every backend call and the time each one took. A few scenarios later you know what the integration
+does, far sooner than reading it would have told you. The same applies to inherited routes, where nobody
+left is sure what the flow does either.
 
 And because it is served from the application's own HTTP port, you can do this where it matters —
 SIT, UAT, a pod in the cluster — not only on a laptop. Tracing starts off, is armed from the UI
@@ -46,11 +63,34 @@ so it is safe to leave in place.
 
 ![Latency Waterfall](images/debugger_waterfall.png)
 
+Selecting a connection on the topology highlights its bars, and selecting a bar selects the
+connection — the two views stay in step.
+
+![Waterfall linked to the topology](images/debugger_waterfall_linked.png)
+
+Retries show up before you open anything. The amber `↻` badge on a connection counts the
+**attempts**, while the message count beside it stays at 1 — one exchange, delivered three
+times. Here `invokeFlakyRoute → flakyTargetRoute` reads `1` and `↻3`, with the failed
+attempts drawn as red edges and the one that finally succeeded in green.
+
+![Retry count on the topology](images/debugger_retry_badge.png)
+
+The waterfall then shows what those attempts cost. `direct://invokeFlaky` is a wide 416ms
+bar sitting above three near-instant attempts on `direct://flakyTarget` — two red, then a
+blue one that succeeds. The parent was not working for 416ms; it was waiting out two
+redelivery delays. `direct://invokeAlwaysFailsDlq` shows the other ending: retries
+exhausted, then the `direct://deadLetter` tail. Both flows were started by a timer, so
+there was no caller for the failure to be reported to.
+
+![Retries and dead-lettering in the waterfall](images/debugger_retries.png)
+
 ### Safe to Run Outside Development
 - Tracing starts **off** and disarms itself after a configurable period of inactivity, so it cannot be left running by accident.
 - Sensitive values in headers and bodies are **redacted by default** — passwords, tokens, API keys, card numbers and more — with a configurable key list.
 - Bodies can be excluded from capture entirely when even best-effort redaction is not enough.
 - Trace a **single transaction** in a busy application: give CamelBee an order id or correlation id and it records only the flow containing it, along with the branches that flow spawns. Everything else is never recorded at all.
+
+![Trace a single transaction](images/debugger_capture_filter.png)
 
 ### Health Monitoring
 - View the health status of your microservice at a glance with the built-in health panel, showing context name, framework version, Camel version, JVM, and garbage collector information.
@@ -62,8 +102,6 @@ so it is safe to leave in place.
 - Monitor Camel microservices with essential metrics and variables, ensuring the health and performance of your application.
 - Browse all available metrics in a detailed modal view, or filter metrics by keyword to quickly find the data you need.
 - Visualize route exchange counts and traffic flow across your topology.
-
-![All Metrics](images/metrics_all_metrics.png)
 
 ![Filtered Metrics](images/metrics_filtered_metrics.png)
 
@@ -777,6 +815,8 @@ on your application's own port for Quarkus and Spring Boot, and on the camel-mai
 
 **Since 4.0 those endpoints require a login by default.** `camelbee.auth-enabled` defaults to `true`,
 and nothing is readable without a token.
+
+![Login screen](images/login_screen.png)
 
 That default exists because the API is not read-only. `GET /camelbee/routes` returns the full route
 topology including internal hostnames and queue names; `POST /camelbee/tracer/status` **turns tracing

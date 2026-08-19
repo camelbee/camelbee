@@ -39,6 +39,11 @@
         <jacoco.line.coverage.minimum>0.00</jacoco.line.coverage.minimum>
         <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
         <camel-maven-plugin.version>4.22.0</camel-maven-plugin.version>
+        <!-- Version of io.camelbee:common unpacked for the shared checkstyle/spotbugs/formatter
+             configs. MUST stay a literal, not ${project.version}: this pom is also the inherited
+             grandparent of every generated microservice, where ${project.version} is the user's
+             own version (e.g. 1.0-SNAPSHOT) and the unpack fails. Bump with each release. -->
+        <camelbee.version>4.0.0</camelbee.version>
         <checkstyle.version>13.10.0</checkstyle.version>
         <commons-io.version>2.22.0</commons-io.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
@@ -305,10 +310,7 @@
                                 <artifactItem>
                                     <groupId>io.camelbee</groupId>
                                     <artifactId>common</artifactId>
-                                    <!-- Same reactor, released together, and versions:set does not
-                                         rewrite plugin configuration - so track the project version
-                                         rather than leaving a literal to go stale at each bump. -->
-                                    <version>${project.version}</version>
+                                    <version>${camelbee.version}</version>
                                     <type>jar</type>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
                                     <includes>config/**, formatter/**</includes>

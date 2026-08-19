@@ -41,3 +41,5 @@ target-camelk/
 # Camel file-component working directories created by the samples and their tests
 inputdir/
 outputdir/
+
+screenshot-demo/
