@@ -79,7 +79,13 @@ public class RouteContextService {
   /** How {{...}} placeholders are resolved; supplied per runtime. See {@link PropertyResolver}. */
   private final PropertyResolver propertyResolver;
 
-  private List<CamelRoute> routes;
+  /**
+   * Cached topology. Populated only once the CamelContext has started — see
+   * {@link #getCamelRoutes()}. Volatile because it is written from whichever thread asks
+   * first (an HTTP worker serving /camelbee/routes) and read from Camel's routing threads
+   * via the tracer.
+   */
+  private volatile List<CamelRoute> routes;
 
   public RouteContextService(CamelContext camelContext) {
     this(camelContext, PropertyResolver.fromCamelContext(camelContext));
@@ -99,14 +105,38 @@ public class RouteContextService {
   /**
    * Returns CamelRoutes.
    *
+   * <p>The result is cached, because the tracer asks for it per exchange. It is only cached
+   * once the CamelContext reports started, though: the HTTP layer can be serving requests
+   * while Camel is still starting, and a call landing in that window would otherwise pin an
+   * empty — or half-built — topology for the life of the process. That is not hypothetical;
+   * a readiness probe polling /camelbee/routes during startup left the UI drawing a blank
+   * canvas until the application was restarted. While the context is still coming up the
+   * topology is rebuilt on each call and nothing is retained.
+   *
    * @return route list with the links.
    */
   public List<CamelRoute> getCamelRoutes() {
 
-    if (routes != null) {
-      return routes;
+    List<CamelRoute> cached = routes;
+    if (cached != null) {
+      return cached;
     }
-    routes = new ArrayList<>();
+
+    List<CamelRoute> collectedRoutes = buildCamelRoutes();
+
+    if (camelContext.getStatus().isStarted()) {
+      routes = collectedRoutes;
+    } else {
+      LOGGER.debug("CamelContext is not started yet ({}); serving the topology without caching it.",
+          camelContext.getStatus());
+    }
+
+    return collectedRoutes;
+  }
+
+  private List<CamelRoute> buildCamelRoutes() {
+
+    List<CamelRoute> collected = new ArrayList<>();
 
     List<CamelRoute> restRoutes = new ArrayList<>();
 
@@ -115,6 +145,12 @@ public class RouteContextService {
 
       RouteDefinition routeDefinition = ((ModelCamelContext) camelContext)
           .getRouteDefinition(routeId);
+
+      if (routeDefinition == null) {
+        // Can happen while the context is still starting: the Route exists but its
+        // definition is not registered on the model yet. Skip it; this call is not cached.
+        continue;
+      }
 
       List<CamelRouteOutput> outputs = new ArrayList<>();
 
@@ -135,7 +171,7 @@ public class RouteContextService {
       if (isRestApiRoute) {
         restRoutes.add(metaRoute);
       } else {
-        routes.add(metaRoute);
+        collected.add(metaRoute);
       }
 
     }
@@ -144,9 +180,9 @@ public class RouteContextService {
      directly from the rest-openapi route,
      this is not done by camel anymore if you use rest-openapi with a yaml file.
      */
-    adjustRestInputRoutes(restRoutes, routes);
+    adjustRestInputRoutes(restRoutes, collected);
 
-    return routes;
+    return collected;
   }
 
   private void extractOutputs(List<ProcessorDefinition<?>> outputss,

@@ -285,4 +285,43 @@ class RouteContextServiceTest {
         .filteredOn(o -> o.getType().equals("org.apache.camel.model.DynamicRouterDefinition"))
         .hasSize(1);
   }
+
+  /**
+   * A readiness probe hitting /camelbee/routes while Camel is still starting used to pin an empty
+   * topology into the cache for the life of the process — the UI then drew a blank canvas and only
+   * a restart fixed it. Nothing is cached until the context reports started.
+   */
+  @Test
+  void getCamelRoutes_doesNotCacheWhileTheContextIsStillStarting() throws Exception {
+    DefaultCamelContext startingContext = new DefaultCamelContext();
+    RouteContextService earlyService = new RouteContextService(startingContext);
+
+    // Asked before the context is up: no routes to report, and crucially not remembered.
+    assertThat(earlyService.getCamelRoutes()).isEmpty();
+
+    startingContext.addRoutes(new RouteBuilder() {
+
+      @Override
+      public void configure() {
+        from("direct:late").routeId("lateRoute").to("mock:late");
+      }
+    });
+    startingContext.start();
+
+    try {
+      assertThat(earlyService.getCamelRoutes())
+          .extracting(CamelRoute::getId)
+          .containsExactly("lateRoute");
+    } finally {
+      startingContext.stop();
+    }
+  }
+
+  /**
+   * Once started the topology is cached, because the tracer asks for it per exchange.
+   */
+  @Test
+  void getCamelRoutes_cachesOnceTheContextIsStarted() {
+    assertThat(service.getCamelRoutes()).isSameAs(service.getCamelRoutes());
+  }
 }
