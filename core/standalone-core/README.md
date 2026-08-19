@@ -243,7 +243,7 @@ That default exists because the API is not read-only:
 | Endpoint | What it gives away, or does |
 | --- | --- |
 | `GET /camelbee/routes` | The complete route topology: route ids, EIP structure and every endpoint URI — including hostnames and queue names. Credentials inside a URI are redacted. |
-| `POST /camelbee/tracer/status` | **Turns tracing on.** Without a gate, a caller does not have to wait for someone else to start a session — they can arm capture themselves and then read the traffic. |
+| `POST /camelbee/tracer/status` | **Turns tracing on.** Without a gate, a caller does not have to wait for someone else to start a session — they can enable capture themselves and then read the traffic. |
 | `GET /camelbee/messages` | Every captured message — bodies, headers, timings and exception text — subject to redaction. |
 | `DELETE /camelbee/messages` | Discards the collected trace. |
 

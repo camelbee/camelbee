@@ -16,14 +16,17 @@
 
 package org.camelbee.debugger.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.camel.CamelContext;
@@ -63,7 +66,40 @@ import org.yaml.snakeyaml.constructor.SafeConstructor;
 public class RouteContextService {
 
   public static final String OPENAPI_OPERATIONID = "operationId";
-  public static final String REST_OPENAPI_COMPONENT = "rest-openapi://";
+
+  /**
+   * The scheme of Camel's rest-openapi component. Matched as a prefix, not searched for anywhere in
+   * the URI: the location that follows it may be spelled {@code openapi.json}, {@code //openapi.json},
+   * {@code ///openapi.json} or {@code classpath:openapi.json}, and all of them must be recognized.
+   */
+  public static final String REST_OPENAPI_COMPONENT = "rest-openapi:";
+
+  /** Component a rest-openapi consumer dispatches its operations to unless the endpoint overrides it. */
+  private static final String DEFAULT_CONSUMER_COMPONENT = "direct";
+
+  private static final String CLASSPATH_PREFIX = "classpath:";
+
+  private static final String FILE_PREFIX = "file:";
+
+  /**
+   * The keys of an OpenAPI path item that are operations. The others - {@code summary},
+   * {@code description}, {@code parameters}, {@code servers}, {@code $ref} - are not, and are not
+   * shaped like one either.
+   */
+  private static final Set<String> OPENAPI_HTTP_METHODS = Set.of("get", "put", "post", "delete", "options", "head", "patch", "trace");
+
+  private static final Pattern CONSUMER_COMPONENT_PATTERN = Pattern.compile("[?&]consumerComponentName=([^&]*)");
+
+  /** {@code scheme://host} and {@code scheme:host} address the same endpoint; see {@link #normalizeRouteInput}. */
+  private static final Pattern AUTHORITY_SEPARATOR_PATTERN = Pattern.compile(":/{2,}");
+
+  /** A path like {@code /C:/specs/openapi.json}, which only Windows produces and only Windows rejects. */
+  private static final Pattern WINDOWS_DRIVE_PATTERN = Pattern.compile("^/[A-Za-z]:");
+
+  private static final Pattern LEADING_SLASHES_PATTERN = Pattern.compile("^/{2,}");
+
+  /** Reused: an ObjectMapper is expensive to build and this one is only ever asked to read. */
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\{\\{(.*?)}}");
 
@@ -303,106 +339,322 @@ public class RouteContextService {
 
   /**
    * Normalize a route's {@code From[...]} input string for REST-input matching: strip query
-   * strings (common on direct:/seda: inputs, e.g. {@code bridgeErrorHandler}) and lowercase, so a
-   * real route's input matches the query-param-free synthetic input built from an OpenAPI
-   * operationId. Recipe format is not case-guaranteed across Camel versions, hence the
-   * case-insensitive comparison.
+   * strings (common on direct:/seda: inputs, e.g. {@code bridgeErrorHandler}), collapse the
+   * {@code ://} authority separator and lowercase, so a real route's input matches the
+   * query-param-free synthetic input built from an OpenAPI operationId. Recipe format is not
+   * case-guaranteed across Camel versions, hence the case-insensitive comparison.
+   *
+   * <p>{@code from("direct://getWidgets")} and {@code from("direct:getWidgets")} are the same route
+   * to Camel, which stores whichever spelling was authored. The synthetic input is always built with
+   * a single colon, so without this the double-slash spelling of a handler route silently failed to
+   * be flagged as REST. This is only ever a comparison key - nothing displayed is normalized.
    */
   static String normalizeRouteInput(String input) {
     if (input == null) {
       return null;
     }
-    return QUERY_STRING_IN_BRACKETS_PATTERN.matcher(input).replaceAll("").toLowerCase();
+    String withoutQuery = QUERY_STRING_IN_BRACKETS_PATTERN.matcher(input).replaceAll("");
+    return AUTHORITY_SEPARATOR_PATTERN.matcher(withoutQuery).replaceAll(":").toLowerCase();
   }
 
-  private boolean checkRestOpenApiRouteDefinition(RouteDefinition routeDefinition, List<CamelRouteOutput> outputs) {
+  /**
+   * Detects a {@code rest-openapi} consumer route and, when it is one, synthesizes the edges Camel
+   * resolves at runtime but never records in the route model.
+   *
+   * <p>A contract-first route is written as {@code from("rest-openapi:openapi.yaml")}: the component
+   * reads the spec and dispatches each operation to {@code direct:<operationId>}. None of that
+   * dispatch reaches the RouteDefinition - its output list is empty - so without this step the REST
+   * route is drawn as a dead end and every handler route as an orphan. The spec is therefore parsed
+   * here and one synthetic output added per operationId, which {@link #adjustRestInputRoutes} then
+   * matches against the real routes to flag them as REST.
+   *
+   * <p>Returning true takes the route out of the topology (see {@link #buildCamelRoutes()}): it only
+   * exists to carry the synthetic outputs. That happens only when operations were actually found - a
+   * spec that cannot be read leaves the route in the graph, unlinked but visible, rather than making
+   * it vanish on nothing but a WARN.
+   *
+   * <p>Known limitation: operations declaring no {@code operationId} are skipped. Camel generates one
+   * for those, but the generated form is an internal detail of Camel's processor strategy and no
+   * hand-written {@code from("direct:...")} could match it anyway.
+   *
+   * @param routeDefinition the route whose input is inspected.
+   * @param outputs         the output list the synthetic edges are appended to.
+   * @return true when this is a rest-openapi route whose spec yielded at least one operation.
+   */
+  boolean checkRestOpenApiRouteDefinition(RouteDefinition routeDefinition, List<CamelRouteOutput> outputs) {
+
     String inputUri = routeDefinition.getInput() != null ? routeDefinition.getInput().getUri() : null;
 
-    if (inputUri != null && inputUri.contains(REST_OPENAPI_COMPONENT)) {
+    String specPath = extractOpenApiSpecPath(inputUri);
 
-      int startIndex = inputUri.indexOf(REST_OPENAPI_COMPONENT) + REST_OPENAPI_COMPONENT.length();
-
-      int endIndex = inputUri.indexOf("?", startIndex);
-      if (endIndex == -1) {
-        endIndex = inputUri.length();
-      }
-
-      String openApiPath = inputUri.substring(startIndex, endIndex);
-      List<String> operationIds = null;
-
-      if (openApiPath.endsWith(".json")) {
-        operationIds = readOperationIdsFromJson(openApiPath);
-      } else if (openApiPath.endsWith(".yml") || openApiPath.endsWith(".yaml")) {
-        operationIds = readOperationIdsFromYaml(openApiPath);
-      } else {
-        LOGGER.warn("Unknown file type for the OpenAPI spec: {}", openApiPath);
-        return false;
-      }
-
-      operationIds.forEach(p -> outputs.add(new CamelRouteOutput("", "From[direct:" + p + "]", null, null, null)));
-
-      return true;
+    if (specPath == null) {
+      return false;
     }
 
-    return false;
+    List<String> operationIds = readOperationIds(specPath);
 
+    if (operationIds.isEmpty()) {
+      LOGGER.warn("No OpenApi operations read from {}: publishing route {} without its generated edges.",
+          specPath, routeDefinition.getId());
+      return false;
+    }
+
+    String component = resolveConsumerComponent(inputUri);
+
+    operationIds.forEach(p -> outputs.add(new CamelRouteOutput("", "From[" + component + ":" + p + "]", null, null, null)));
+
+    return true;
   }
 
-  private List<String> readOperationIdsFromYaml(String openApiPath) {
+  /**
+   * Extracts the OpenAPI spec location from a {@code rest-openapi} route input, or null if the input
+   * is not such a route.
+   *
+   * <p>Camel keeps the URI exactly as authored in the route model - it is not normalized on start -
+   * so every spelling the DSL accepts has to be handled here: {@code rest-openapi:openapi.json},
+   * {@code rest-openapi://openapi.yaml}, {@code rest-openapi:///openapi.json} and
+   * {@code rest-openapi:classpath:my-api.yaml} all name the same kind of resource. Matching on the
+   * scheme prefix rather than searching for {@code rest-openapi://} anywhere in the string is what
+   * makes the single-colon form - the one used throughout Camel's own documentation - work.
+   *
+   * @param inputUri the raw {@code from()} URI of the route.
+   * @return the spec location with the scheme and any query string removed, or null.
+   */
+  static String extractOpenApiSpecPath(String inputUri) {
 
-    List<String> operationIds = new ArrayList<>();
+    if (inputUri == null) {
+      return null;
+    }
+
+    String uri = inputUri.trim();
+
+    if (!startsWithIgnoreCase(uri, REST_OPENAPI_COMPONENT)) {
+      return null;
+    }
+
+    String path = uri.substring(REST_OPENAPI_COMPONENT.length());
+
+    int queryIndex = path.indexOf('?');
+    if (queryIndex >= 0) {
+      path = path.substring(0, queryIndex);
+    }
+
+    // "//" is the authority separator, not part of the location: rest-openapi:///x.json means x.json.
+    if (path.startsWith("//")) {
+      path = path.substring(2);
+    }
+
+    path = path.trim();
+
+    return path.isEmpty() ? null : path;
+  }
+
+  /**
+   * Returns the component the rest-openapi consumer routes its operations to: {@code direct} unless
+   * the endpoint overrides it with {@code consumerComponentName}. A component-level override is not
+   * visible in the URI and is therefore not honoured here.
+   *
+   * @param inputUri the raw {@code from()} URI of the route.
+   * @return the component name to build the synthetic {@code From[component:operationId]} edges with.
+   */
+  private String resolveConsumerComponent(String inputUri) {
+
+    Matcher matcher = CONSUMER_COMPONENT_PATTERN.matcher(inputUri);
+
+    if (!matcher.find()) {
+      return DEFAULT_CONSUMER_COMPONENT;
+    }
+
+    String component = resolvePlaceholders(matcher.group(1)).trim();
+
+    return component.isEmpty() ? DEFAULT_CONSUMER_COMPONENT : component;
+  }
+
+  /**
+   * Reads the operationIds declared in an OpenAPI spec.
+   *
+   * <p>Never throws: a spec that is missing, remote, malformed or of an unknown type yields an empty
+   * list and a warning. The topology is built for every route in one pass, so an exception escaping
+   * here would fail the whole {@code /camelbee/routes} call over one unreadable file.
+   *
+   * @param specPath the spec location as returned by {@link #extractOpenApiSpecPath(String)}.
+   * @return the declared operationIds in document order, without duplicates; never null.
+   */
+  List<String> readOperationIds(String specPath) {
+
+    String lowerCasePath = specPath.toLowerCase();
+    boolean json = lowerCasePath.endsWith(".json");
+    boolean yaml = lowerCasePath.endsWith(".yaml") || lowerCasePath.endsWith(".yml");
+
+    if (!json && !yaml) {
+      LOGGER.warn("Unknown file type for the OpenAPI spec: {}", specPath);
+      return List.of();
+    }
+
+    try (InputStream inputStream = openSpecification(specPath)) {
+
+      if (inputStream == null) {
+        LOGGER.warn("Could not find the OpenApi spec: {}", specPath);
+        return List.of();
+      }
+
+      return json ? readOperationIdsFromJson(inputStream) : readOperationIdsFromYaml(inputStream);
+
+    } catch (Exception e) {
+      LOGGER.warn("Could not read the OpenApi spec: {} with exception: {}", specPath, e.toString());
+      return List.of();
+    }
+  }
+
+  /**
+   * Opens an OpenAPI spec the way the rest-openapi component resolves it: from the classpath by
+   * default, from disk for a {@code file:} location or a path that exists there, and not at all for
+   * a remote one - fetching a URL while the topology is being built would block a request thread on
+   * a third party.
+   *
+   * @param specPath the spec location.
+   * @return the stream, or null when the spec cannot be located.
+   * @throws IOException if a file that exists cannot be opened.
+   */
+  private InputStream openSpecification(String specPath) throws IOException {
+
+    if (startsWithIgnoreCase(specPath, "http://") || startsWithIgnoreCase(specPath, "https://")) {
+      LOGGER.warn("Remote OpenApi specs are not read for the topology: {}", specPath);
+      return null;
+    }
+
+    if (startsWithIgnoreCase(specPath, FILE_PREFIX)) {
+      return Files.newInputStream(Path.of(toFilePath(specPath)));
+    }
+
+    String path = startsWithIgnoreCase(specPath, CLASSPATH_PREFIX)
+        ? specPath.substring(CLASSPATH_PREFIX.length()) : specPath;
+
+    /*
+     ClassLoader.getResourceAsStream - unlike Class.getResourceAsStream - does not accept a leading
+     slash and returns null for one, which is exactly what rest-openapi:///openapi.json produces.
+     */
+    InputStream inputStream = classpathResource(path.startsWith("/") ? path.substring(1) : path);
+
+    if (inputStream != null) {
+      LOGGER.debug("Read the OpenApi spec {} from the classpath.", specPath);
+      return inputStream;
+    }
+
+    Path onDisk = Path.of(path);
+
+    if (!Files.isRegularFile(onDisk)) {
+      return null;
+    }
+
+    // Logged, not silent: a relative path that misses the classpath resolves against the working
+    // directory, and reading a same-named file that happens to sit there should be visible.
+    LOGGER.info("OpenApi spec {} is not on the classpath; reading it from {}.", specPath, onDisk.toAbsolutePath());
+
+    return Files.newInputStream(onDisk);
+  }
+
+  /**
+   * Turns a {@code file:} location into a filesystem path. {@code file:/x}, {@code file://x} and
+   * {@code file:///x} all denote the same file, so the leading slashes are collapsed - except on a
+   * Windows drive letter, where {@code file:///C:/spec.json} would collapse to {@code /C:/spec.json}
+   * and no longer be a path Windows accepts.
+   *
+   * @param fileLocation a location starting with {@code file:}.
+   * @return the filesystem path it denotes.
+   */
+  static String toFilePath(String fileLocation) {
+
+    String filePath = LEADING_SLASHES_PATTERN.matcher(fileLocation.substring(FILE_PREFIX.length())).replaceFirst("/");
+
+    return WINDOWS_DRIVE_PATTERN.matcher(filePath).find() ? filePath.substring(1) : filePath;
+  }
+
+  private static InputStream classpathResource(String resource) {
+
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+
+    InputStream inputStream = contextClassLoader != null ? contextClassLoader.getResourceAsStream(resource) : null;
+
+    return inputStream != null ? inputStream : RouteContextService.class.getClassLoader().getResourceAsStream(resource);
+  }
+
+  private static boolean startsWithIgnoreCase(String value, String prefix) {
+    return value.regionMatches(true, 0, prefix, 0, prefix.length());
+  }
+
+  private List<String> readOperationIdsFromYaml(InputStream inputStream) {
 
     Yaml yaml = new Yaml(new SafeConstructor(new LoaderOptions()));
 
-    try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(openApiPath)) {
+    Object specification = yaml.load(inputStream);
 
-      Map<String, Object> data = yaml.load(inputStream);
-
-      Map<String, Map<String, Map<String, Object>>> paths = (Map<String, Map<String, Map<String, Object>>>) data.get("paths");
-
-      for (Map<String, Map<String, Object>> methods : paths.values()) {
-        for (Map<String, Object> methodData : methods.values()) {
-          if (methodData.containsKey(OPENAPI_OPERATIONID)) {
-            operationIds.add(methodData.get(OPENAPI_OPERATIONID).toString());
-          }
-        }
-      }
-
-    } catch (Exception e) {
-      LOGGER.warn("Could not read the OpenApi spec: {} with exception: {}", openApiPath, e);
-    }
-
-    return operationIds;
+    return specification instanceof Map<?, ?> map ? collectOperationIds(map.get("paths")) : List.of();
   }
 
-  private List<String> readOperationIdsFromJson(String openApiPath) {
+  /**
+   * Reads the spec as plain maps rather than as a JsonNode tree, so both formats are walked by the
+   * one {@link #collectOperationIds} implementation. Two walkers over the same structure had already
+   * drifted apart on how they type-check an operationId.
+   */
+  private List<String> readOperationIdsFromJson(InputStream inputStream) throws IOException {
 
-    List<String> operationIds = new ArrayList<>();
+    Object specification = OBJECT_MAPPER.readValue(inputStream, Object.class);
 
-    ObjectMapper mapper = new ObjectMapper();
+    return specification instanceof Map<?, ?> map ? collectOperationIds(map.get("paths")) : List.of();
+  }
 
-    try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(openApiPath)) {
+  /**
+   * Collects the operationIds out of a parsed {@code paths} node.
+   *
+   * <p>Everything is checked before it is cast. A path item legally holds more than operations -
+   * {@code summary} and {@code description} are strings, {@code parameters} and {@code servers} are
+   * lists, {@code $ref} points elsewhere - and blindly treating each value as an operation map used
+   * to abort the walk on a ClassCastException, silently truncating the operation list of any spec
+   * that used those keys.
+   *
+   * @param paths the value of the spec's {@code paths} key.
+   * @return the operationIds in document order, without duplicates.
+   */
+  private List<String> collectOperationIds(Object paths) {
 
-      JsonNode rootNode = mapper.readTree(inputStream);
-
-      JsonNode pathsNode = rootNode.get("paths");
-      if (pathsNode != null) {
-        pathsNode.fields().forEachRemaining(entry -> {
-          JsonNode methodsNode = entry.getValue();
-          methodsNode.fields().forEachRemaining(method -> {
-            JsonNode operationIdNode = method.getValue().get(OPENAPI_OPERATIONID);
-            if (operationIdNode != null) {
-              operationIds.add(operationIdNode.asText());
-            }
-          });
-        });
-      }
-
-    } catch (IOException e) {
-      LOGGER.warn("Could not read the OpenApi spec: {} with exception: {}", openApiPath, e);
+    if (!(paths instanceof Map<?, ?> pathItems)) {
+      return List.of();
     }
 
-    return operationIds;
+    Set<String> operationIds = new LinkedHashSet<>();
+
+    for (Object pathItem : pathItems.values()) {
+
+      if (!(pathItem instanceof Map<?, ?> operations)) {
+        continue;
+      }
+
+      for (Map.Entry<?, ?> operation : operations.entrySet()) {
+
+        if (!isOperation(operation.getKey()) || !(operation.getValue() instanceof Map<?, ?> operationFields)) {
+          continue;
+        }
+
+        Object operationId = operationFields.get(OPENAPI_OPERATIONID);
+
+        if (operationId != null) {
+          addOperationId(operationIds, operationId.toString());
+        }
+      }
+    }
+
+    return List.copyOf(operationIds);
+  }
+
+  private static void addOperationId(Set<String> operationIds, String operationId) {
+    if (!operationId.isBlank()) {
+      operationIds.add(operationId.trim());
+    }
+  }
+
+  private static boolean isOperation(Object pathItemKey) {
+    return pathItemKey instanceof String key && OPENAPI_HTTP_METHODS.contains(key.toLowerCase());
   }
 
 }

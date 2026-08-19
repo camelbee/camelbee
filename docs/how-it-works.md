@@ -113,7 +113,7 @@ application:
   flows containing the string you give it, plus the branches they spawn. Everything else is never
   recorded — it is not filtered at display time.
 
-The tracer is **off** at startup, armed from the UI without a restart, and disarms itself after
+The tracer is **off** at startup, enabled from the UI without a restart, and switches itself off after
 `camelbee.tracer-max-idle-time` (default 300000 ms) of inactivity.
 
 ---
@@ -127,7 +127,7 @@ API you can call yourself:
 |---|---|
 | `GET /camelbee/routes` | The topology — routes, nodes and the edges between them |
 | `GET /camelbee/messages?index=&addVersion=&resetVersion=` | Incremental message polling |
-| `POST /camelbee/tracer/status` | Arm / disarm tracing |
+| `POST /camelbee/tracer/status` | Enable / disable tracing |
 | `POST /camelbee/tracer/filter` | Set the capture filter |
 | `GET /camelbee/auth/status`, `POST /camelbee/auth/login` | Authentication |
 
@@ -156,7 +156,7 @@ assets resolve wherever the app is mounted.
 
 | Concern | How |
 |---|---|
-| Server state & polling | **TanStack Query** — messages refetch every 2s while tracing is armed, health and metrics on the intervals you set in Settings, and nothing polls when disabled |
+| Server state & polling | **TanStack Query** — messages refetch every 2s while tracing is on, health and metrics on the intervals you set in Settings, and nothing polls when disabled |
 | Topology graph | **@xyflow/react** for rendering, **dagre** for layout (`src/utils/routeGraph.ts` turns the `/camelbee/routes` response into nodes and edges) |
 | Charts | **Recharts** for the JVM/CPU/GC series on the metrics page |
 | Routing | **react-router-dom**, with a server-side fallback so `/camelbee/settings` can be bookmarked, shared and reloaded |

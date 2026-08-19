@@ -1,0 +1,6 @@
+openapi: 3.0.3
+paths:
+  /widgets:
+    get:
+  - this is not valid yaml at all
+   operationId: nope

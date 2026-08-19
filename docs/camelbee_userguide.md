@@ -179,7 +179,7 @@ The grips also respond to the arrow keys once focused. Sizes are remembered acro
 ## Using CamelBee in Production
 
 CamelBee's tracer is designed to be safe to switch on outside development: it starts **off**, and it
-**disarms itself** after a period of inactivity (`camelbee.tracer-max-idle-time`). Two further
+**switches itself off** after a period of inactivity (`camelbee.tracer-max-idle-time`). Two further
 features exist specifically for production use, and the sections after them cover who is allowed to
 reach it in the first place.
 
@@ -271,7 +271,7 @@ log**. Redaction is applied first, so the same masking protects it. But none of 
 safety mechanisms do:
 
 - it is **not** affected by the **Start Tracing** / **Stop Tracing** toggle in the UI;
-- it is **not** affected by `camelbee.tracer-max-idle-time`, so it never disarms itself;
+- it is **not** affected by `camelbee.tracer-max-idle-time`, so it never switches itself off;
 - it is **not** affected by the **Only trace containing…** capture filter, so narrowing an
   investigation in the UI does not narrow what is logged.
 

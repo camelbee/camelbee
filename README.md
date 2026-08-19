@@ -1,11 +1,11 @@
 # CamelBee — Apache Camel monitoring and debugging, embedded in your application
 
 CamelBee asks the running application what its Camel routes are — every endpoint, and how they connect —
-and draws it as a live topology in an **embedded UI, served from your application's own HTTP port**. Arm
+and draws it as a live topology in an **embedded UI, served from your application's own HTTP port**. Turn on
 the tracer from that UI and the traffic becomes visible too: messages animate along the graph, every hop
 lands as a bar in a latency waterfall, and each request and response is there to read.
 
-One dependency. No agent, no collector, no external service — and tracing is armed and disarmed from the
+One dependency. No agent, no collector, no external service — and tracing is switched on and off from the
 UI, without a redeploy. Works on **Quarkus**, **Spring Boot**, **Camel K** and **standalone Camel**, on
 your laptop and in SIT, UAT or a pod in the cluster.
 
@@ -34,8 +34,8 @@ does, far sooner than reading it would have told you. The same applies to inheri
 left is sure what the flow does either.
 
 And because it is served from the application's own HTTP port, you can do this where it matters —
-SIT, UAT, a pod in the cluster — not only on a laptop. Tracing starts off, is armed from the UI
-without a restart, disarms itself when idle, and redacts sensitive values at the point of capture,
+SIT, UAT, a pod in the cluster — not only on a laptop. Tracing starts off, is enabled from the UI
+without a restart, switches itself off when idle, and redacts sensitive values at the point of capture,
 so it is safe to leave in place.
 
 ## Features
@@ -85,7 +85,7 @@ there was no caller for the failure to be reported to.
 ![Retries and dead-lettering in the waterfall](images/debugger_retries.png)
 
 ### Safe to Run Outside Development
-- Tracing starts **off** and disarms itself after a configurable period of inactivity, so it cannot be left running by accident.
+- Tracing starts **off**, and once on it stops itself after a configurable period of inactivity, so it cannot be left running by accident.
 - Sensitive values in headers and bodies are **redacted by default** — passwords, tokens, API keys, card numbers and more — with a configurable key list.
 - Bodies can be excluded from capture entirely when even best-effort redaction is not enough.
 - Trace a **single transaction** in a busy application: give CamelBee an order id or correlation id and it records only the flow containing it, along with the branches that flow spawns. Everything else is never recorded at all.
@@ -756,7 +756,7 @@ Once your application is running, the CamelBee UI is available at: `http://local
 ### Running CamelBee Outside Development
 
 The snippets above are enough to get started, and the production-safety defaults are already correct
-— tracing starts off, disarms itself when idle, and sensitive values are redacted without any
+— tracing starts off, stops itself when idle, and sensitive values are redacted without any
 configuration. Three further properties are available when you need them:
 
 ```properties
@@ -787,8 +787,8 @@ started; nothing else has to be set. Same names on all runtimes — `camelbee.*`
 | `camelbee.context-enabled` | `false` | Serves the topology API and the embedded UI. Turn on to use CamelBee at all. |
 | `camelbee.notifier-enabled` | `true` | Event notifier behind message tracing and the waterfall. |
 | `camelbee.route-configurer-enabled` | `true` | Attaches the interceptors that record hops. |
-| `camelbee.tracer-enabled` | `false` | Arms the tracer at startup. Off by design — arm it from the UI instead, no restart needed. |
-| `camelbee.tracer-max-idle-time` | `300000` | Milliseconds of inactivity before the tracer disarms itself. |
+| `camelbee.tracer-enabled` | `false` | Enables the tracer at startup. Off by design — turn it on from the UI instead, no restart needed. |
+| `camelbee.tracer-max-idle-time` | `300000` | Milliseconds of inactivity before the tracer switches itself off. |
 | `camelbee.tracer-max-messages-count` | `1000` | Cap on retained traced messages; the UI warns when it is hit. |
 | `camelbee.tracer-body-enabled` | `true` | Set `false` to never capture body text at all — the only hard guarantee. |
 | `camelbee.masking-enabled` | `true` | Redacts sensitive values out of traced headers and bodies at the point of capture. |
@@ -820,7 +820,7 @@ and nothing is readable without a token.
 
 That default exists because the API is not read-only. `GET /camelbee/routes` returns the full route
 topology including internal hostnames and queue names; `POST /camelbee/tracer/status` **turns tracing
-on**, so without a gate a caller can arm capture themselves and then read the traffic; and
+on**, so without a gate a caller can enable capture themselves and then read the traffic; and
 `GET /camelbee/messages` returns captured bodies, headers and error text. Redaction governs *what is
 recorded*, authentication governs *who may read it* — you want both.
 

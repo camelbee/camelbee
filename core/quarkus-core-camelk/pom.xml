@@ -188,6 +188,14 @@
 			<testResource>
 				<directory>${project.basedir}/../quarkus-core/src/test/resources</directory>
 			</testResource>
+			<!--
+			  shared-core's test sources are compiled here (see add-shared-core-test-sources below),
+			  so their fixtures have to be on this module's test classpath too - without this the
+			  engine's rest-openapi tests find no spec to read and fail only in this module.
+			-->
+			<testResource>
+				<directory>${project.basedir}/../shared-core/src/test/resources</directory>
+			</testResource>
 		</testResources>
 
 		<plugins>
