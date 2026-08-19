@@ -32,7 +32,7 @@
 
     <properties>
 
-        <quarkus.platform.version>3.38.2</quarkus.platform.version>
+        <quarkus.platform.version>3.38.3</quarkus.platform.version>
         <camel-quarkus.platform.version>${quarkus.platform.version}</camel-quarkus.platform.version>
         <quarkiverse-artemis.version>3.0.0</quarkiverse-artemis.version>
         <assertj-core.version>3.27.7</assertj-core.version>
@@ -49,7 +49,7 @@
         <com.google.crypto.tink.version>1.23.0</com.google.crypto.tink.version>
         <!-- MCP support for generated microservices (declared conditionally in the archetype). -->
         <quarkus-mcp-server.version>1.13.1</quarkus-mcp-server.version>
-        <mcp-sdk.version>2.0.0</mcp-sdk.version>
+        <mcp-sdk.version>2.0.1</mcp-sdk.version>
         <!-- langchain4j BOM for the LANGCHAIN4JAGENT / LANGCHAIN4JEMBEDDING backends (declared
              conditionally in the archetype). Verified against the actual 1.15.1 jars (javap on
              AnthropicChatModel$Builder / MistralAiChatModel$Builder etc.) for base URLs, endpoint
