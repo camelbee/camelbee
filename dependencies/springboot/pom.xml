@@ -35,7 +35,7 @@
              1.12.1 runtime Camel 4.20.0 ships. apicurio-registry-serdes-avro-serde transitively pulls
              avro 1.12.0, which would win mediation and lacks Utf8.compareSequences(...) — breaking the
              generated code. The Quarkus side is already on 1.12.1 via its platform BOM. -->
-        <avro.version>1.12.1</avro.version>
+        <avro.version>1.12.2</avro.version>
     </properties>
 
     <dependencyManagement>
