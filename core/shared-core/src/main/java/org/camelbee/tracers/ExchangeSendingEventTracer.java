@@ -137,7 +137,7 @@ public class ExchangeSendingEventTracer {
     }
 
     // if custom error is thrown then we need to handle that one as well.
-    String errorMessage = TracerUtils.handleError(exchange, currentRoute);
+    String errorMessage = TracerUtils.handleError(exchange);
 
     return TracerUtils.stampParentExchangeId(
         new Message(exchange.getExchangeId(), MessageEventType.SENDING, requestBody, requestHeaders, routeId,

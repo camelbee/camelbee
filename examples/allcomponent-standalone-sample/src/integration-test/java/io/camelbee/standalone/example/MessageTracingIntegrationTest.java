@@ -195,7 +195,24 @@ class MessageTracingIntegrationTest extends CamelBeeApplicationSupport {
       assertThat(text(message, "endpoint")).isEqualTo(FLAKY_EDGE);
       assertThat(text(message, "exception")).contains("simulated transient failure");
     });
-    assertThat(failures).anySatisfy(message -> assertThat(text(message, "endpoint")).isEqualTo("direct://invokeAlwaysFails"));
+    /*
+     Attribution lands on the hop that actually threw, not on the boundary that recovered from it.
+     direct:boom is what throws; direct:invokeAlwaysFails wraps it in doTry/doCatch and returns a
+     normal response, so it must NOT be typed as the failure.
+
+     This is the shape that regressed before: an earlier, already-reported failure elsewhere in the
+     same exchange (invokeFlaky's redeliveries) leaves Exchange.EXCEPTION_CAUGHT set - Camel never
+     clears it - and preferring that stale record over the live exchange.getException() deduped
+     boom's fresh failure away entirely, leaving boom looking successful and pinning the error on
+     invokeAlwaysFails one hop later.
+     */
+    assertThat(failures).anySatisfy(message -> {
+      assertThat(text(message, "endpoint")).isEqualTo("direct://boom");
+      assertThat(text(message, "exception")).contains("simulated permanent failure");
+    });
+    assertThat(failures)
+        .as("the doTry/doCatch boundary recovered, so it is not itself a failure")
+        .noneSatisfy(message -> assertThat(text(message, "endpoint")).isEqualTo("direct://invokeAlwaysFails"));
   }
 
   @Test

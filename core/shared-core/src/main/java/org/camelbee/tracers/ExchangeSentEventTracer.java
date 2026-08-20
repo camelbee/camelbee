@@ -96,7 +96,7 @@ public class ExchangeSentEventTracer {
 
     MessageType messageType = MessageType.RESPONSE;
 
-    String errorMessage = TracerUtils.handleError(exchange, currentRoute);
+    String errorMessage = TracerUtils.handleError(exchange);
 
     if (errorMessage != null) {
       messageType = MessageType.ERROR_RESPONSE;

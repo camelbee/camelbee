@@ -15,12 +15,12 @@
  */
 package org.camelbee.utils;
 
-import static org.camelbee.constants.CamelBeeConstants.CAMEL_FAILED_EVENT_ENDPOINT;
 import static org.camelbee.constants.CamelBeeConstants.CAMEL_FAILED_EVENT_IDENTITY_HASHCODE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -46,7 +46,7 @@ class TracerUtilsTest {
     when(exchange.getException()).thenReturn(null);
 
     // Act
-    String result = TracerUtils.handleError(exchange, "direct:test");
+    String result = TracerUtils.handleError(exchange);
 
     // Assert
     assertNull(result);
@@ -54,15 +54,15 @@ class TracerUtilsTest {
 
   @Test
   void handleErrorShouldReturnMessageForNewException() {
-    // Arrange
+    // Arrange: the error handler has handled the failure and cleared exchange.getException(),
+    // leaving only its own EXCEPTION_CAUGHT record - the case that property exists to cover.
     Exception testException = new RuntimeException("Test error message");
 
     when(exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class)).thenReturn(testException);
     when(exchange.getProperty(CAMEL_FAILED_EVENT_IDENTITY_HASHCODE)).thenReturn(null);
-    when(exchange.getProperty(CAMEL_FAILED_EVENT_ENDPOINT)).thenReturn(null);
 
     // Act
-    String result = TracerUtils.handleError(exchange, "direct:test");
+    String result = TracerUtils.handleError(exchange);
 
     // Assert
     assertEquals("Test error message", result);
@@ -77,26 +77,29 @@ class TracerUtilsTest {
 
     when(exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class)).thenReturn(testException);
     when(exchange.getProperty(CAMEL_FAILED_EVENT_IDENTITY_HASHCODE)).thenReturn(exceptionHashCode);
-    when(exchange.getProperty(CAMEL_FAILED_EVENT_ENDPOINT)).thenReturn(null);
 
     // Act
-    String result = TracerUtils.handleError(exchange, "direct:test");
+    String result = TracerUtils.handleError(exchange);
 
     // Assert
     assertNull(result);
   }
 
   @Test
-  void handleErrorShouldCheckExchangeExceptionWhenExceptionCaughtIsNull() {
-    // Arrange
-    Exception testException = new RuntimeException("Test error message");
+  void handleErrorPrefersTheLiveExceptionOverTheErrorHandlersRecord() {
+    // Arrange: a failure is in flight (getException() non-null). That is the exchange's current
+    // state, so it wins outright - EXCEPTION_CAUGHT is not consulted at all, which is why it is
+    // stubbed leniently here rather than being read.
+    Exception live = new RuntimeException("Test error message");
+    Exception handlerRecord = new RuntimeException("older, already handled");
 
-    when(exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class)).thenReturn(null);
-    when(exchange.getException()).thenReturn(testException);
+    lenient().when(exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class))
+        .thenReturn(handlerRecord);
+    when(exchange.getException()).thenReturn(live);
     when(exchange.getProperty(CAMEL_FAILED_EVENT_IDENTITY_HASHCODE)).thenReturn(null);
 
     // Act
-    String result = TracerUtils.handleError(exchange, "direct:test");
+    String result = TracerUtils.handleError(exchange);
 
     // Assert
     assertEquals("Test error message", result);
@@ -105,44 +108,51 @@ class TracerUtilsTest {
 
   @Test
   void handleErrorPrefersFreshExceptionOnSameHopRedeliveryRetry() {
-    // Arrange: EXCEPTION_CAUGHT still holds the previous attempt's (already-reported) exception,
-    // as it does mid-DeadLetterChannel-redelivery, but this SENT is for the same endpoint that
-    // reported it.
+    // Arrange: mid-DeadLetterChannel-redelivery, EXCEPTION_CAUGHT still names the previous
+    // (already-reported) attempt while getException() has already moved on to the current one.
+    // Reporting the lagging record would dedup against its own earlier report and lose this
+    // attempt entirely, so the live exception has to win.
     Exception previousAttempt = new RuntimeException("attempt 1");
     Exception currentAttempt = new RuntimeException("attempt 2");
 
-    when(exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class)).thenReturn(previousAttempt);
+    lenient().when(exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class))
+        .thenReturn(previousAttempt);
     when(exchange.getProperty(CAMEL_FAILED_EVENT_IDENTITY_HASHCODE))
         .thenReturn(System.identityHashCode(previousAttempt));
-    when(exchange.getProperty(CAMEL_FAILED_EVENT_ENDPOINT)).thenReturn("direct:flakyTarget");
     when(exchange.getException()).thenReturn(currentAttempt);
 
     // Act
-    String result = TracerUtils.handleError(exchange, "direct:flakyTarget");
+    String result = TracerUtils.handleError(exchange);
 
     // Assert
     assertEquals("attempt 2", result);
   }
 
   @Test
-  void handleErrorKeepsExceptionCaughtForAnUnrelatedFailureOnADifferentHop() {
-    // Arrange: EXCEPTION_CAUGHT is stale/already-reported from an earlier failure on a DIFFERENT
-    // endpoint (e.g. a redelivery elsewhere in the same exchange), and exchange.getException() is
-    // fresh for THIS hop - but this is not a same-hop retry, so EXCEPTION_CAUGHT should still win,
-    // deferring to whichever event Camel actually attaches the caught exception to.
+  void handleErrorReportsAFreshFailureOnADifferentHopRatherThanAStaleCaughtOne() {
+    // Arrange: an earlier failure elsewhere in this exchange (a redelivery that has since
+    // concluded) left EXCEPTION_CAUGHT set - Camel never clears it - and it has already been
+    // reported. Now a DIFFERENT hop throws, so getException() is freshly non-null.
+    //
+    // The stale record must not win here. It would dedup against its own earlier report and
+    // return null, leaving the hop that actually threw looking successful; the exception would
+    // then surface one hop later, on whichever boundary catches it. That is precisely what made
+    // direct:boom render as a success while direct:invokeAlwaysFails - which merely caught it -
+    // was flagged as the failure.
     Exception stale = new RuntimeException("earlier failure");
     Exception freshUnrelated = new RuntimeException("boom");
 
-    when(exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class)).thenReturn(stale);
+    lenient().when(exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class))
+        .thenReturn(stale);
     when(exchange.getProperty(CAMEL_FAILED_EVENT_IDENTITY_HASHCODE))
         .thenReturn(System.identityHashCode(stale));
-    when(exchange.getProperty(CAMEL_FAILED_EVENT_ENDPOINT)).thenReturn("direct:flakyTarget");
+    when(exchange.getException()).thenReturn(freshUnrelated);
 
     // Act
-    String result = TracerUtils.handleError(exchange, "direct:boom");
+    String result = TracerUtils.handleError(exchange);
 
-    // Assert
-    assertNull(result);
+    // Assert: reported against direct:boom, the hop that actually threw
+    assertEquals("boom", result);
   }
 
   @Test

@@ -112,7 +112,7 @@ public class ExchangeCompletedEventTracer {
     final String currentRoute = routeStack.pop();
     final String callerRoute = routeStack.peek();
 
-    String errorMessage = TracerUtils.handleError(exchange, currentRoute);
+    String errorMessage = TracerUtils.handleError(exchange);
 
     /*
      A failed exchange is reported as an error even when handleError returns nothing. That happens

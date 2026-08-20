@@ -39,8 +39,6 @@ public final class CamelBeeConstants {
 
   public static final String CAMEL_FAILED_EVENT_IDENTITY_HASHCODE = "camelbee-failedevent-identity";
 
-  public static final String CAMEL_FAILED_EVENT_ENDPOINT = "camelbee-failedevent-endpoint";
-
   public static final String CAMELBEE_PRODUCED_EXCHANGE = "camelbee-produced-exchange";
 
   public static final String MDC_UNITOFWORK_EXECUTED = "camelbee-unitofwork-executed";
