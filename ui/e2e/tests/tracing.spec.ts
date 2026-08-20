@@ -360,6 +360,102 @@ test.describe('waterfall', () => {
     await expect(panel.getByText('direct://invokeEnrich', { exact: true })).toBeVisible();
   });
 
+  /**
+   * Regression guard for two real ordering bugs, both in `waterfall.ts`'s buildSpansForExchange /
+   * buildFlows, both only visible on real traced data because they need genuine same-millisecond
+   * ties (or, for the first, a Windows-only clock jump) that fixture data has to engineer by hand:
+   *
+   * 1. direct:invokeMockC/mock:C is visited twice on the SAME exchange - once by the pipeline's
+   *    routingSlip (immediately followed by its own direct:invokeMockD/mock:D stop), once later by
+   *    the dynamicRouter. Pairs used to be grouped by endpoint URI before the final time sort, so a
+   *    second visit to an endpoint landed adjacent to the first instead of at its true position.
+   * 2. Every nested pair on one exchange (direct:invokeHttp wrapping the http health call,
+   *    direct:invokeMockA/B/C/D each wrapping their own mock:), the child's SENT always arrives, and
+   *    always closes, before the parent's own SENT - so a naive tiebreak (or a secondary sort key
+   *    that compares `end`) resolves every start-tie in the child's favour, rendering it above its
+   *    own parent.
+   *
+   * This drives the real sample end to end, so it exercises real server timestamps, not fixture
+   * data engineered to tie - ties are exactly what these bugs need to surface, and running against
+   * the real thing is the only way to know they still tie in practice.
+   */
+  test('keeps every hop in true causal order, including revisited and nested endpoints', async ({ page }) => {
+    await page.getByRole('button', { name: 'Waterfall', exact: true }).click();
+
+    const panel = page.getByTestId('waterfall-panel');
+    await expect(panel.getByTestId('waterfall-bar').first()).toBeVisible(ARRIVAL);
+
+    const rowTexts = await panel.locator('[data-testid^="waterfall-row"]').allTextContents();
+    // Row text is the endpoint immediately followed by its duration ("0ms", "12ms", or "—" while
+    // pending), with no separator - so a plain substring search would wrongly count
+    // 'mock://enrich' rows as matches for 'mock://enrichDynamic' too, since one endpoint name is a
+    // literal prefix of the other. Anchoring the match to the start of the row, and requiring what
+    // follows it to be the start of a duration, rules that out.
+    const indicesOf = (endpoint: string) =>
+      rowTexts.reduce<number[]>((acc, text, i) => {
+        if (!text.startsWith(endpoint)) return acc;
+        return /^(\d|—)/.test(text.slice(endpoint.length)) ? [...acc, i] : acc;
+      }, []);
+    // The health hop's endpoint carries the sample's own (randomly assigned) port, so match it by
+    // a unique, stable fragment instead of the full URL - no other row's endpoint contains this.
+    const rowsContaining = (fragment: string) =>
+      rowTexts.reduce<number[]>((acc, text, i) => (text.includes(fragment) ? [...acc, i] : acc), []);
+
+    // Every direct:invokeX -> child pair in the pipeline that nests on one exchange (the wrapping
+    // producer's own SENT cannot fire until its child's SENT already has). Each must render its
+    // parent strictly before the matching child, occurrence for occurrence, in visit order.
+    const nestedPairs: [string, string][] = [
+      ['direct://invokeMockA', 'mock://A'],
+      ['direct://invokeMockB', 'mock://B'],
+      ['direct://invokeMockC', 'mock://C'],
+      ['direct://invokeMockD', 'mock://D'],
+      ['direct://invokeEnrich', 'mock://enrich'],
+      ['direct://invokeEnrichDynamic', 'mock://enrichDynamic'],
+      ['direct://invokeFile', 'file://outputdir'],
+    ];
+
+    const assertParentBeforeEachChild = (
+      parent: string,
+      parentRows: number[],
+      childRows: number[],
+    ) => {
+      expect(parentRows.length, `no rows for ${parent}`).toBeGreaterThan(0);
+      expect(childRows, `${parent} and its child should have the same visit count`).toHaveLength(
+        parentRows.length,
+      );
+
+      // visits happen strictly in sequence (the pipeline never opens a second visit before the
+      // first has fully closed), so pairing by position is exactly pairing by occurrence
+      parentRows.forEach((parentRow, i) => {
+        expect(parentRow, `${parent} #${i + 1} should render before its own child`).toBeLessThan(
+          childRows[i]!,
+        );
+      });
+    };
+
+    for (const [parent, child] of nestedPairs) {
+      assertParentBeforeEachChild(parent, indicesOf(parent), indicesOf(child));
+    }
+
+    // The health hop's own port varies per run, so it is matched by a stable URL fragment rather
+    // than the anchored endpoint-name matcher above.
+    assertParentBeforeEachChild(
+      'direct://invokeHttp?block=true',
+      indicesOf('direct://invokeHttp?block=true'),
+      rowsContaining('/api/health'),
+    );
+
+    // The routingSlip visits direct:invokeMockC then direct:invokeMockD as its two stops, in that
+    // order, before the dynamicRouter revisits direct:invokeMockC later - so invokeMockD's ONE
+    // routingSlip visit must sit strictly between the two invokeMockC visits, not after both of
+    // them (which is what endpoint-grouping used to produce).
+    const invokeMockC = indicesOf('direct://invokeMockC');
+    const invokeMockD = indicesOf('direct://invokeMockD');
+    expect(invokeMockC).toHaveLength(2);
+    expect(invokeMockD[0]).toBeGreaterThan(invokeMockC[0]);
+    expect(invokeMockD[0]).toBeLessThan(invokeMockC[1]);
+  });
+
   test('can be dragged taller, and the size survives closing and reopening', async ({ page }) => {
     const toggle = page.getByRole('button', { name: 'Waterfall', exact: true });
     await toggle.click();

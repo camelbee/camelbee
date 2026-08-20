@@ -44,9 +44,14 @@ import org.junit.jupiter.api.TestInstance;
  * matching is built on them: a redelivered send has to appear as several request/response pairs on
  * one edge for a single exchange, and a failure has to be typed {@code ERROR_RESPONSE}.
  *
- * <p>All assertions are order-insensitive. {@code multicast().parallelProcessing()} and
+ * <p>Most assertions are order-insensitive. {@code multicast().parallelProcessing()} and
  * {@code wireTap} mean the arrival order of traced messages is genuinely nondeterministic; asserting
- * on a sequence here would be asserting on a race.
+ * on a sequence there would be asserting on a race. The one exception is
+ * {@link #keepsSameExchangeEndpointRevisitsInExecutionOrder()}: routingSlip and dynamicRouter run
+ * serially on one thread on the SAME exchange (no copy, unlike multicast/wireTap), so their relative
+ * order is a genuine invariant, not a race - and it is exactly the invariant the UI's waterfall
+ * relies on (see ui/src/utils/waterfall.ts) when it falls back to server arrival order to break a
+ * timestamp tie.
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MessageTracingIntegrationTest extends CamelBeeApplicationSupport {
@@ -415,6 +420,46 @@ class MessageTracingIntegrationTest extends CamelBeeApplicationSupport {
         assertThat(parent != null && !parent.isNull()).isTrue();
       });
     }
+  }
+
+  /**
+   * The UI's waterfall (ui/src/utils/waterfall.ts) sorts hops by timestamp, and falls back to
+   * server arrival order to break ties - which are common for fast in-memory {@code direct:}
+   * calls. That fallback is only safe if the server's own order reflects true execution order for
+   * a single exchange, which this asserts directly.
+   *
+   * <p>{@code direct:invokeMockC} is hit twice on ONE exchange: once by the routingSlip
+   * ({@code direct:invokeMockC,direct:invokeMockD} - so its own invokeMockD stop runs immediately
+   * after), once by the dynamicRouter's first invocation, afterwards. Unlike multicast/wireTap
+   * above, routingSlip and dynamicRouter never copy the exchange, so this is one thread running
+   * serially - a real invariant, not a race - and a regression guard for a bug where the UI grouped
+   * both invokeMockC visits together, pushing the routingSlip's own invokeMockD stop out from
+   * between them.
+   */
+  @Test
+  @DisplayName("keeps a routingSlip/dynamicRouter revisit of the same endpoint in true execution order")
+  void keepsSameExchangeEndpointRevisitsInExecutionOrder() {
+    Map<String, List<JsonNode>> byExchange = groupByExchange(
+        where(m -> "direct://invokeMockC".equals(text(m, "endpoint")) && "REQUEST".equals(text(m, "messageType"))));
+
+    String rootExchangeId = byExchange.entrySet().stream()
+        .filter(e -> e.getValue().size() == 2)
+        .map(Map.Entry::getKey)
+        .findFirst()
+        .orElseThrow(() -> new AssertionError(
+            "expected exactly one exchange to send to direct://invokeMockC twice (routingSlip, then dynamicRouter)"));
+
+    List<String> sequence = traced.stream()
+        .filter(m -> rootExchangeId.equals(text(m, "exchangeId")))
+        .filter(m -> "REQUEST".equals(text(m, "messageType")))
+        .map(m -> text(m, "endpoint"))
+        .filter(endpoint -> "direct://invokeMockC".equals(endpoint) || "direct://invokeMockD".equals(endpoint))
+        .toList();
+
+    // routingSlip's C, then its own D, then dynamicRouter's later revisit of C, then the separate
+    // toD("direct:invokeMock${mockTarget}") stop that revisits D afterwards
+    assertThat(sequence).containsExactly(
+        "direct://invokeMockC", "direct://invokeMockD", "direct://invokeMockC", "direct://invokeMockD");
   }
 
   private static List<JsonNode> where(Predicate<JsonNode> predicate) {

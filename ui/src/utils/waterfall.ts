@@ -7,6 +7,13 @@ import type { Message } from '@/types';
  * the hop finished. So the SENT's timestamp is the bar's END and `timeStamp - timeTaken` is its
  * start. Deriving it from the SENDING's own timestamp instead would be wrong for anything async:
  * a wireTap's SENDING is recorded on the calling thread, while the work happens elsewhere.
+ *
+ * That makes `start`/`end`/`durationMs` a self-consistent description of WHEN the hop ran
+ * (`end - start === durationMs` always holds), and they are what the bar's position and width are
+ * drawn from. They are deliberately NOT what row order is decided by - see {@link Span.seq}: these
+ * are wall-clock samples, and a wall clock is too coarse to order hops that take under a
+ * millisecond. Keeping the two concerns separate is why a bar can legitimately sit fractionally
+ * left of the row above it; the rows are in causal order, the bars are on a time axis.
  */
 export interface Span {
   exchangeId: string;
@@ -25,6 +32,34 @@ export interface Span {
   depth: number;
   /** True when no SENT arrived, so the bar is a point rather than a measured span. */
   pending: boolean;
+  /**
+   * The position in the original `messages` array of this span's SENDING (or its SENT, when no
+   * SENDING was recorded) - the order the server actually observed the hop OPEN in.
+   *
+   * This is what row order is sorted by, in place of `start`. The server appends traced messages in
+   * event order (`debuggerStore` only ever concatenates a poll's results onto the tail), so this
+   * index IS causal order, recorded rather than inferred - no clock arithmetic involved.
+   *
+   * Ordering on `start` instead cannot work, for two independent reasons:
+   *
+   * 1. Spans are paired per endpoint (see {@link buildSpansForExchange}), so a second visit to the
+   *    same endpoint within one exchange - e.g. a routingSlip stop revisited later by a
+   *    dynamicRouter - sits adjacent to the first visit in the pre-sort array rather than at its
+   *    true position. Sorting by `start` is what was supposed to correct that, but hops finishing
+   *    inside the same millisecond (routine for in-memory `direct:` calls) tie, and a stable sort
+   *    then just preserves that wrong order.
+   * 2. `start` is derived as `SENT.timeStamp - timeTaken` from `System.currentTimeMillis()`, whose
+   *    resolution is coarse on Windows (~15ms ticks vs ~1ms elsewhere). A nested child can land in
+   *    an earlier tick than the parent still waiting on it, computing an earlier `start` and
+   *    rendering above its own caller.
+   *
+   * Deliberately keyed on the SENDING, not the SENT/anchor: for a nested pair on one exchange (e.g.
+   * `direct:invokeMockC` wrapping `mock:C`) the inner hop's SENT always arrives first - the outer
+   * cannot close until the inner does - so keying on the SENT would rank every child ahead of its
+   * own parent. A hop's own SENDING always fires before any event its call produces, parent and
+   * sibling alike, which is exactly the relation the waterfall needs to show.
+   */
+  seq: number;
   /**
    * The message the bar was built from - the SENT, or the SENDING when no response arrived.
    *
@@ -73,7 +108,10 @@ function toEpochMs(value: string | null | undefined): number | null {
  * same pair opens a new span rather than overwriting - redeliveries reuse the exchange id for every
  * attempt, and each attempt is a bar of its own.
  */
-function buildSpansForExchange(messages: Message[]): Omit<Span, 'depth'>[] {
+function buildSpansForExchange(
+  messages: Message[],
+  seqOf: Map<Message, number>,
+): Omit<Span, 'depth'>[] {
   type Open = { request: Message | null; response: Message | null };
   const byEndpoint = new Map<string, Open[]>();
 
@@ -119,6 +157,7 @@ function buildSpansForExchange(messages: Message[]): Omit<Span, 'depth'>[] {
         isError: response?.messageType === 'ERROR_RESPONSE',
         exception: response?.exception ?? null,
         pending: !response,
+        seq: seqOf.get(request ?? anchor) ?? 0,
         message: anchor,
       });
     }
@@ -174,7 +213,8 @@ function resolveRoots(parentOf: Map<string, string | null>): {
  * Group traced messages into flows ready to render as a waterfall.
  *
  * Flows are returned newest-first, matching how the debugger surfaces recent traffic elsewhere.
- * Spans within a flow are ordered by start time so the staircase reads top-to-bottom.
+ * Spans within a flow are ordered by the order the hops opened in - see {@link Span.seq} for why
+ * that is recorded rather than derived from their timestamps.
  */
 /**
  * Works out which route a flow entered through.
@@ -204,6 +244,10 @@ function resolveFromRouteId(rootMessages: Message[] | undefined): string | null 
 export function buildFlows(messages: Message[]): Flow[] {
   const byExchange = new Map<string, Message[]>();
   const parentOf = new Map<string, string | null>();
+  // true arrival order, used to break start-time ties deterministically - see Span.seq
+  const seqOf = new Map<Message, number>();
+
+  messages.forEach((m, index) => seqOf.set(m, index));
 
   for (const m of messages) {
     let list = byExchange.get(m.exchangeId);
@@ -227,7 +271,7 @@ export function buildFlows(messages: Message[]): Flow[] {
     const root = rootOf.get(exchangeId) ?? exchangeId;
     const depth = depthOf.get(exchangeId) ?? 0;
 
-    const spans = buildSpansForExchange(msgs).map((s) => ({ ...s, depth }));
+    const spans = buildSpansForExchange(msgs, seqOf).map((s) => ({ ...s, depth }));
     if (spans.length === 0) continue;
 
     const existing = spansByRoot.get(root);
@@ -238,7 +282,14 @@ export function buildFlows(messages: Message[]): Flow[] {
   const flows: Flow[] = [];
 
   for (const [rootExchangeId, spans] of spansByRoot) {
-    spans.sort((a, b) => a.start - b.start || a.end - b.end);
+    // Causal order, not clock order - see Span.seq. Ordering on `start` instead would put row
+    // order at the mercy of System.currentTimeMillis() arithmetic: hops that tie on the
+    // millisecond (routine for in-memory direct: calls) fall back to whatever order the pairing
+    // happened to produce, and on a coarse clock (Windows ticks ~15ms) a nested child can compute
+    // an earlier start than the parent that is still waiting on it, rendering the child above its
+    // own caller. seq is the order the server actually observed the hops open in, so it is immune
+    // to both. It is a message array index and therefore already unique - nothing follows it.
+    spans.sort((a, b) => a.seq - b.seq);
 
     const start = Math.min(...spans.map((s) => s.start));
     const end = Math.max(...spans.map((s) => s.end));
@@ -293,18 +344,18 @@ export function spanGeometry(span: Span, flow: Flow): { offsetPct: number; width
  * The rows one flow should actually draw, bounded but never hiding the slow hops.
  *
  * <p>A flow's span count is unbounded - a {@code split()} over a large body puts every item's
- * exchange in the same flow - so rendering all of them is not an option. Taking the first N by start
- * time alone is not either: this panel exists to answer "why was this slow", and the one slow hop is
- * as likely to be item 3000 as item 3.
+ * exchange in the same flow - so rendering all of them is not an option. Taking the first N alone is
+ * not either: this panel exists to answer "why was this slow", and the one slow hop is as likely to
+ * be item 3000 as item 3.
  *
- * <p>So the visible set is the union of the first {@code maxRows} in time order and the
- * {@code slowestCount} slowest anywhere in the flow, re-sorted by start time so the staircase still
- * reads left to right. An outlier in the tail therefore always appears, at its true position.
+ * <p>So the visible set is the union of the first {@code maxRows} and the {@code slowestCount}
+ * slowest anywhere in the flow, kept in the flow's own order (see {@link Span.seq}) so the staircase
+ * still reads top-to-bottom. An outlier in the tail therefore always appears, at its true position.
  *
  * @param flow          the flow to draw.
  * @param maxRows       how many leading spans to keep.
  * @param slowestCount  how many of the slowest spans to guarantee, wherever they fall.
- * @return the spans to render, in start order; the whole flow when it is already small enough.
+ * @return the spans to render, in flow order; the whole flow when it is already small enough.
  */
 export function visibleSpans(flow: Flow, maxRows: number, slowestCount: number): Span[] {
   if (flow.spans.length <= maxRows) {

@@ -93,6 +93,166 @@ describe('buildFlows', () => {
     expect(flows[0]!.spans.map((s) => s.durationMs)).toEqual([100, 120]);
   });
 
+  it('keeps true arrival order when a same-exchange endpoint is revisited and timestamps tie', () => {
+    // e.g. a routingSlip stop revisited later by a dynamicRouter, on the exchange's own thread -
+    // both hit direct:invokeMockC/mock:C, with direct:invokeMockD/mock:D truly in between. Fast
+    // in-memory hops commonly tie on the millisecond, so this only surfaces via the seq tiebreak.
+    const messages = [
+      ...hop('ex-1', 'direct:invokeMockC', 1000, 0),
+      ...hop('ex-1', 'mock:C', 1000, 0),
+      ...hop('ex-1', 'direct:invokeMockD', 1000, 0),
+      ...hop('ex-1', 'mock:D', 1000, 0),
+      ...hop('ex-1', 'direct:invokeMockC', 1000, 0),
+      ...hop('ex-1', 'mock:C', 1000, 0),
+    ];
+
+    const flows = buildFlows(messages);
+
+    expect(flows[0]!.spans.map((s) => s.endpoint)).toEqual([
+      'direct:invokeMockC',
+      'mock:C',
+      'direct:invokeMockD',
+      'mock:D',
+      'direct:invokeMockC',
+      'mock:C',
+    ]);
+  });
+
+  it('does not let a coarse SENT clock invert a synchronous parent above its own child', () => {
+    // Windows' System.currentTimeMillis() ticks in ~15ms steps. A parent that truly closes 1ms
+    // after its child can have its SENT land in the next tick, so the parent's derived start
+    // (stamp - durationMs = 1009) comes out AFTER the child's (994) even though the parent opened
+    // first and was still waiting on the child the whole time. Row order therefore cannot be taken
+    // from `start` at all; it comes from the order the hops were observed to OPEN (Span.seq), which
+    // no clock resolution can distort. The bars still sit on the timestamps - only the row order is
+    // decided by seq - so this deliberately asserts order, not geometry.
+    const messages = [
+      makeMessage({
+        exchangeId: 'ex-1',
+        endpoint: 'direct:invokeHttp',
+        exchangeEventType: 'SENDING',
+        messageType: 'REQUEST',
+        timeStamp: '993',
+      }),
+      makeMessage({
+        exchangeId: 'ex-1',
+        endpoint: 'http:health',
+        exchangeEventType: 'SENDING',
+        messageType: 'REQUEST',
+        timeStamp: '994',
+      }),
+      makeMessage({
+        exchangeId: 'ex-1',
+        endpoint: 'http:health',
+        exchangeEventType: 'SENT',
+        messageType: 'RESPONSE',
+        timeStamp: '1000', // still the earlier clock tick
+        timeTaken: 6,
+      }),
+      makeMessage({
+        exchangeId: 'ex-1',
+        endpoint: 'direct:invokeHttp',
+        exchangeEventType: 'SENT',
+        messageType: 'RESPONSE',
+        timeStamp: '1016', // jumped to the next ~15ms tick, though it truly closed ~1ms later
+        timeTaken: 7,
+      }),
+    ];
+
+    const flows = buildFlows(messages);
+
+    expect(flows[0]!.spans.map((s) => s.endpoint)).toEqual(['direct:invokeHttp', 'http:health']);
+  });
+
+  it('orders a nested same-exchange pair by SENDING order, not by which SENT arrived first', () => {
+    // direct:invokeMockC wraps mock:C on one exchange - the same shape as invokeHttp/health above,
+    // but with timings taken from what the real sample actually reports for this pair: mock:C
+    // closes at 1000 having taken 0ms (start 1000, end 1000); invokeMockC closes 1ms later at 1001
+    // having taken 1ms (start 1000, end 1001). So their derived starts TIE, which is routine for
+    // near-instant direct: hops and needs no clock quirk at all.
+    //
+    // Both of the obvious ways to break that tie are wrong, and this case catches both: the inner's
+    // SENT always arrives before the outer's (the parent cannot close until its child has), so
+    // ordering on SENT arrival ranks the child first; and a nested pair's `end` values structurally
+    // never tie for the same reason, so a secondary sort on `end` also resolves in the child's
+    // favour. Only the order the hops OPENED in (Span.seq, keyed on the SENDING) gets this right.
+    const messages = [
+      makeMessage({
+        exchangeId: 'ex-1',
+        endpoint: 'direct:invokeMockC',
+        exchangeEventType: 'SENDING',
+        messageType: 'REQUEST',
+        timeStamp: '1000',
+      }),
+      makeMessage({
+        exchangeId: 'ex-1',
+        endpoint: 'mock:C',
+        exchangeEventType: 'SENDING',
+        messageType: 'REQUEST',
+        timeStamp: '1000',
+      }),
+      makeMessage({
+        exchangeId: 'ex-1',
+        endpoint: 'mock:C',
+        exchangeEventType: 'SENT',
+        messageType: 'RESPONSE',
+        timeStamp: '1000', // inner closes first
+        timeTaken: 0,
+      }),
+      makeMessage({
+        exchangeId: 'ex-1',
+        endpoint: 'direct:invokeMockC',
+        exchangeEventType: 'SENT',
+        messageType: 'RESPONSE',
+        timeStamp: '1001', // outer closes 1ms later, but computes the same start (1001 - 1 = 1000)
+        timeTaken: 1,
+      }),
+    ];
+
+    const flows = buildFlows(messages);
+
+    expect(flows[0]!.spans.map((s) => s.endpoint)).toEqual(['direct:invokeMockC', 'mock:C']);
+  });
+
+  it('keeps a bar self-consistent: end - start is always exactly durationMs', () => {
+    // The bar's position comes from `start` and its width from `durationMs`, so the two have to
+    // describe the same interval or a bar is drawn somewhere it did not run. An earlier attempt at
+    // the ordering fix clamped `start` back to the SENDING timestamp without touching `end` or
+    // `durationMs`, which broke exactly this: an async hop (SENDING recorded on the calling thread
+    // at 1000, work actually running 1450..1500) came out start=1000/end=1500/durationMs=50 and
+    // rendered a 50ms bar 450ms to the left of the work it represented. Row order is Span.seq's
+    // job; `start` must stay a truthful timestamp.
+    const messages = [
+      makeMessage({
+        exchangeId: 'ex-1',
+        endpoint: 'direct:asyncThing',
+        exchangeEventType: 'SENDING',
+        messageType: 'REQUEST',
+        timeStamp: '1000', // queued on the caller thread, long before the work runs
+      }),
+      makeMessage({
+        exchangeId: 'ex-1',
+        endpoint: 'direct:asyncThing',
+        exchangeEventType: 'SENT',
+        messageType: 'RESPONSE',
+        timeStamp: '1500',
+        timeTaken: 50,
+      }),
+      ...hop('ex-1', 'mock:sync', 1600, 20),
+    ];
+
+    const spans = buildFlows(messages)[0]!.spans;
+
+    expect(spans).toHaveLength(2);
+    spans.forEach((span) => {
+      expect(span.end - span.start, `${span.endpoint} bar does not match its own duration`).toBe(
+        span.durationMs,
+      );
+    });
+    // and the async hop is placed at the work, not at the enqueue
+    expect(spans.find((s) => s.endpoint === 'direct:asyncThing')!.start).toBe(1450);
+  });
+
   it('marks a hop with no SENT as pending, with no invented duration', () => {
     const flows = buildFlows([
       makeMessage({
