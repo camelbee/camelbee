@@ -18,6 +18,29 @@ your laptop and in SIT, UAT or a pod in the cluster.
 
 ![Debugger Page](images/debugger_page.png)
 
+## Table of Contents
+
+- [Why](#why)
+- [Features](#features)
+  - [Route Visualization](#route-visualization)
+  - [Message Tracing & Debugging](#message-tracing--debugging)
+  - [Latency Waterfall](#latency-waterfall)
+  - [Safe to Run Outside Development](#safe-to-run-outside-development)
+  - [Health Monitoring](#health-monitoring)
+  - [Real-time Metrics](#real-time-metrics)
+  - [Metrics Charts](#metrics-charts)
+  - [Settings](#settings)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+  - [Option 1: Add the Core Library as a Dependency (Recommended)](#option-1-add-the-core-library-as-a-dependency-recommended)
+  - [Option 2: Use a CamelBee Starter as Parent (New projects only)](#option-2-use-a-camelbee-starter-as-parent-new-projects-only)
+  - [Option 3: Build a Custom Core Library (Custom Java/Camel Versions)](#option-3-build-a-custom-core-library-custom-javacamel-versions)
+  - [Running CamelBee Outside Development](#running-camelbee-outside-development)
+  - [All configuration properties](#all-configuration-properties)
+  - [Securing the CamelBee Endpoints](#securing-the-camelbee-endpoints)
+  - [Detailed Documentation](#detailed-documentation)
+- [License](#license)
+
 ## Why
 
 Integrations are increasingly written by AI agents, and a whole one now arrives in a single commit —
@@ -135,6 +158,7 @@ camelbee/
 |   |-- standalone-core/                 # Plain Camel (camel-main) core module
 |   |   |-- README.md
 |   |-- quarkus-core-camelk/             # quarkus-core's sources, built against Camel K's platform
+|   |   |-- README.md
 |-- dependencies/
 |   |-- quarkus/                         # Quarkus BOM/dependency management
 |   |-- springboot/                      # Spring Boot BOM/dependency management
@@ -236,6 +260,8 @@ The recommended way for existing microservices. Add the CamelBee core library di
 
 **For Quarkus:**
 
+*Example: [core-only-quarkus-sample](examples/core-only-quarkus-sample/README.md)*
+
 Add the CamelBee core dependency:
 ```xml
 <dependency>
@@ -280,6 +306,8 @@ quarkus:
 ```
 
 **For Spring Boot:**
+
+*Example: [core-only-springboot-sample](examples/core-only-springboot-sample/README.md)*
 
 Add the CamelBee core dependency. `spring-boot-starter-web` and `camel-spring-boot-starter` are
 `provided` — declare them yourself (at your own versions) if they aren't already in your POM:
@@ -349,6 +377,8 @@ public class YourApplication {
 
 **For Standalone (plain Camel / `camel-main`, no Spring Boot or Quarkus):**
 
+*Example: [core-only-standalone-sample](examples/core-only-standalone-sample/README.md)*
+
 > **Note:** For standalone projects without an existing parent POM, the starter (Option 2) is the recommended path — it brings `camel-platform-http-main` and Micrometer/Prometheus metrics automatically.
 
 Add the CamelBee core dependency, together with `camel-platform-http-main` (CamelBee uses the camel-main management server to expose its UI and API):
@@ -412,6 +442,8 @@ camel.server.port = 8080
 
 **For Camel K:**
 
+*Example: [allcomponent-camelk-sample](examples/allcomponent-camelk-sample/README.md)*
+
 Camel K runs integrations on the **Camel Quarkus** runtime, but pins an older Camel than this project's main build (Camel 4.8.5 vs 4.21). Use `camelbee-quarkus-core-camelk` — the same sources built against Camel K's baseline. Declare everything in your integration file's modeline (the core's CDI beans are auto-discovered because the jar ships a Jandex index):
 
 ```java
@@ -474,6 +506,9 @@ public class YourRoute extends RouteBuilder {
 Only suitable for new projects without an existing parent POM. The starters are available on Maven Central and automatically include the core library, embedded UI, and all required dependencies — including all dependency version management. No local build needed.
 
 **For Quarkus:**
+
+*Example: [allcomponent-quarkus-sample](examples/allcomponent-quarkus-sample/README.md)*
+
 ```xml
 <parent>
   <groupId>io.camelbee</groupId>
@@ -517,6 +552,9 @@ quarkus:
 ```
 
 **For Spring Boot:**
+
+*Example: [allcomponent-springboot-sample](examples/allcomponent-springboot-sample/README.md)*
+
 ```xml
 <parent>
   <groupId>io.camelbee</groupId>
@@ -573,6 +611,9 @@ public class YourApplication {
 ```
 
 **For Standalone (plain Camel / `camel-main`, no Spring Boot or Quarkus):**
+
+*Example: [allcomponent-standalone-sample](examples/allcomponent-standalone-sample/README.md)*
+
 ```xml
 <parent>
   <groupId>io.camelbee</groupId>
@@ -872,7 +913,7 @@ altogether, is in the **Securing the CamelBee endpoints** section of your core R
 - **Quarkus:** [CamelBee Quarkus Core README](https://github.com/camelbee/camelbee/blob/main/core/quarkus-core/README.md)
 - **Spring Boot:** [CamelBee SpringBoot Core README](https://github.com/camelbee/camelbee/blob/main/core/springboot-core/README.md)
 - **Standalone:** [CamelBee Standalone Core README](https://github.com/camelbee/camelbee/blob/main/core/standalone-core/README.md)
-- **Camel K:** [CamelBee Camel K Sample README](https://github.com/camelbee/camelbee/blob/main/examples/allcomponent-camelk-sample/README.md)
+- **Camel K:** [CamelBee Camel K Sample README](https://github.com/camelbee/camelbee/blob/main/examples/allcomponent-camelk-sample/README.md) · [CamelBee Quarkus Core (Camel K runtime) README](https://github.com/camelbee/camelbee/blob/main/core/quarkus-core-camelk/README.md)
 - **Security (JWT validation routes):** [CamelBee Security README](https://github.com/camelbee/camelbee/blob/main/security/README.md)
 - **Embedded UI development:** [CamelBee UI README](https://github.com/camelbee/camelbee/blob/main/ui/README.md)
 
