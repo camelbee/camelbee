@@ -189,14 +189,20 @@ Traced headers and bodies are shown in the UI and written to the application log
 captured is disclosed. CamelBee therefore **redacts sensitive values by default** — you do not have
 to switch this on.
 
-- Keys such as `password`, `token`, `authorization`, `apikey`, `creditcard`, `cvv`, `iban` and `ssn`
-  are replaced with `***`.
-- Matching ignores case and separators, so one `apikey` entry also catches `X-Api-Key`.
-- Set `camelbee.masked-keys` to your own comma-separated list to replace the defaults.
+- Nineteen keys are replaced with `***` by default: `password`, `passwd`, `secret`, `token`,
+  `authorization`, `auth`, `apikey`, `accesskey`, `privatekey`, `credential`, `creditcard`,
+  `cardnumber`, `cardno`, `cvv`, `cvc`, `iban`, `ssn`, `pin` and `otp`.
+- Matching ignores case and separators, so one `apikey` entry also catches `X-Api-Key`, `api_key`
+  and `apiKey`.
+- An entry matches a whole word of a key. `password` covers `userPassword`; `auth` does not redact
+  `author`, and `pin` does not redact `shippingAddress`.
+- Set `camelbee.masked-keys` to your own comma-separated list. It **replaces** the defaults rather
+  than adding to them, so include the built-in keys you still want.
 
 **Know the limits.** Header redaction is exact, because the key name is known. Body redaction is
-best-effort pattern matching over JSON, XML and form-encoded payloads: it cannot redact a field you
-did not configure, and a body in some other format is left untouched. If a body must never be
+best-effort pattern matching over JSON, XML, form-encoded and line-oriented `key: value`
+payloads: it cannot redact a field you did not configure, a nested object under a sensitive key is
+not descended into, and a body in some other format is left untouched. If a body must never be
 captured under any circumstances, set `camelbee.tracer-body-enabled = false`, which reads no body
 text at all. Note that this setting does **not** affect headers — redaction is what protects those.
 

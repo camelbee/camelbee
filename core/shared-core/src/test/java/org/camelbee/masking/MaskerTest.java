@@ -150,6 +150,18 @@ class MaskerTest {
     }
 
     @Test
+    @DisplayName("redacting an xml attribute does not swallow the rest of the document")
+    void boundsAttributeValues() {
+      // an attribute value has no '&' or whitespace before the end of the body, so an unbounded
+      // value pattern consumed everything after it: '<user password=***' and the element, its text
+      // and its closing tag were simply gone from the trace.
+      String masked = DEFAULTS.maskBody("<user password=\"hunter2\">ege</user>");
+
+      assertThat(masked).doesNotContain("hunter2");
+      assertThat(masked).isEqualTo("<user password=\"***\">ege</user>");
+    }
+
+    @Test
     @DisplayName("redacts form-encoded and query-string values")
     void redactsFormEncoded() {
       String masked = DEFAULTS.maskBody("user=ege&password=hunter2&remember=true");
@@ -173,6 +185,103 @@ class MaskerTest {
     void nullAndEmpty() {
       assertThat(DEFAULTS.maskBody(null)).isNull();
       assertThat(DEFAULTS.maskBody("")).isEmpty();
+    }
+  }
+
+  @Nested
+  @DisplayName("key matching")
+  class KeyMatching {
+
+    @Test
+    @DisplayName("a configured key matches a whole word, not a substring of a longer one")
+    void matchesWholeWordsOnly() {
+      // 'auth' inside 'author', 'secret' inside 'secretary', 'pin' inside 'shipping'. These are
+      // ordinary business fields: redacting them protects nothing and destroys exactly the data the
+      // trace exists to show, which is a worse failure here than a miss would be elsewhere.
+      assertThat(DEFAULTS.isSensitiveKey("Author")).isFalse();
+      assertThat(DEFAULTS.isSensitiveKey("secretary")).isFalse();
+      assertThat(DEFAULTS.isSensitiveKey("X-Shipping-Id")).isFalse();
+
+      assertThat(DEFAULTS.maskBody("{\"author\":\"Coltrane\"}")).contains("Coltrane");
+      assertThat(DEFAULTS.maskBody("{\"shippingAddress\":\"Main St 5\"}")).contains("Main St 5");
+      assertThat(DEFAULTS.maskBody("<shippingCost>12.50</shippingCost>")).contains("12.50");
+      assertThat(DEFAULTS.maskBody("author=Coltrane&shipping=express"))
+          .contains("author=Coltrane").contains("shipping=express");
+    }
+
+    @Test
+    @DisplayName("still matches a configured key that is one word of a compound key")
+    void matchesCompoundKeys() {
+      assertThat(DEFAULTS.isSensitiveKey("userPassword")).isTrue();
+      assertThat(DEFAULTS.isSensitiveKey("password_confirmation")).isTrue();
+      assertThat(DEFAULTS.maskBody("{\"userPassword\":\"hunter2\"}")).doesNotContain("hunter2");
+    }
+
+    @Test
+    @DisplayName("a body key obeys the same separator rules as a header key")
+    void bodyKeysHonourSeparators() {
+      // these leaked: the body patterns searched for the literal 'apikey', so the snake_case and
+      // kebab-case spellings went out untouched while the header path redacted the very same name.
+      // snake_case is the majority convention in JSON APIs, so this was not an edge case.
+      assertThat(DEFAULTS.maskBody("{\"api_key\":\"abc\"}")).doesNotContain("abc");
+      assertThat(DEFAULTS.maskBody("{\"access-key\":\"abc\"}")).doesNotContain("abc");
+      assertThat(DEFAULTS.maskBody("{\"credit_card\":\"4111\"}")).doesNotContain("4111");
+      assertThat(DEFAULTS.maskBody("<credit-card>4111</credit-card>")).doesNotContain("4111");
+      assertThat(DEFAULTS.maskBody("api_key=abc&access-key=def"))
+          .doesNotContain("abc").doesNotContain("def");
+    }
+
+    @Test
+    @DisplayName("an acronym run splits where the next word starts")
+    void splitsAcronyms() {
+      assertThat(DEFAULTS.isSensitiveKey("APIKey")).isTrue();
+      assertThat(DEFAULTS.isSensitiveKey("SSNValue")).isTrue();
+    }
+  }
+
+  @Nested
+  @DisplayName("line-oriented bodies")
+  class LineOrientedBodies {
+
+    @Test
+    @DisplayName("redacts a raw http header block captured as a body")
+    void redactsHttpHeaderBlock() {
+      // the case that justifies handling 'key: value' at all - a proxied or dumped request carries
+      // the single highest-value secret in the default list as plain text
+      String masked = DEFAULTS.maskBody("GET /orders HTTP/1.1\nHost: api.example.com\n"
+          + "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9\nAccept: application/json");
+
+      assertThat(masked).doesNotContain("eyJhbGciOiJIUzI1NiJ9");
+      assertThat(masked).contains("Host: api.example.com");
+      assertThat(masked).contains("Accept: application/json");
+    }
+
+    @Test
+    @DisplayName("redacts an indented yaml value")
+    void redactsYaml() {
+      String masked = DEFAULTS.maskBody("datasource:\n  username: ege\n  password: hunter2\n");
+
+      assertThat(masked).doesNotContain("hunter2");
+      assertThat(masked).contains("username: ege");
+    }
+
+    @Test
+    @DisplayName("leaves a sentence that merely contains a colon alone")
+    void leavesProseAlone() {
+      // why the pattern is anchored to the start of a line rather than matching any colon: an
+      // unanchored rule redacts the tail of ordinary prose, which is why payload tracers usually
+      // decline to handle this shape at all
+      String body = "please rotate the password: it expired last week";
+
+      assertThat(DEFAULTS.maskBody(body)).isEqualTo(body);
+    }
+
+    @Test
+    @DisplayName("a url is not mistaken for a key: value pair")
+    void leavesUrlsAlone() {
+      String body = "see http://host:8080/path for details";
+
+      assertThat(DEFAULTS.maskBody(body)).isEqualTo(body);
     }
   }
 

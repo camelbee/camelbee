@@ -286,10 +286,11 @@ camelbee:
   auth-enabled: true
   username: camelbee
   password: change-me
-  # Sensitive values are redacted at the point of capture. Replace the built-in key
-  # list if yours differs; set tracer-body-enabled: false to never capture bodies at all.
+  # Sensitive values are redacted at the point of capture. Setting masked-keys REPLACES
+  # the 19 built-in keys rather than adding to them, so list every key you still want;
+  # set tracer-body-enabled: false to never capture bodies at all.
   masking-enabled: true
-  # masked-keys: password,token,authorization,apikey,creditcard,cvv,iban,ssn
+  # masked-keys: password,passwd,secret,token,authorization,auth,apikey,accesskey,privatekey,credential,creditcard,cardnumber,cardno,cvv,cvc,iban,ssn,pin,otp,nationalId
   tracer-body-enabled: true
 
 quarkus:
@@ -343,10 +344,11 @@ camelbee:
   auth-enabled: true
   username: camelbee
   password: change-me
-  # Sensitive values are redacted at the point of capture. Replace the built-in key
-  # list if yours differs; set tracer-body-enabled: false to never capture bodies at all.
+  # Sensitive values are redacted at the point of capture. Setting masked-keys REPLACES
+  # the 19 built-in keys rather than adding to them, so list every key you still want;
+  # set tracer-body-enabled: false to never capture bodies at all.
   masking-enabled: true
-  # masked-keys: password,token,authorization,apikey,creditcard,cvv,iban,ssn
+  # masked-keys: password,passwd,secret,token,authorization,auth,apikey,accesskey,privatekey,credential,creditcard,cardnumber,cardno,cvv,cvc,iban,ssn,pin,otp,nationalId
   tracer-body-enabled: true
 
 management:
@@ -426,10 +428,11 @@ camelbee.logging-enabled = false
 camelbee.auth-enabled = true
 camelbee.username = camelbee
 camelbee.password = change-me
-# Sensitive values are redacted at the point of capture. Replace the built-in key
-# list if yours differs; set tracer-body-enabled = false to never capture bodies at all.
+# Sensitive values are redacted at the point of capture. Setting masked-keys REPLACES
+# the 19 built-in keys rather than adding to them, so list every key you still want;
+# set tracer-body-enabled = false to never capture bodies at all.
 camelbee.masking-enabled = true
-# camelbee.masked-keys = password,token,authorization,apikey,creditcard,cvv,iban,ssn
+# camelbee.masked-keys = password,passwd,secret,token,authorization,auth,apikey,accesskey,privatekey,credential,creditcard,cardnumber,cardno,cvv,cvc,iban,ssn,pin,otp,nationalId
 camelbee.tracer-body-enabled = true
 
 # the application's own platform-http server (your routes)
@@ -532,10 +535,11 @@ camelbee:
   auth-enabled: true
   username: camelbee
   password: change-me
-  # Sensitive values are redacted at the point of capture. Replace the built-in key
-  # list if yours differs; set tracer-body-enabled: false to never capture bodies at all.
+  # Sensitive values are redacted at the point of capture. Setting masked-keys REPLACES
+  # the 19 built-in keys rather than adding to them, so list every key you still want;
+  # set tracer-body-enabled: false to never capture bodies at all.
   masking-enabled: true
-  # masked-keys: password,token,authorization,apikey,creditcard,cvv,iban,ssn
+  # masked-keys: password,passwd,secret,token,authorization,auth,apikey,accesskey,privatekey,credential,creditcard,cardnumber,cardno,cvv,cvc,iban,ssn,pin,otp,nationalId
   tracer-body-enabled: true
 
 quarkus:
@@ -578,10 +582,11 @@ camelbee:
   auth-enabled: true
   username: camelbee
   password: change-me
-  # Sensitive values are redacted at the point of capture. Replace the built-in key
-  # list if yours differs; set tracer-body-enabled: false to never capture bodies at all.
+  # Sensitive values are redacted at the point of capture. Setting masked-keys REPLACES
+  # the 19 built-in keys rather than adding to them, so list every key you still want;
+  # set tracer-body-enabled: false to never capture bodies at all.
   masking-enabled: true
-  # masked-keys: password,token,authorization,apikey,creditcard,cvv,iban,ssn
+  # masked-keys: password,passwd,secret,token,authorization,auth,apikey,accesskey,privatekey,credential,creditcard,cardnumber,cardno,cvv,cvc,iban,ssn,pin,otp,nationalId
   tracer-body-enabled: true
 
 management:
@@ -654,10 +659,11 @@ camelbee.logging-enabled = false
 camelbee.auth-enabled = true
 camelbee.username = camelbee
 camelbee.password = change-me
-# Sensitive values are redacted at the point of capture. Replace the built-in key
-# list if yours differs; set tracer-body-enabled = false to never capture bodies at all.
+# Sensitive values are redacted at the point of capture. Setting masked-keys REPLACES
+# the 19 built-in keys rather than adding to them, so list every key you still want;
+# set tracer-body-enabled = false to never capture bodies at all.
 camelbee.masking-enabled = true
-# camelbee.masked-keys = password,token,authorization,apikey,creditcard,cvv,iban,ssn
+# camelbee.masked-keys = password,passwd,secret,token,authorization,auth,apikey,accesskey,privatekey,credential,creditcard,cardnumber,cardno,cvv,cvc,iban,ssn,pin,otp,nationalId
 camelbee.tracer-body-enabled = true
 
 # the application's own platform-http server (your routes)
@@ -702,10 +708,11 @@ camelbee:
   auth-enabled: true
   username: camelbee
   password: change-me
-  # Sensitive values are redacted at the point of capture. Replace the built-in key
-  # list if yours differs; set tracer-body-enabled: false to never capture bodies at all.
+  # Sensitive values are redacted at the point of capture. Setting masked-keys REPLACES
+  # the 19 built-in keys rather than adding to them, so list every key you still want;
+  # set tracer-body-enabled: false to never capture bodies at all.
   masking-enabled: true
-  # masked-keys: password,token,authorization,apikey,creditcard,cvv,iban,ssn
+  # masked-keys: password,passwd,secret,token,authorization,auth,apikey,accesskey,privatekey,credential,creditcard,cardnumber,cardno,cvv,cvc,iban,ssn,pin,otp,nationalId
   tracer-body-enabled: true
 
 quarkus:
@@ -745,10 +752,11 @@ camelbee:
   auth-enabled: true
   username: camelbee
   password: change-me
-  # Sensitive values are redacted at the point of capture. Replace the built-in key
-  # list if yours differs; set tracer-body-enabled: false to never capture bodies at all.
+  # Sensitive values are redacted at the point of capture. Setting masked-keys REPLACES
+  # the 19 built-in keys rather than adding to them, so list every key you still want;
+  # set tracer-body-enabled: false to never capture bodies at all.
   masking-enabled: true
-  # masked-keys: password,token,authorization,apikey,creditcard,cvv,iban,ssn
+  # masked-keys: password,passwd,secret,token,authorization,auth,apikey,accesskey,privatekey,credential,creditcard,cardnumber,cardno,cvv,cvc,iban,ssn,pin,otp,nationalId
   tracer-body-enabled: true
 
 management:
@@ -804,7 +812,7 @@ configuration. Three further properties are available when you need them:
 # redact configured keys out of traced headers and bodies (default: true)
 camelbee.masking-enabled = true
 # your own comma-separated key list, replacing the built-in one
-camelbee.masked-keys = password,token,authorization,apikey,creditcard,cvv,iban,ssn
+camelbee.masked-keys = password,passwd,secret,token,authorization,auth,apikey,accesskey,privatekey,credential,creditcard,cardnumber,cardno,cvv,cvc,iban,ssn,pin,otp,nationalId
 # never capture body text at all - the only hard guarantee (default: true)
 camelbee.tracer-body-enabled = true
 ```
@@ -833,7 +841,7 @@ started; nothing else has to be set. Same names on all runtimes — `camelbee.*`
 | `camelbee.tracer-max-messages-count` | `1000` | Cap on retained traced messages; the UI warns when it is hit. |
 | `camelbee.tracer-body-enabled` | `true` | Set `false` to never capture body text at all — the only hard guarantee. |
 | `camelbee.masking-enabled` | `true` | Redacts sensitive values out of traced headers and bodies at the point of capture. |
-| `camelbee.masked-keys` | *(built-in list)* | Comma-separated keys replacing the built-in list (`password,token,authorization,apikey,creditcard,cvv,iban,ssn`). |
+| `camelbee.masked-keys` | *(19 built-in keys)* | Comma-separated list that **replaces** the built-in one, rather than adding to it: `password, passwd, secret, token, authorization, auth, apikey, accesskey, privatekey, credential, creditcard, cardnumber, cardno, cvv, cvc, iban, ssn, pin, otp`. A key is matched whole-word and separator-insensitively, so `apikey` covers `X-Api-Key`, `api_key` and `apiKey`, and `userPassword` is caught by `password` - but `shipping` is not caught by `pin`. |
 | `camelbee.auth-enabled` | `true` | Requires a login for the UI and REST API. Leave on outside a laptop. |
 | `camelbee.username` | `camelbee` | Login user when authentication is on. |
 | `camelbee.password` | *(none)* | Login password. Set it, or via `CAMELBEE_PASSWORD`. No default — auth cannot be used until it is set. |
