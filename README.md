@@ -11,10 +11,11 @@ your laptop and in SIT, UAT or a pod in the cluster.
 
 > **On Spring Boot or Quarkus, but not using Camel?** Your service almost certainly still does
 > integration work — REST clients, scheduled jobs, queue listeners, retries, mappers — spread across
-> classes with no picture of how they fit together, and nothing to show what actually flowed through them
-> last Tuesday. Written as Camel routes with CamelBee added, that same logic reports its own topology and
-> lets you replay any request hop by hop, in the environment where it broke, without standing up a
-> tracing backend first. Camel is the routing engine; CamelBee is what makes it something you can see.
+> classes with no picture of how they fit together, and no way to watch a request move through them
+> without adding log statements and redeploying. Written as Camel routes with CamelBee added, that same
+> logic reports its own topology, and switching on the tracer shows the next requests hop by hop — in the
+> environment where it breaks, without standing up a tracing backend first. Camel is the routing engine;
+> CamelBee is what makes it something you can see.
 
 ![Debugger Page](images/debugger_page.png)
 
