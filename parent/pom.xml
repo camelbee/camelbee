@@ -86,7 +86,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <skipSurefireReport>true</skipSurefireReport>
-        <sonar-maven-plugin.version>5.7.0.6970</sonar-maven-plugin.version>
+        <sonar-maven-plugin.version>5.8.0.7211</sonar-maven-plugin.version>
         <sonar.coverage.exclusions>**/*Test*.*, **/*Config*.*</sonar.coverage.exclusions>
         <sonar.projectKey>camelbee.${project.name}</sonar.projectKey>
         <sonar.qualitygate.wait>true</sonar.qualitygate.wait>
