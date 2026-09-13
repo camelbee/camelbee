@@ -44,7 +44,7 @@
              grandparent of every generated microservice, where ${project.version} is the user's
              own version (e.g. 1.0-SNAPSHOT) and the unpack fails. Bump with each release. -->
         <camelbee.version>4.0.1</camelbee.version>
-        <checkstyle.version>14.0.0</checkstyle.version>
+        <checkstyle.version>14.1.0</checkstyle.version>
         <commons-io.version>2.22.0</commons-io.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
         <cxf-core.version>4.2.3</cxf-core.version>
