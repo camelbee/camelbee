@@ -159,7 +159,7 @@ The following files have been resolved:
    org.openapitools:jackson-databind-nullable:jar:0.2.11:compile -- module org.openapitools.jackson.nullable
    org.opentest4j:opentest4j:jar:1.3.0:test -- module org.opentest4j
    org.ow2.asm:asm:jar:9.7.1:test -- module org.objectweb.asm
-   org.projectlombok:lombok:jar:1.18.46:provided -- module lombok
+   org.projectlombok:lombok:jar:1.18.48:provided -- module lombok
    org.rnorth.duct-tape:duct-tape:jar:1.0.8:test -- module duct.tape (auto)
    org.skyscreamer:jsonassert:jar:1.5.3:test -- module jsonassert (auto)
    org.slf4j:jul-to-slf4j:jar:2.0.18:provided -- module jul.to.slf4j

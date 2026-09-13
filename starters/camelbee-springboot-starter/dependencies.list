@@ -210,7 +210,7 @@ The following files have been resolved:
    org.ow2.asm:asm-commons:jar:9.10.1:compile -- module org.objectweb.asm.commons
    org.ow2.asm:asm-tree:jar:9.10.1:compile -- module org.objectweb.asm.tree
    org.ow2.asm:asm:jar:9.7.1:compile -- module org.objectweb.asm
-   org.projectlombok:lombok:jar:1.18.46:provided -- module lombok
+   org.projectlombok:lombok:jar:1.18.48:provided -- module lombok
    org.rnorth.duct-tape:duct-tape:jar:1.0.8:test -- module duct.tape (auto)
    org.skyscreamer:jsonassert:jar:1.5.3:test -- module jsonassert (auto)
    org.slf4j:jul-to-slf4j:jar:2.0.18:compile -- module jul.to.slf4j

@@ -298,7 +298,7 @@ The following files have been resolved:
    org.ow2.asm:asm-tree:jar:9.7:test -- module org.objectweb.asm.tree
    org.ow2.asm:asm-util:jar:9.7:test -- module org.objectweb.asm.util
    org.ow2.asm:asm:jar:9.7:test -- module org.objectweb.asm
-   org.projectlombok:lombok:jar:1.18.46:provided -- module lombok
+   org.projectlombok:lombok:jar:1.18.48:provided -- module lombok
    org.reactivestreams:reactive-streams:jar:1.0.4:compile -- module org.reactivestreams [auto]
    org.rnorth.duct-tape:duct-tape:jar:1.0.8:test -- module duct.tape (auto)
    org.slf4j:slf4j-api:jar:2.0.6:compile -- module org.slf4j
