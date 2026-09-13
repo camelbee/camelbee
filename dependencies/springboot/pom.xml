@@ -30,7 +30,7 @@
         <!-- Verified against the actual 1.15.1 jars (javap on AnthropicChatModel$Builder /
              MistralAiChatModel$Builder etc.) for base URLs, endpoint paths, auth headers, and
              response shapes — don't bump without re-verifying provider wiring in the archetype. -->
-        <langchain4j.version>1.19.0</langchain4j.version>
+        <langchain4j.version>1.20.0</langchain4j.version>
         <!-- Must match ${avro-maven-plugin.version} in the parent pom: the generated Avro record
              classes call runtime API from the codegen version. apicurio-registry-serdes-avro-serde
              pulls an older avro transitively, which would otherwise win mediation. Bump both together.
