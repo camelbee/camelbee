@@ -74,7 +74,7 @@
         <maven-pmd-plugin.version>3.28.0</maven-pmd-plugin.version>
         <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
         <maven-surefire-plugin.version>3.6.0</maven-surefire-plugin.version>
-        <maven-surefire-report-plugin.version>3.5.6</maven-surefire-report-plugin.version>
+        <maven-surefire-report-plugin.version>3.6.0</maven-surefire-report-plugin.version>
         <!-- Derived from java.version so a module overriding it moves source/target with it. -->
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
