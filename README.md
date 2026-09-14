@@ -268,7 +268,7 @@ Add the CamelBee core dependency:
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-quarkus-core</artifactId>
-  <version>4.0.1</version>
+  <version>4.1.0</version>
 </dependency>
 ```
 
@@ -317,7 +317,7 @@ Add the CamelBee core dependency. `spring-boot-starter-web` and `camel-spring-bo
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-springboot-core</artifactId>
-  <version>4.0.1</version>
+  <version>4.1.0</version>
 </dependency>
 <!-- supplied by your application, at your versions -->
 <dependency>
@@ -389,7 +389,7 @@ Add the CamelBee core dependency, together with `camel-platform-http-main` (Came
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-standalone-core</artifactId>
-  <version>4.0.1</version>
+  <version>4.1.0</version>
 </dependency>
 <dependency>
   <groupId>org.apache.camel</groupId>
@@ -451,7 +451,7 @@ camel.server.port = 8080
 Camel K runs integrations on the **Camel Quarkus** runtime, but pins an older Camel than this project's main build (Camel 4.8.5 vs 4.22). Use `camelbee-quarkus-core-camelk` — the same sources built against Camel K's baseline. Declare everything in your integration file's modeline (the core's CDI beans are auto-discovered because the jar ships a Jandex index):
 
 ```java
-// camel-k: dependency=mvn:io.camelbee:camelbee-quarkus-core-camelk:4.0.1
+// camel-k: dependency=mvn:io.camelbee:camelbee-quarkus-core-camelk:4.1.0
 // camel-k: dependency=camel:direct
 // camel-k: dependency=camel:log
 // camel-k: build-property=camelbee.context-enabled=true
@@ -517,7 +517,7 @@ Only suitable for new projects without an existing parent POM. The starters are 
 <parent>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-quarkus-starter</artifactId>
-  <version>4.0.1</version>
+  <version>4.1.0</version>
 </parent>
 ```
 
@@ -564,7 +564,7 @@ quarkus:
 <parent>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-springboot-starter</artifactId>
-  <version>4.0.1</version>
+  <version>4.1.0</version>
 </parent>
 ```
 
@@ -624,7 +624,7 @@ public class YourApplication {
 <parent>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-standalone-starter</artifactId>
-  <version>4.0.1</version>
+  <version>4.1.0</version>
 </parent>
 ```
 
@@ -690,7 +690,7 @@ provided `pom-custom.xml` and add it as a dependency.
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-quarkus-core-custom</artifactId>
-  <version>4.0.1</version>
+  <version>4.1.0</version>
 </dependency>
 ```
 
@@ -734,7 +734,7 @@ quarkus:
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-springboot-core-custom</artifactId>
-  <version>4.0.1</version>
+  <version>4.1.0</version>
 </dependency>
 ```
 
@@ -791,7 +791,7 @@ public class YourApplication {
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-standalone-core-custom</artifactId>
-  <version>4.0.1</version>
+  <version>4.1.0</version>
 </dependency>
 <dependency>
   <groupId>org.apache.camel</groupId>

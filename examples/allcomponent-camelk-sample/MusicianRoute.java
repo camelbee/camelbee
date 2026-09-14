@@ -1,4 +1,4 @@
-// camel-k: dependency=mvn:io.camelbee:camelbee-quarkus-core-camelk:4.0.1
+// camel-k: dependency=mvn:io.camelbee:camelbee-quarkus-core-camelk:4.1.0
 // camel-k: dependency=camel:http
 // camel-k: dependency=camel:mock
 // camel-k: dependency=camel:seda

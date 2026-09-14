@@ -34,7 +34,7 @@
 
     <groupId>io.camelbee</groupId>
     <artifactId>core-only-standalone-sample</artifactId>
-    <version>4.0.1</version>
+    <version>4.1.0</version>
     <packaging>jar</packaging>
 
     <name>core-only-standalone-sample</name>
@@ -44,7 +44,7 @@
     <properties>
         <!-- The floor from the README version table. Raising this defeats the point of the module. -->
         <camel.version>4.12.0</camel.version>
-        <camelbee.version>4.0.1</camelbee.version>
+        <camelbee.version>4.1.0</camelbee.version>
         <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <logback-classic.version>1.5.13</logback-classic.version>

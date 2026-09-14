@@ -21,7 +21,7 @@
     <parent>
         <groupId>io.camelbee</groupId>
         <artifactId>camelbee</artifactId>
-        <version>4.0.1</version>
+        <version>4.1.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -43,7 +43,7 @@
              configs. MUST stay a literal, not ${project.version}: this pom is also the inherited
              grandparent of every generated microservice, where ${project.version} is the user's
              own version (e.g. 1.0-SNAPSHOT) and the unpack fails. Bump with each release. -->
-        <camelbee.version>4.0.1</camelbee.version>
+        <camelbee.version>4.1.0</camelbee.version>
         <checkstyle.version>14.1.0</checkstyle.version>
         <commons-io.version>2.22.0</commons-io.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
@@ -522,6 +522,10 @@
                         <include>**/*IntegrationTest.java</include>
                     </includes>
                     <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+                    <!-- Failsafe 3.6.0 stopped reading -DskipTests from the command line (use -DskipITs
+                         instead); explicitly binding it here restores the pre-3.6.0 contract that
+                         -DskipTests skips Failsafe too, which the "quality" build stage relies on. -->
+                    <skipTests>${skipTests}</skipTests>
                 </configuration>
                 <executions>
                     <execution>

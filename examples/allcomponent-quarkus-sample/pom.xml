@@ -22,12 +22,12 @@
   <parent>
     <groupId>io.camelbee</groupId>
     <artifactId>camelbee-quarkus-starter</artifactId>
-    <version>4.0.1</version>
+    <version>4.1.0</version>
     <relativePath>../../starters/camelbee-quarkus-starter/pom.xml</relativePath>
   </parent>
 
   <artifactId>allcomponent-quarkus-sample</artifactId>
-  <version>4.0.1</version>
+  <version>4.1.0</version>
   <packaging>jar</packaging>
 
   <name>allcomponent-quarkus-sample</name>

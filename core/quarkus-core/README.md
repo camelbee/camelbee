@@ -33,7 +33,7 @@ Add the CamelBee core dependency:
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-quarkus-core</artifactId>
-  <version>4.0.1</version>
+  <version>4.1.0</version>
 </dependency>
 ```
 
@@ -80,7 +80,7 @@ Only suitable for new projects without an existing parent POM. Simply use `camel
 <parent>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-quarkus-starter</artifactId>
-  <version>4.0.1</version>
+  <version>4.1.0</version>
 </parent>
 ```
 
@@ -149,7 +149,7 @@ mvn -f pom-custom.xml clean install    # run in ./camelbee/core/quarkus-core
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-quarkus-core-custom</artifactId>
-  <version>4.0.1</version>
+  <version>4.1.0</version>
 </dependency>
 ```
 

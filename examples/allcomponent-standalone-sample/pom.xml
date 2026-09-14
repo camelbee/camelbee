@@ -22,12 +22,12 @@
     <parent>
         <groupId>io.camelbee</groupId>
         <artifactId>camelbee-standalone-starter</artifactId>
-        <version>4.0.1</version>
+        <version>4.1.0</version>
         <relativePath>../../starters/camelbee-standalone-starter/pom.xml</relativePath>
     </parent>
 
     <artifactId>allcomponent-standalone-sample</artifactId>
-    <version>4.0.1</version>
+    <version>4.1.0</version>
     <packaging>jar</packaging>
 
     <name>allcomponent-standalone-sample</name>

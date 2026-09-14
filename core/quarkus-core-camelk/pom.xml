@@ -62,7 +62,7 @@
 	<parent>
 		<groupId>io.camelbee</groupId>
 		<artifactId>camelbee-quarkus-camelk-dependencies</artifactId>
-		<version>4.0.1</version>
+		<version>4.1.0</version>
 		<relativePath>../../dependencies/quarkus-camelk/pom.xml</relativePath>
 	</parent>
 
