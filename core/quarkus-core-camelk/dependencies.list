@@ -211,7 +211,7 @@ The following files have been resolved:
    org.apache.camel:camel-xpath:jar:4.8.5:test -- module camel.xpath (auto)
    org.apache.camel:camel-xslt:jar:4.8.5:test -- module camel.xslt (auto)
    org.apache.commons:commons-compress:jar:1.27.0:test -- module org.apache.commons.compress
-   org.apache.commons:commons-lang3:jar:3.17.0:compile -- module org.apache.commons.lang3
+   org.apache.commons:commons-lang3:jar:3.20.0:compile -- module org.apache.commons.lang3
    org.apache.cxf:cxf-core:jar:4.2.3:compile -- module org.apache.cxf.core [auto]
    org.apache.httpcomponents:httpclient:jar:4.5.14:test -- module org.apache.httpcomponents.httpclient [auto]
    org.apache.httpcomponents:httpcore:jar:4.4.16:test -- module org.apache.httpcomponents.httpcore [auto]

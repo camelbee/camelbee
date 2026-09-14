@@ -357,7 +357,7 @@ The following files have been resolved:
    org.testcontainers:junit-jupiter:jar:1.21.4:test -- module junit.jupiter (auto)
    org.testcontainers:testcontainers:jar:2.0.5:test -- module testcontainers (auto)
    org.wildfly.common:wildfly-common:jar:2.0.1:compile -- module org.wildfly.common
-   org.yaml:snakeyaml:jar:2.6:compile -- module org.yaml.snakeyaml
+   org.yaml:snakeyaml:jar:2.7:compile -- module org.yaml.snakeyaml
    wsdl4j:wsdl4j:jar:1.6.3:provided -- module wsdl4j (auto)
    xml-resolver:xml-resolver:jar:1.2:provided -- module xml.resolver (auto)
 

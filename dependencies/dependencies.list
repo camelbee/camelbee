@@ -30,5 +30,5 @@ The following files have been resolved:
    org.slf4j:slf4j-api:jar:1.7.36:test -- module org.slf4j [auto]
    org.testcontainers:junit-jupiter:jar:1.21.4:test -- module junit.jupiter (auto)
    org.testcontainers:testcontainers:jar:2.0.5:test -- module testcontainers (auto)
-   org.yaml:snakeyaml:jar:2.6:compile -- module org.yaml.snakeyaml
+   org.yaml:snakeyaml:jar:2.7:compile -- module org.yaml.snakeyaml
 

@@ -345,7 +345,7 @@ The following files have been resolved:
    org.testcontainers:testcontainers:jar:2.0.5:test -- module testcontainers (auto)
    org.xerial.snappy:snappy-java:jar:1.1.10.7:runtime -- module snappy.java (auto)
    org.xmlunit:xmlunit-core:jar:2.11.0:test -- module org.xmlunit [auto]
-   org.yaml:snakeyaml:jar:2.6:compile -- module org.yaml.snakeyaml
+   org.yaml:snakeyaml:jar:2.7:compile -- module org.yaml.snakeyaml
    tools.jackson.core:jackson-core:jar:3.1.5:compile -- module tools.jackson.core
    tools.jackson.core:jackson-databind:jar:3.1.5:compile -- module tools.jackson.databind
 

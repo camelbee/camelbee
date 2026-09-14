@@ -344,5 +344,5 @@ The following files have been resolved:
    org.testcontainers:junit-jupiter:jar:1.21.4:test -- module junit.jupiter (auto)
    org.testcontainers:testcontainers:jar:2.0.5:test -- module testcontainers (auto)
    org.wildfly.common:wildfly-common:jar:2.0.1:compile -- module org.wildfly.common
-   org.yaml:snakeyaml:jar:2.6:compile -- module org.yaml.snakeyaml
+   org.yaml:snakeyaml:jar:2.7:compile -- module org.yaml.snakeyaml
 

@@ -15,7 +15,7 @@ The following files have been resolved:
    junit:junit:jar:4.13.2:test -- module junit [auto]
    net.java.dev.jna:jna:jar:5.8.0:test -- module com.sun.jna [auto]
    org.apache.commons:commons-compress:jar:1.27.0:test -- module org.apache.commons.compress
-   org.apache.commons:commons-lang3:jar:3.17.0:compile -- module org.apache.commons.lang3
+   org.apache.commons:commons-lang3:jar:3.20.0:compile -- module org.apache.commons.lang3
    org.apache.cxf:cxf-core:jar:4.2.3:compile -- module org.apache.cxf.core [auto]
    org.apache.ws.xmlschema:xmlschema-core:jar:2.3.2:compile -- module xmlschema.core (auto)
    org.codehaus.woodstox:stax2-api:jar:4.2.2:compile -- module org.codehaus.stax2
@@ -31,5 +31,5 @@ The following files have been resolved:
    org.slf4j:slf4j-api:jar:2.0.6:test -- module org.slf4j
    org.testcontainers:junit-jupiter:jar:1.21.4:test -- module junit.jupiter (auto)
    org.testcontainers:testcontainers:jar:1.20.1:test -- module testcontainers (auto)
-   org.yaml:snakeyaml:jar:2.6:compile -- module org.yaml.snakeyaml
+   org.yaml:snakeyaml:jar:2.7:compile -- module org.yaml.snakeyaml
 
