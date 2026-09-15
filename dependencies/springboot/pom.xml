@@ -29,8 +29,14 @@
         <apicurio-registry-serdes.version>2.6.13.Final</apicurio-registry-serdes.version>
         <!-- Verified against the actual 1.15.1 jars (javap on AnthropicChatModel$Builder /
              MistralAiChatModel$Builder etc.) for base URLs, endpoint paths, auth headers, and
-             response shapes — don't bump without re-verifying provider wiring in the archetype. -->
-        <langchain4j.version>1.20.0</langchain4j.version>
+             response shapes — don't bump without re-verifying provider wiring in the archetype.
+
+             Kept equal to the Quarkus side's langchain4j.version (dependencies/quarkus/pom.xml) even
+             though camel-spring-boot-bom does not itself pin dev.langchain4j:langchain4j-core (so this
+             property alone decides every dev.langchain4j:* version here, unlike Quarkus where it has
+             to match quarkus-camel-bom's langchain4j-core pin) — see the Quarkus property's comment for
+             the version-skew failure mode this avoids on that side. -->
+        <langchain4j.version>1.19.0</langchain4j.version>
         <!-- Must match ${avro-maven-plugin.version} in the parent pom: the generated Avro record
              classes call runtime API from the codegen version. apicurio-registry-serdes-avro-serde
              pulls an older avro transitively, which would otherwise win mediation. Bump both together.
