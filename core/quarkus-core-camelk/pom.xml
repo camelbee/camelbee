@@ -62,7 +62,7 @@
 	<parent>
 		<groupId>io.camelbee</groupId>
 		<artifactId>camelbee-quarkus-camelk-dependencies</artifactId>
-		<version>4.0.1</version>
+		<version>4.1.0</version>
 		<relativePath>../../dependencies/quarkus-camelk/pom.xml</relativePath>
 	</parent>
 
@@ -91,7 +91,7 @@
 		<!-- Sources are shared with quarkus-core, which holds the coverage gate; no second gate here. -->
 		<jacoco.line.coverage.minimum>0.00</jacoco.line.coverage.minimum>
 
-		<build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
+		<build-helper-maven-plugin.version>3.6.2</build-helper-maven-plugin.version>
 	</properties>
 
 	<dependencies>

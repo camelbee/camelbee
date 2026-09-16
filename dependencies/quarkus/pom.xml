@@ -21,7 +21,7 @@
     <parent>
         <groupId>io.camelbee</groupId>
         <artifactId>dependencies</artifactId>
-        <version>4.0.1</version>
+        <version>4.1.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -32,7 +32,7 @@
 
     <properties>
 
-        <quarkus.platform.version>3.39.1</quarkus.platform.version>
+        <quarkus.platform.version>3.39.3</quarkus.platform.version>
         <camel-quarkus.platform.version>${quarkus.platform.version}</camel-quarkus.platform.version>
         <quarkiverse-artemis.version>3.0.0</quarkiverse-artemis.version>
         <assertj-core.version>3.27.7</assertj-core.version>
@@ -45,16 +45,30 @@
         <camel-quarkus.platform.group-id>${quarkus.platform.group-id}</camel-quarkus.platform.group-id>
         <camel-quarkus.platform.artifact-id>quarkus-camel-bom</camel-quarkus.platform.artifact-id>
         <org.awaitility.awaitility>4.3.0</org.awaitility.awaitility>
-        <org.jetbrains.kotlin.kotlin-reflect.version>2.4.10</org.jetbrains.kotlin.kotlin-reflect.version>
+        <org.jetbrains.kotlin.kotlin-reflect.version>2.4.20</org.jetbrains.kotlin.kotlin-reflect.version>
         <com.google.crypto.tink.version>1.23.0</com.google.crypto.tink.version>
         <!-- MCP support for generated microservices (declared conditionally in the archetype). -->
-        <quarkus-mcp-server.version>1.13.1</quarkus-mcp-server.version>
+        <quarkus-mcp-server.version>2.0.1</quarkus-mcp-server.version>
         <mcp-sdk.version>2.0.1</mcp-sdk.version>
         <!-- langchain4j BOM for the LANGCHAIN4JAGENT / LANGCHAIN4JEMBEDDING backends (declared
              conditionally in the archetype). Verified against the actual 1.15.1 jars (javap on
              AnthropicChatModel$Builder / MistralAiChatModel$Builder etc.) for base URLs, endpoint
              paths, auth headers, and response shapes — don't bump without re-verifying provider
-             wiring in the archetype. Kept in sync with the SpringBoot side. -->
+             wiring in the archetype. Kept in sync with the SpringBoot side.
+
+             MUST match the dev.langchain4j:langchain4j-core version that ${camel-quarkus.platform.artifact-id}
+             pins (currently 1.19.0 — grep quarkus-camel-bom-${camel-quarkus.platform.version}.pom for
+             langchain4j-core). This BOM is imported AFTER the Quarkus platform BOMs so those win on
+             langchain4j-core/langchain4j/langchain4j-open-ai/langchain4j-embeddings overlap (see below) —
+             but langchain4j-anthropic/-mistral-ai (stable track) and langchain4j-pgvector/
+             -embeddings-all-minilm-l6-v2 (beta track) are NOT managed by the Quarkus platform BOMs, so
+             THIS property is the only thing pinning them. If it drifts from langchain4j-core's pinned
+             version, those artifacts pair against a langchain4j-core they were never built against and
+             every Quarkus LANGCHAIN4JAGENT/LANGCHAIN4JEMBEDDING project fails at boot with
+             NoClassDefFoundError (pgvector/embeddings) or malformed provider requests (anthropic/
+             mistral-ai) — this happened when langchain4j.version was bumped to 1.20.0 while
+             quarkus-camel-bom stayed on langchain4j-core 1.19.0. Bumping camel-quarkus.platform.version
+             may silently change langchain4j-core's pinned version too — re-check it whenever that moves. -->
         <langchain4j.version>1.19.0</langchain4j.version>
     </properties>
 

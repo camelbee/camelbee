@@ -43,7 +43,7 @@
 
     <groupId>io.camelbee</groupId>
     <artifactId>core-only-quarkus-sample</artifactId>
-    <version>4.0.1</version>
+    <version>4.1.0</version>
     <packaging>jar</packaging>
 
     <name>core-only-quarkus-sample</name>
@@ -54,7 +54,7 @@
         <!-- The floor from the README version table. Raising these defeats the point of the module. -->
         <quarkus.version>3.15.4</quarkus.version>
         <camel-quarkus.version>3.15.3</camel-quarkus.version>
-        <camelbee.version>4.0.1</camelbee.version>
+        <camelbee.version>4.1.0</camelbee.version>
         <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>

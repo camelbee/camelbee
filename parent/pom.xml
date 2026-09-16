@@ -21,7 +21,7 @@
     <parent>
         <groupId>io.camelbee</groupId>
         <artifactId>camelbee</artifactId>
-        <version>4.0.1</version>
+        <version>4.1.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -37,14 +37,14 @@
              (no floor) so modules without Java tests don't fail the build; each
              tested module overrides this with its baseline and ratchets toward 0.80. -->
         <jacoco.line.coverage.minimum>0.00</jacoco.line.coverage.minimum>
-        <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
+        <build-helper-maven-plugin.version>3.6.2</build-helper-maven-plugin.version>
         <camel-maven-plugin.version>4.22.0</camel-maven-plugin.version>
         <!-- Version of io.camelbee:common unpacked for the shared checkstyle/spotbugs/formatter
              configs. MUST stay a literal, not ${project.version}: this pom is also the inherited
              grandparent of every generated microservice, where ${project.version} is the user's
              own version (e.g. 1.0-SNAPSHOT) and the unpack fails. Bump with each release. -->
-        <camelbee.version>4.0.1</camelbee.version>
-        <checkstyle.version>14.0.0</checkstyle.version>
+        <camelbee.version>4.1.0</camelbee.version>
+        <checkstyle.version>14.1.0</checkstyle.version>
         <commons-io.version>2.22.0</commons-io.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
         <cxf-core.version>4.2.3</cxf-core.version>
@@ -62,19 +62,19 @@
         <json-schema-validator.version>3.0.7</json-schema-validator.version>
         <java.version>21</java.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
-        <lombok.version>1.18.46</lombok.version>
+        <lombok.version>1.18.48</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
-        <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.11.0</maven-dependency-plugin.version>
-        <maven-failsafe-plugin.version>3.5.6</maven-failsafe-plugin.version>
+        <maven-failsafe-plugin.version>3.6.0</maven-failsafe-plugin.version>
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
         <maven-jxr-plugin.version>3.6.0</maven-jxr-plugin.version>
       
         <maven-pmd-plugin.version>3.28.0</maven-pmd-plugin.version>
         <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
-        <maven-surefire-plugin.version>3.5.6</maven-surefire-plugin.version>
-        <maven-surefire-report-plugin.version>3.5.6</maven-surefire-report-plugin.version>
+        <maven-surefire-plugin.version>3.6.0</maven-surefire-plugin.version>
+        <maven-surefire-report-plugin.version>3.6.0</maven-surefire-report-plugin.version>
         <!-- Derived from java.version so a module overriding it moves source/target with it. -->
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -86,17 +86,17 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <skipSurefireReport>true</skipSurefireReport>
-        <sonar-maven-plugin.version>5.7.0.6970</sonar-maven-plugin.version>
+        <sonar-maven-plugin.version>5.8.0.7211</sonar-maven-plugin.version>
         <sonar.coverage.exclusions>**/*Test*.*, **/*Config*.*</sonar.coverage.exclusions>
         <sonar.projectKey>camelbee.${project.name}</sonar.projectKey>
         <sonar.qualitygate.wait>true</sonar.qualitygate.wait>
         <spotbugs-annotations.version>4.10.4</spotbugs-annotations.version>
-        <spotbugs-maven-plugin.version>4.10.4.0</spotbugs-maven-plugin.version>
+        <spotbugs-maven-plugin.version>4.10.4.1</spotbugs-maven-plugin.version>
         <spotbugs.version>4.10.4</spotbugs.version>
 
         <testcontainers-bom.version>2.0.5</testcontainers-bom.version>
         <junit-jupiter.version>1.21.4</junit-jupiter.version>
-        <snakeyaml.version>2.6</snakeyaml.version>
+        <snakeyaml.version>2.7</snakeyaml.version>
         <wiremock.version>3.13.2</wiremock.version>
         <nimbus-jose-jwt.version>10.9.1</nimbus-jose-jwt.version>
         <os-maven-plugin.version>1.7.1</os-maven-plugin.version>
@@ -106,7 +106,7 @@
         <avro-maven-plugin.version>1.12.1</avro-maven-plugin.version>
         <maven-replacer-plugin.version>1.5.3</maven-replacer-plugin.version>
         <jakarta.xml.ws-api.version>4.0.3</jakarta.xml.ws-api.version>
-        <swagger-annotations-jakarta.version>2.2.54</swagger-annotations-jakarta.version>
+        <swagger-annotations-jakarta.version>2.2.55</swagger-annotations-jakarta.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
 
         <!-- ================================================================ -->
@@ -134,7 +134,7 @@
           → Use <dependencyManagement> to enforce versions
         -->
         <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
-        <proto-google-common-protos.version>2.75.0</proto-google-common-protos.version>
+        <proto-google-common-protos.version>2.76.0</proto-google-common-protos.version>
         <protoc.version>3.25.8</protoc.version>
         <protoc-gen-grpc-java.version>1.78.0</protoc-gen-grpc-java.version>
         <!-- ================================================================ -->
@@ -522,6 +522,10 @@
                         <include>**/*IntegrationTest.java</include>
                     </includes>
                     <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+                    <!-- Failsafe 3.6.0 stopped reading -DskipTests from the command line (use -DskipITs
+                         instead); explicitly binding it here restores the pre-3.6.0 contract that
+                         -DskipTests skips Failsafe too, which the "quality" build stage relies on. -->
+                    <skipTests>${skipTests}</skipTests>
                 </configuration>
                 <executions>
                     <execution>

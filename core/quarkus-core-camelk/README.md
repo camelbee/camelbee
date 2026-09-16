@@ -40,7 +40,7 @@ Built as part of the normal reactor build (`mvn clean install` from the repo roo
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-quarkus-core-camelk</artifactId>
-  <version>4.0.1</version>
+  <version>4.1.0</version>
 </dependency>
 ```
 
@@ -55,7 +55,7 @@ runs the same Camel K runtime this module was built against (see below).
 ## Consuming it from a Camel K modeline
 
 ```java
-// camel-k: dependency=mvn:io.camelbee:camelbee-quarkus-core-camelk:4.0.1
+// camel-k: dependency=mvn:io.camelbee:camelbee-quarkus-core-camelk:4.1.0
 // camel-k: dependency=camel:direct
 // camel-k: dependency=camel:log
 // camel-k: build-property=camelbee.context-enabled=true

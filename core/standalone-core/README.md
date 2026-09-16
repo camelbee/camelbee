@@ -30,7 +30,7 @@ The simplest path. Use `camelbee-standalone-starter` as your project's parent PO
 <parent>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-standalone-starter</artifactId>
-  <version>4.0.1</version>
+  <version>4.1.0</version>
 </parent>
 ```
 
@@ -42,7 +42,7 @@ For projects with an existing parent POM. Add the CamelBee core library directly
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-standalone-core</artifactId>
-  <version>4.0.1</version>
+  <version>4.1.0</version>
 </dependency>
 <dependency>
   <groupId>org.apache.camel</groupId>
@@ -80,7 +80,7 @@ mvn -f pom-custom.xml clean install    # run in ./camelbee/core/standalone-core
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-standalone-core-custom</artifactId>
-  <version>4.0.1</version>
+  <version>4.1.0</version>
 </dependency>
 <dependency>
   <groupId>org.apache.camel</groupId>

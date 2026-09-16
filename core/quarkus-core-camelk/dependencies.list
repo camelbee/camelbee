@@ -211,7 +211,7 @@ The following files have been resolved:
    org.apache.camel:camel-xpath:jar:4.8.5:test -- module camel.xpath (auto)
    org.apache.camel:camel-xslt:jar:4.8.5:test -- module camel.xslt (auto)
    org.apache.commons:commons-compress:jar:1.27.0:test -- module org.apache.commons.compress
-   org.apache.commons:commons-lang3:jar:3.17.0:compile -- module org.apache.commons.lang3
+   org.apache.commons:commons-lang3:jar:3.20.0:compile -- module org.apache.commons.lang3
    org.apache.cxf:cxf-core:jar:4.2.3:compile -- module org.apache.cxf.core [auto]
    org.apache.httpcomponents:httpclient:jar:4.5.14:test -- module org.apache.httpcomponents.httpclient [auto]
    org.apache.httpcomponents:httpcore:jar:4.4.16:test -- module org.apache.httpcomponents.httpcore [auto]
@@ -298,7 +298,7 @@ The following files have been resolved:
    org.ow2.asm:asm-tree:jar:9.7:test -- module org.objectweb.asm.tree
    org.ow2.asm:asm-util:jar:9.7:test -- module org.objectweb.asm.util
    org.ow2.asm:asm:jar:9.7:test -- module org.objectweb.asm
-   org.projectlombok:lombok:jar:1.18.46:provided -- module lombok
+   org.projectlombok:lombok:jar:1.18.48:provided -- module lombok
    org.reactivestreams:reactive-streams:jar:1.0.4:compile -- module org.reactivestreams [auto]
    org.rnorth.duct-tape:duct-tape:jar:1.0.8:test -- module duct.tape (auto)
    org.slf4j:slf4j-api:jar:2.0.6:compile -- module org.slf4j

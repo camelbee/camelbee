@@ -31,7 +31,7 @@ Add the CamelBee core dependency. `spring-boot-starter-web` and `camel-spring-bo
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-springboot-core</artifactId>
-  <version>4.0.1</version>
+  <version>4.1.0</version>
 </dependency>
 <!-- supplied by your application, at your versions -->
 <dependency>
@@ -104,7 +104,7 @@ Only suitable for new projects without an existing parent POM. Simply use `camel
 <parent>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-springboot-starter</artifactId>
-  <version>4.0.1</version>
+  <version>4.1.0</version>
 </parent>
 ```
 
@@ -186,7 +186,7 @@ mvn -f pom-custom.xml clean install    # run in ./camelbee/core/springboot-core
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-springboot-core-custom</artifactId>
-  <version>4.0.1</version>
+  <version>4.1.0</version>
 </dependency>
 ```
 
