@@ -50,7 +50,7 @@
           quarkus-core-camelk, which recompiles these sources from source against that
           baseline rather than consuming this jar. See that file.
         -->
-        <shared.camel.version>4.22.0</shared.camel.version>
+        <shared.camel.version>4.22.1</shared.camel.version>
         <jacoco.line.coverage.minimum>0.80</jacoco.line.coverage.minimum>
 
         <!-- Test-only versions. Declared here rather than inherited: this module's parent is
