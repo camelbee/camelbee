@@ -38,7 +38,7 @@
              tested module overrides this with its baseline and ratchets toward 0.80. -->
         <jacoco.line.coverage.minimum>0.00</jacoco.line.coverage.minimum>
         <build-helper-maven-plugin.version>3.6.2</build-helper-maven-plugin.version>
-        <camel-maven-plugin.version>4.22.0</camel-maven-plugin.version>
+        <camel-maven-plugin.version>4.22.1</camel-maven-plugin.version>
         <!-- Version of io.camelbee:common unpacked for the shared checkstyle/spotbugs/formatter
              configs. MUST stay a literal, not ${project.version}: this pom is also the inherited
              grandparent of every generated microservice, where ${project.version} is the user's
