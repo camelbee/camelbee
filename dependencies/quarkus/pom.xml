@@ -69,7 +69,7 @@
              mistral-ai) — this happened when langchain4j.version was bumped to 1.20.0 while
              quarkus-camel-bom stayed on langchain4j-core 1.19.0. Bumping camel-quarkus.platform.version
              may silently change langchain4j-core's pinned version too — re-check it whenever that moves. -->
-        <langchain4j.version>1.19.0</langchain4j.version>
+        <langchain4j.version>1.20.0</langchain4j.version>
     </properties>
 
     <dependencyManagement>
