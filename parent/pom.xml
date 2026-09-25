@@ -67,14 +67,22 @@
         <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
         <maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.11.0</maven-dependency-plugin.version>
-        <maven-failsafe-plugin.version>3.6.0</maven-failsafe-plugin.version>
+        <maven-failsafe-plugin.version>3.5.6</maven-failsafe-plugin.version>
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
         <maven-jxr-plugin.version>3.6.0</maven-jxr-plugin.version>
       
         <maven-pmd-plugin.version>3.28.0</maven-pmd-plugin.version>
         <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
-        <maven-surefire-plugin.version>3.6.0</maven-surefire-plugin.version>
-        <maven-surefire-report-plugin.version>3.6.0</maven-surefire-report-plugin.version>
+        <!--
+          surefire/failsafe/report are pinned to 3.5.6, NOT 3.6.0. 3.6.0's console-output capture
+          (StackWalkerStrategy) loads a class through Quarkus's FacadeClassLoader while the main thread
+          holds that loader's lock waiting on the deployment-dependency resolver, so any JDK/JUL log line
+          emitted from a resolver thread (e.g. the PKCS12 truststore load) deadlocks the forked test JVM
+          at 0% CPU, forever. Seen 2026-09-25 in security/quarkus-security. Lift the pin once a
+          surefire/Quarkus release fixes it, and re-run 'mvn clean install' several times to check.
+        -->
+        <maven-surefire-plugin.version>3.5.6</maven-surefire-plugin.version>
+        <maven-surefire-report-plugin.version>3.5.6</maven-surefire-report-plugin.version>
         <!-- Derived from java.version so a module overriding it moves source/target with it. -->
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>

@@ -52,6 +52,16 @@
       "enabled": false
     },
     {
+      "description": "Surefire, failsafe and the report plugin are held at 3.5.6. 3.6.0's console-output capture (StackWalkerStrategy) loads a class through Quarkus's FacadeClassLoader while the main thread holds its lock waiting on the deployment-dependency resolver; a JDK/JUL log line from a resolver thread then deadlocks the forked test JVM forever (seen in security/quarkus-security, 2026-09-25). Grouped so the three can't drift. Lift the cap only after a fixed surefire/Quarkus release, verified by repeated full 'mvn clean install' runs.",
+      "groupName": "Maven surefire/failsafe/report (held below 3.6.0)",
+      "matchPackageNames": [
+        "org.apache.maven.plugins:maven-surefire-plugin",
+        "org.apache.maven.plugins:maven-failsafe-plugin",
+        "org.apache.maven.plugins:maven-surefire-report-plugin"
+      ],
+      "allowedVersions": "<3.6.0"
+    },
+    {
       "description": "Avro is capped below 1.12.2 on purpose. 1.12.2 added org.apache.avro.util.ClassSecurityValidator to ClassUtils.forName, which SpecificDatumReader.setSchema reaches via SpecificData.getClass. Its default trust list is JDK scalars only, so camel-avro's data format throws SecurityException on every generated record class ('Forbidden <pkg>.Order! This class is not trusted to be included in Avro schemas'). Archetype scenario 9 caught it: all 28 springboot avro variants failed while quarkus passed on 1.12.1 from the platform BOM. 1.12.1 is the only version with both the Utf8.compareSequences the generated code needs (1.12.0, which apicurio-registry-serdes-avro-serde pulls transitively, lacks it) and no validator. Lifting this cap is not a renovate.json edit: adopting 1.12.2+ means setting org.apache.avro.SERIALIZABLE_CLASSES / SERIALIZABLE_PACKAGES in every generated microservice before the data format initialises. The runtime and the codegen plugin are grouped so they can never drift apart - dependencies/springboot/pom.xml requires avro.version to match avro-maven-plugin.version.",
       "groupName": "Avro (runtime + codegen plugin, must move together)",
       "matchPackageNames": [

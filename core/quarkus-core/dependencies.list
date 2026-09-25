@@ -33,73 +33,73 @@ The following files have been resolved:
    commons-codec:commons-codec:jar:1.22.1:test -- module org.apache.commons.codec
    commons-io:commons-io:jar:2.22.0:compile -- module org.apache.commons.io
    io.camelbee:camelbee-core:jar:4.1.0:compile -- module camelbee.core (auto)
-   io.netty:netty-buffer:jar:4.1.137.Final:compile -- module io.netty.buffer [auto]
-   io.netty:netty-codec-dns:jar:4.1.137.Final:compile -- module io.netty.codec.dns [auto]
-   io.netty:netty-codec-haproxy:jar:4.1.137.Final:compile -- module io.netty.codec.haproxy [auto]
-   io.netty:netty-codec-http2:jar:4.1.137.Final:compile -- module io.netty.codec.http2 [auto]
-   io.netty:netty-codec-http:jar:4.1.137.Final:compile -- module io.netty.codec.http [auto]
-   io.netty:netty-codec-socks:jar:4.1.137.Final:compile -- module io.netty.codec.socks [auto]
-   io.netty:netty-codec:jar:4.1.137.Final:compile -- module io.netty.codec [auto]
-   io.netty:netty-common:jar:4.1.137.Final:compile -- module io.netty.common [auto]
-   io.netty:netty-handler-proxy:jar:4.1.137.Final:compile -- module io.netty.handler.proxy [auto]
-   io.netty:netty-handler:jar:4.1.137.Final:compile -- module io.netty.handler [auto]
-   io.netty:netty-resolver-dns:jar:4.1.137.Final:compile -- module io.netty.resolver.dns [auto]
-   io.netty:netty-resolver:jar:4.1.137.Final:compile -- module io.netty.resolver [auto]
-   io.netty:netty-tcnative-classes:jar:2.0.81.Final:compile -- module io.netty.tcnative.classes.openssl
-   io.netty:netty-transport-native-unix-common:jar:4.1.137.Final:compile -- module io.netty.transport.unix.common [auto]
-   io.netty:netty-transport:jar:4.1.137.Final:compile -- module io.netty.transport [auto]
+   io.netty:netty-buffer:jar:4.1.138.Final:compile -- module io.netty.buffer [auto]
+   io.netty:netty-codec-dns:jar:4.1.138.Final:compile -- module io.netty.codec.dns [auto]
+   io.netty:netty-codec-haproxy:jar:4.1.138.Final:compile -- module io.netty.codec.haproxy [auto]
+   io.netty:netty-codec-http2:jar:4.1.138.Final:compile -- module io.netty.codec.http2 [auto]
+   io.netty:netty-codec-http:jar:4.1.138.Final:compile -- module io.netty.codec.http [auto]
+   io.netty:netty-codec-socks:jar:4.1.138.Final:compile -- module io.netty.codec.socks [auto]
+   io.netty:netty-codec:jar:4.1.138.Final:compile -- module io.netty.codec [auto]
+   io.netty:netty-common:jar:4.1.138.Final:compile -- module io.netty.common [auto]
+   io.netty:netty-handler-proxy:jar:4.1.138.Final:compile -- module io.netty.handler.proxy [auto]
+   io.netty:netty-handler:jar:4.1.138.Final:compile -- module io.netty.handler [auto]
+   io.netty:netty-resolver-dns:jar:4.1.138.Final:compile -- module io.netty.resolver.dns [auto]
+   io.netty:netty-resolver:jar:4.1.138.Final:compile -- module io.netty.resolver [auto]
+   io.netty:netty-tcnative-classes:jar:2.0.84.Final:compile -- module io.netty.tcnative.classes.openssl
+   io.netty:netty-transport-native-unix-common:jar:4.1.138.Final:compile -- module io.netty.transport.unix.common [auto]
+   io.netty:netty-transport:jar:4.1.138.Final:compile -- module io.netty.transport [auto]
    io.quarkiverse.cxf:quarkus-cxf-axiom-api-stub:jar:3.39.1:provided -- module quarkus.cxf.axiom.api.stub (auto)
    io.quarkiverse.cxf:quarkus-cxf-saaj:jar:3.39.1:provided -- module quarkus.cxf.saaj (auto)
    io.quarkiverse.cxf:quarkus-cxf-woodstox:jar:3.39.1:provided -- module quarkus.cxf.woodstox (auto)
    io.quarkiverse.cxf:quarkus-cxf:jar:3.39.1:provided -- module quarkus.cxf (auto)
-   io.quarkus.arc:arc:jar:3.39.3:compile -- module io.quarkus.arc
+   io.quarkus.arc:arc:jar:3.39.5:compile -- module io.quarkus.arc
    io.quarkus.gizmo:gizmo2:jar:2.1.1:test -- module io.quarkus.gizmo2
    io.quarkus.gizmo:gizmo:jar:1.10.1:test -- module io.quarkus.gizmo
    io.quarkus.security:quarkus-security:jar:2.3.2:compile -- module io.quarkus.security.api [auto]
-   io.quarkus.vertx.utils:quarkus-vertx-utils:jar:3.39.3:provided -- module quarkus.vertx.utils (auto)
-   io.quarkus:quarkus-arc:jar:3.39.3:compile -- module quarkus.arc (auto)
-   io.quarkus:quarkus-bootstrap-app-model:jar:3.39.3:test -- module quarkus.bootstrap.app.model (auto)
-   io.quarkus:quarkus-bootstrap-core:jar:3.39.3:test -- module quarkus.bootstrap.core (auto)
-   io.quarkus:quarkus-bootstrap-gradle-resolver:jar:3.39.3:test -- module quarkus.bootstrap.gradle.resolver (auto)
-   io.quarkus:quarkus-bootstrap-json:jar:3.39.3:test -- module quarkus.bootstrap.json (auto)
-   io.quarkus:quarkus-bootstrap-maven-resolver:jar:3.39.3:test -- module quarkus.bootstrap.maven.resolver (auto)
-   io.quarkus:quarkus-bootstrap-maven4-resolver:jar:3.39.3:test -- module quarkus.bootstrap.maven4.resolver (auto)
-   io.quarkus:quarkus-bootstrap-runner:jar:3.39.3:compile -- module io.quarkus.bootstrap.runner
-   io.quarkus:quarkus-builder:jar:3.39.3:test -- module quarkus.builder (auto)
-   io.quarkus:quarkus-class-change-agent:jar:3.39.3:test -- module io.quarkus.changeagent
-   io.quarkus:quarkus-classloader-commons:jar:3.39.3:compile -- module io.quarkus.commons.classloading
-   io.quarkus:quarkus-core-deployment:jar:3.39.3:test -- module quarkus.core.deployment (auto)
-   io.quarkus:quarkus-core:jar:3.39.3:compile -- module io.quarkus.core [auto]
-   io.quarkus:quarkus-credentials:jar:3.39.3:compile -- module quarkus.credentials (auto)
-   io.quarkus:quarkus-development-mode-spi:jar:3.39.3:compile -- module io.quarkus.dev.spi
+   io.quarkus.vertx.utils:quarkus-vertx-utils:jar:3.39.5:provided -- module quarkus.vertx.utils (auto)
+   io.quarkus:quarkus-arc:jar:3.39.5:compile -- module quarkus.arc (auto)
+   io.quarkus:quarkus-bootstrap-app-model:jar:3.39.5:test -- module quarkus.bootstrap.app.model (auto)
+   io.quarkus:quarkus-bootstrap-core:jar:3.39.5:test -- module quarkus.bootstrap.core (auto)
+   io.quarkus:quarkus-bootstrap-gradle-resolver:jar:3.39.5:test -- module quarkus.bootstrap.gradle.resolver (auto)
+   io.quarkus:quarkus-bootstrap-json:jar:3.39.5:test -- module quarkus.bootstrap.json (auto)
+   io.quarkus:quarkus-bootstrap-maven-resolver:jar:3.39.5:test -- module quarkus.bootstrap.maven.resolver (auto)
+   io.quarkus:quarkus-bootstrap-maven4-resolver:jar:3.39.5:test -- module quarkus.bootstrap.maven4.resolver (auto)
+   io.quarkus:quarkus-bootstrap-runner:jar:3.39.5:compile -- module io.quarkus.bootstrap.runner
+   io.quarkus:quarkus-builder:jar:3.39.5:test -- module quarkus.builder (auto)
+   io.quarkus:quarkus-class-change-agent:jar:3.39.5:test -- module io.quarkus.changeagent
+   io.quarkus:quarkus-classloader-commons:jar:3.39.5:compile -- module io.quarkus.commons.classloading
+   io.quarkus:quarkus-core-deployment:jar:3.39.5:test -- module quarkus.core.deployment (auto)
+   io.quarkus:quarkus-core:jar:3.39.5:compile -- module io.quarkus.core [auto]
+   io.quarkus:quarkus-credentials:jar:3.39.5:compile -- module quarkus.credentials (auto)
+   io.quarkus:quarkus-development-mode-spi:jar:3.39.5:compile -- module io.quarkus.dev.spi
    io.quarkus:quarkus-fs-util:jar:1.4.2:compile -- module io.quarkus.fs.util
-   io.quarkus:quarkus-hibernate-validator-spi:jar:3.39.3:test -- module quarkus.hibernate.validator.spi (auto)
-   io.quarkus:quarkus-ide-launcher:jar:3.39.3:compile -- module io.quarkus.launcher [auto]
-   io.quarkus:quarkus-jackson:jar:3.39.3:provided -- module quarkus.jackson (auto)
-   io.quarkus:quarkus-jaxb:jar:3.39.3:provided -- module quarkus.jaxb (auto)
-   io.quarkus:quarkus-jaxp:jar:3.39.3:provided -- module quarkus.jaxp (auto)
-   io.quarkus:quarkus-jsonp:jar:3.39.3:compile -- module quarkus.jsonp (auto)
-   io.quarkus:quarkus-junit-common:jar:3.39.3:test -- module quarkus.junit.common (auto)
-   io.quarkus:quarkus-junit-config:jar:3.39.3:test -- module quarkus.junit.config (auto)
-   io.quarkus:quarkus-junit:jar:3.39.3:test -- module quarkus.junit (auto)
-   io.quarkus:quarkus-mutiny:jar:3.39.3:compile -- module quarkus.mutiny (auto)
-   io.quarkus:quarkus-netty:jar:3.39.3:compile -- module quarkus.netty (auto)
-   io.quarkus:quarkus-proxy-registry:jar:3.39.3:provided -- module quarkus.proxy.registry (auto)
-   io.quarkus:quarkus-resteasy-common:jar:3.39.3:provided -- module quarkus.resteasy.common (auto)
-   io.quarkus:quarkus-resteasy-jackson:jar:3.39.3:provided -- module quarkus.resteasy.jackson (auto)
-   io.quarkus:quarkus-resteasy-server-common:jar:3.39.3:provided -- module quarkus.resteasy.server.common (auto)
-   io.quarkus:quarkus-resteasy:jar:3.39.3:provided -- module quarkus.resteasy (auto)
-   io.quarkus:quarkus-security-runtime-spi:jar:3.39.3:compile -- module quarkus.security.runtime.spi (auto)
-   io.quarkus:quarkus-smallrye-context-propagation:jar:3.39.3:compile -- module quarkus.smallrye.context.propagation (auto)
-   io.quarkus:quarkus-smallrye-health:jar:3.39.3:compile -- module quarkus.smallrye.health (auto)
-   io.quarkus:quarkus-test-common:jar:3.39.3:test -- module quarkus.test.common (auto)
-   io.quarkus:quarkus-tls-registry-spi:jar:3.39.3:compile -- module quarkus.tls.registry.spi (auto)
-   io.quarkus:quarkus-tls-registry:jar:3.39.3:compile -- module quarkus.tls.registry (auto)
-   io.quarkus:quarkus-value-registry:jar:3.39.3:compile -- module quarkus.value.registry (auto)
-   io.quarkus:quarkus-vertx-http:jar:3.39.3:compile -- module quarkus.vertx.http (auto)
-   io.quarkus:quarkus-vertx-latebound-mdc-provider:jar:3.39.3:compile -- module quarkus.vertx.latebound.mdc.provider (auto)
-   io.quarkus:quarkus-vertx:jar:3.39.3:compile -- module quarkus.vertx (auto)
-   io.quarkus:quarkus-virtual-threads:jar:3.39.3:compile -- module quarkus.virtual.threads (auto)
+   io.quarkus:quarkus-hibernate-validator-spi:jar:3.39.5:test -- module quarkus.hibernate.validator.spi (auto)
+   io.quarkus:quarkus-ide-launcher:jar:3.39.5:compile -- module io.quarkus.launcher [auto]
+   io.quarkus:quarkus-jackson:jar:3.39.5:provided -- module quarkus.jackson (auto)
+   io.quarkus:quarkus-jaxb:jar:3.39.5:provided -- module quarkus.jaxb (auto)
+   io.quarkus:quarkus-jaxp:jar:3.39.5:provided -- module quarkus.jaxp (auto)
+   io.quarkus:quarkus-jsonp:jar:3.39.5:compile -- module quarkus.jsonp (auto)
+   io.quarkus:quarkus-junit-common:jar:3.39.5:test -- module quarkus.junit.common (auto)
+   io.quarkus:quarkus-junit-config:jar:3.39.5:test -- module quarkus.junit.config (auto)
+   io.quarkus:quarkus-junit:jar:3.39.5:test -- module quarkus.junit (auto)
+   io.quarkus:quarkus-mutiny:jar:3.39.5:compile -- module quarkus.mutiny (auto)
+   io.quarkus:quarkus-netty:jar:3.39.5:compile -- module quarkus.netty (auto)
+   io.quarkus:quarkus-proxy-registry:jar:3.39.5:provided -- module quarkus.proxy.registry (auto)
+   io.quarkus:quarkus-resteasy-common:jar:3.39.5:provided -- module quarkus.resteasy.common (auto)
+   io.quarkus:quarkus-resteasy-jackson:jar:3.39.5:provided -- module quarkus.resteasy.jackson (auto)
+   io.quarkus:quarkus-resteasy-server-common:jar:3.39.5:provided -- module quarkus.resteasy.server.common (auto)
+   io.quarkus:quarkus-resteasy:jar:3.39.5:provided -- module quarkus.resteasy (auto)
+   io.quarkus:quarkus-security-runtime-spi:jar:3.39.5:compile -- module quarkus.security.runtime.spi (auto)
+   io.quarkus:quarkus-smallrye-context-propagation:jar:3.39.5:compile -- module quarkus.smallrye.context.propagation (auto)
+   io.quarkus:quarkus-smallrye-health:jar:3.39.5:compile -- module quarkus.smallrye.health (auto)
+   io.quarkus:quarkus-test-common:jar:3.39.5:test -- module quarkus.test.common (auto)
+   io.quarkus:quarkus-tls-registry-spi:jar:3.39.5:compile -- module quarkus.tls.registry.spi (auto)
+   io.quarkus:quarkus-tls-registry:jar:3.39.5:compile -- module quarkus.tls.registry (auto)
+   io.quarkus:quarkus-value-registry:jar:3.39.5:compile -- module quarkus.value.registry (auto)
+   io.quarkus:quarkus-vertx-http:jar:3.39.5:compile -- module quarkus.vertx.http (auto)
+   io.quarkus:quarkus-vertx-latebound-mdc-provider:jar:3.39.5:compile -- module quarkus.vertx.latebound.mdc.provider (auto)
+   io.quarkus:quarkus-vertx:jar:3.39.5:compile -- module quarkus.vertx (auto)
+   io.quarkus:quarkus-virtual-threads:jar:3.39.5:compile -- module quarkus.virtual.threads (auto)
    io.smallrye.beanbag:smallrye-beanbag-maven:jar:1.6.1:test -- module io.smallrye.beanbag.maven [auto]
    io.smallrye.beanbag:smallrye-beanbag-sisu:jar:1.6.1:test -- module io.smallrye.beanbag.sisu
    io.smallrye.beanbag:smallrye-beanbag:jar:1.6.1:test -- module io.smallrye.beanbag
@@ -124,28 +124,28 @@ The following files have been resolved:
    io.smallrye.config:smallrye-config:jar:3.17.2:compile -- module io.smallrye.config.inject
    io.smallrye.reactive:mutiny-smallrye-context-propagation:jar:3.3.0:compile -- module io.smallrye.mutiny.context [auto]
    io.smallrye.reactive:mutiny:jar:3.3.0:compile -- module io.smallrye.mutiny
-   io.smallrye.reactive:smallrye-mutiny-vertx-auth-common:jar:3.23.0:compile -- module io.smallrye.mutiny.vertx.auth.common [auto]
-   io.smallrye.reactive:smallrye-mutiny-vertx-bridge-common:jar:3.23.0:compile -- module io.smallrye.mutiny.vertx.bridge.common [auto]
-   io.smallrye.reactive:smallrye-mutiny-vertx-core:jar:3.23.0:compile -- module io.smallrye.mutiny.vertx.core [auto]
-   io.smallrye.reactive:smallrye-mutiny-vertx-runtime:jar:3.23.0:compile -- module io.smallrye.mutiny.vertx.runtime [auto]
-   io.smallrye.reactive:smallrye-mutiny-vertx-uri-template:jar:3.23.0:compile -- module io.smallrye.mutiny.vertx.uri.template [auto]
-   io.smallrye.reactive:smallrye-mutiny-vertx-web-common:jar:3.23.0:compile -- module io.smallrye.mutiny.vertx.web.common [auto]
-   io.smallrye.reactive:smallrye-mutiny-vertx-web:jar:3.23.0:compile -- module io.smallrye.mutiny.vertx.web [auto]
+   io.smallrye.reactive:smallrye-mutiny-vertx-auth-common:jar:3.23.1:compile -- module io.smallrye.mutiny.vertx.auth.common [auto]
+   io.smallrye.reactive:smallrye-mutiny-vertx-bridge-common:jar:3.23.1:compile -- module io.smallrye.mutiny.vertx.bridge.common [auto]
+   io.smallrye.reactive:smallrye-mutiny-vertx-core:jar:3.23.1:compile -- module io.smallrye.mutiny.vertx.core [auto]
+   io.smallrye.reactive:smallrye-mutiny-vertx-runtime:jar:3.23.1:compile -- module io.smallrye.mutiny.vertx.runtime [auto]
+   io.smallrye.reactive:smallrye-mutiny-vertx-uri-template:jar:3.23.1:compile -- module io.smallrye.mutiny.vertx.uri.template [auto]
+   io.smallrye.reactive:smallrye-mutiny-vertx-web-common:jar:3.23.1:compile -- module io.smallrye.mutiny.vertx.web.common [auto]
+   io.smallrye.reactive:smallrye-mutiny-vertx-web:jar:3.23.1:compile -- module io.smallrye.mutiny.vertx.web [auto]
    io.smallrye:jandex-gizmo2:jar:3.6.0:test -- module org.jboss.jandex.gizmo2
    io.smallrye:jandex:jar:3.6.0:test -- module org.jboss.jandex
    io.smallrye:smallrye-context-propagation-api:jar:2.3.0:compile -- module smallrye.context.propagation.api (auto)
    io.smallrye:smallrye-context-propagation-storage:jar:2.3.0:compile -- module smallrye.context.propagation.storage (auto)
    io.smallrye:smallrye-context-propagation:jar:2.3.0:compile -- module smallrye.context.propagation (auto)
-   io.smallrye:smallrye-fault-tolerance-vertx:jar:6.11.2:compile -- module io.smallrye.faulttolerance.vertx [auto]
+   io.smallrye:smallrye-fault-tolerance-vertx:jar:6.11.4:compile -- module io.smallrye.faulttolerance.vertx [auto]
    io.smallrye:smallrye-health-api:jar:4.3.0:compile -- module smallrye.health.api (auto)
    io.smallrye:smallrye-health-provided-checks:jar:4.3.0:compile -- module smallrye.health.provided.checks (auto)
    io.smallrye:smallrye-health:jar:4.3.0:compile -- module smallrye.health (auto)
-   io.vertx:vertx-auth-common:jar:4.5.33:compile -- module io.vertx.auth.common [auto]
-   io.vertx:vertx-bridge-common:jar:4.5.33:compile -- module io.vertx.eventbusbridge.common [auto]
-   io.vertx:vertx-core:jar:4.5.33:compile -- module io.vertx.core [auto]
-   io.vertx:vertx-uri-template:jar:4.5.33:compile -- module io.vertx.uritemplate [auto]
-   io.vertx:vertx-web-common:jar:4.5.33:compile -- module io.vertx.web.common [auto]
-   io.vertx:vertx-web:jar:4.5.33:compile -- module io.vertx.web [auto]
+   io.vertx:vertx-auth-common:jar:4.5.34:compile -- module io.vertx.auth.common [auto]
+   io.vertx:vertx-bridge-common:jar:4.5.34:compile -- module io.vertx.eventbusbridge.common [auto]
+   io.vertx:vertx-core:jar:4.5.34:compile -- module io.vertx.core [auto]
+   io.vertx:vertx-uri-template:jar:4.5.34:compile -- module io.vertx.uritemplate [auto]
+   io.vertx:vertx-web-common:jar:4.5.34:compile -- module io.vertx.web.common [auto]
+   io.vertx:vertx-web:jar:4.5.34:compile -- module io.vertx.web [auto]
    jakarta.activation:jakarta.activation-api:jar:2.1.4:compile -- module jakarta.activation
    jakarta.annotation:jakarta.annotation-api:jar:3.0.0:compile -- module jakarta.annotation
    jakarta.el:jakarta.el-api:jar:6.0.1:compile -- module jakarta.el
@@ -167,12 +167,12 @@ The following files have been resolved:
    net.bytebuddy:byte-buddy-agent:jar:1.18.8:test -- module net.bytebuddy.agent
    net.bytebuddy:byte-buddy:jar:1.18.8:test -- module net.bytebuddy
    net.java.dev.jna:jna:jar:5.8.0:test -- module com.sun.jna [auto]
-   org.aesh:aesh:jar:3.17.5:test -- module org.aesh.aesh [auto]
-   org.aesh:readline-api:jar:3.17.2:test -- module org.aesh.readline.api [auto]
-   org.aesh:readline:jar:3.17.2:test -- module org.aesh.readline [auto]
-   org.aesh:terminal-api:jar:3.17.2:test -- module org.aesh.terminal.api [auto]
-   org.aesh:terminal-detect:jar:3.17.2:test -- module org.aesh.terminal.detect [auto]
-   org.aesh:terminal-tty:jar:3.17.2:test -- module org.aesh.terminal.tty [auto]
+   org.aesh:aesh:jar:3.18.1:test -- module org.aesh.aesh [auto]
+   org.aesh:readline-api:jar:3.18.1:test -- module org.aesh.readline.api [auto]
+   org.aesh:readline:jar:3.18.1:test -- module org.aesh.readline [auto]
+   org.aesh:terminal-api:jar:3.18.1:test -- module org.aesh.terminal.api [auto]
+   org.aesh:terminal-detect:jar:3.18.1:test -- module org.aesh.terminal.detect [auto]
+   org.aesh:terminal-tty:jar:3.18.1:test -- module org.aesh.terminal.tty [auto]
    org.apache.camel.quarkus:camel-quarkus-attachments:jar:3.39.0:provided -- module camel.quarkus.attachments (auto)
    org.apache.camel.quarkus:camel-quarkus-bean:jar:3.39.0:compile -- module camel.quarkus.bean (auto)
    org.apache.camel.quarkus:camel-quarkus-core:jar:3.39.0:compile -- module camel.quarkus.core (auto)
@@ -302,16 +302,16 @@ The following files have been resolved:
    org.glassfish.jaxb:jaxb-core:jar:4.0.9:compile -- module org.glassfish.jaxb.core
    org.glassfish.jaxb:jaxb-runtime:jar:4.0.9:compile -- module org.glassfish.jaxb.runtime
    org.glassfish.jaxb:txw2:jar:4.0.9:compile -- module com.sun.xml.txw2
-   org.graalvm.sdk:nativeimage:jar:23.1.2:test -- module org.graalvm.nativeimage
-   org.graalvm.sdk:word:jar:23.1.2:test -- module org.graalvm.word
+   org.graalvm.sdk:nativeimage:jar:25.0.4.1:test -- module org.graalvm.nativeimage
+   org.graalvm.sdk:word:jar:25.0.4.1:test -- module org.graalvm.word
    org.jboss.logging:commons-logging-jboss-logging:jar:2.0.0.Final:test -- module org.apache.commons.logging
    org.jboss.logging:jboss-logging:jar:3.6.3.Final:compile -- module org.jboss.logging
    org.jboss.logmanager:jboss-logmanager:jar:3.2.2.Final:compile -- module org.jboss.logmanager
    org.jboss.resteasy.microprofile:microprofile-config:jar:3.0.1.Final:provided -- module microprofile.config (auto)
-   org.jboss.resteasy:resteasy-cdi:jar:6.2.18.Final:provided -- module org.jboss.resteasy.cdi
-   org.jboss.resteasy:resteasy-core-spi:jar:6.2.18.Final:provided -- module org.jboss.resteasy.spi
-   org.jboss.resteasy:resteasy-core:jar:6.2.18.Final:provided -- module org.jboss.resteasy.core
-   org.jboss.resteasy:resteasy-jackson2-provider:jar:6.2.18.Final:provided -- module org.jboss.resteasy.plugins.providers.jackson
+   org.jboss.resteasy:resteasy-cdi:jar:6.2.19.Final:provided -- module org.jboss.resteasy.cdi
+   org.jboss.resteasy:resteasy-core-spi:jar:6.2.19.Final:provided -- module org.jboss.resteasy.spi
+   org.jboss.resteasy:resteasy-core:jar:6.2.19.Final:provided -- module org.jboss.resteasy.core
+   org.jboss.resteasy:resteasy-jackson2-provider:jar:6.2.19.Final:provided -- module org.jboss.resteasy.plugins.providers.jackson
    org.jboss.resteasy:resteasy-tracing-api:jar:2.0.2.Final:provided -- module org.jboss.resteasy.tracing.api
    org.jboss.slf4j:slf4j-jboss-logmanager:jar:2.0.2.Final:compile -- module slf4j.jboss.logmanager (auto)
    org.jboss.threads:jboss-threads:jar:3.9.2:compile -- module org.jboss.threads
@@ -329,7 +329,7 @@ The following files have been resolved:
    org.jvnet.staxex:stax-ex:jar:2.1.0:provided -- module org.jvnet.staxex
    org.mapstruct:mapstruct:jar:1.6.3:compile -- module org.mapstruct [auto]
    org.mockito:mockito-core:jar:5.21.0:test -- module org.mockito
-   org.mockito:mockito-junit-jupiter:jar:5.23.0:test -- module org.mockito.junit.jupiter
+   org.mockito:mockito-junit-jupiter:jar:5.24.0:test -- module org.mockito.junit.jupiter
    org.objenesis:objenesis:jar:3.3:test -- module org.objenesis [auto]
    org.openapitools:jackson-databind-nullable:jar:0.2.11:compile -- module org.openapitools.jackson.nullable
    org.opentest4j:opentest4j:jar:1.3.0:test -- module org.opentest4j
