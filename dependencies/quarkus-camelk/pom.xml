@@ -51,7 +51,7 @@
           BOM is to pin what Camel K actually runs.
         -->
         <commons-lang3.version>3.20.0</commons-lang3.version>
-        <mockito-junit-jupiter.version>5.23.0</mockito-junit-jupiter.version>
+        <mockito-junit-jupiter.version>5.24.0</mockito-junit-jupiter.version>
         <assertj-core.version>3.27.7</assertj-core.version>
     </properties>
 
