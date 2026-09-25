@@ -59,7 +59,7 @@
         "org.apache.maven.plugins:maven-failsafe-plugin",
         "org.apache.maven.plugins:maven-surefire-report-plugin"
       ],
-      "allowedVersions": "<3.6.0"
+      "allowedVersions": "/^3\\.[0-5]\\./"
     },
     {
       "description": "Avro is capped below 1.12.2 on purpose. 1.12.2 added org.apache.avro.util.ClassSecurityValidator to ClassUtils.forName, which SpecificDatumReader.setSchema reaches via SpecificData.getClass. Its default trust list is JDK scalars only, so camel-avro's data format throws SecurityException on every generated record class ('Forbidden <pkg>.Order! This class is not trusted to be included in Avro schemas'). Archetype scenario 9 caught it: all 28 springboot avro variants failed while quarkus passed on 1.12.1 from the platform BOM. 1.12.1 is the only version with both the Utf8.compareSequences the generated code needs (1.12.0, which apicurio-registry-serdes-avro-serde pulls transitively, lacks it) and no validator. Lifting this cap is not a renovate.json edit: adopting 1.12.2+ means setting org.apache.avro.SERIALIZABLE_CLASSES / SERIALIZABLE_PACKAGES in every generated microservice before the data format initialises. The runtime and the codegen plugin are grouped so they can never drift apart - dependencies/springboot/pom.xml requires avro.version to match avro-maven-plugin.version.",
@@ -69,6 +69,12 @@
         "org.apache.avro:avro-maven-plugin"
       ],
       "allowedVersions": "<1.12.2"
+    },
+    {
+      "description": "Quarkus langchain4j-bom must equal the langchain4j-core version quarkus-camel-bom pins (1.19.3 on platform 3.39.5). Ahead of it, every Quarkus LANGCHAIN4JAGENT/EMBEDDING project dies at boot with NoClassDefFoundError dev/langchain4j/internal/ProviderJsonSpec. Lift the cap only together with a quarkus.platform.version bump whose bom pins the newer langchain4j-core.",
+      "matchFileNames": ["dependencies/quarkus/pom.xml"],
+      "matchPackageNames": ["dev.langchain4j:langchain4j-bom"],
+      "allowedVersions": "<1.20.0"
     },
     {
       "description": "Notify only. A new camel-k-runtime release appears as an unchecked box on the Dependency Dashboard and creates no branch or PR until someone ticks it. Ticking it is not the fix: re-read a live operator with 'kubectl get camelcatalog -o jsonpath={.items[0].spec.runtime.metadata}' and update the comment block AND quarkus.version / camel-quarkus.version together in one hand-written PR.",

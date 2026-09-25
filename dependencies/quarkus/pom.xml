@@ -57,7 +57,7 @@
              wiring in the archetype. Kept in sync with the SpringBoot side.
 
              MUST match the dev.langchain4j:langchain4j-core version that ${camel-quarkus.platform.artifact-id}
-             pins (currently 1.19.0 — grep quarkus-camel-bom-${camel-quarkus.platform.version}.pom for
+             pins (currently 1.19.3 — grep quarkus-camel-bom-${camel-quarkus.platform.version}.pom for
              langchain4j-core). This BOM is imported AFTER the Quarkus platform BOMs so those win on
              langchain4j-core/langchain4j/langchain4j-open-ai/langchain4j-embeddings overlap (see below) —
              but langchain4j-anthropic/-mistral-ai (stable track) and langchain4j-pgvector/
@@ -67,9 +67,9 @@
              every Quarkus LANGCHAIN4JAGENT/LANGCHAIN4JEMBEDDING project fails at boot with
              NoClassDefFoundError (pgvector/embeddings) or malformed provider requests (anthropic/
              mistral-ai) — this happened when langchain4j.version was bumped to 1.20.0 while
-             quarkus-camel-bom stayed on langchain4j-core 1.19.0. Bumping camel-quarkus.platform.version
+             quarkus-camel-bom stayed on langchain4j-core 1.19.x. Bumping camel-quarkus.platform.version
              may silently change langchain4j-core's pinned version too — re-check it whenever that moves. -->
-        <langchain4j.version>1.20.0</langchain4j.version>
+        <langchain4j.version>1.19.3</langchain4j.version>
     </properties>
 
     <dependencyManagement>
