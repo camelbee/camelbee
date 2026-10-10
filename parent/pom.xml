@@ -556,6 +556,10 @@
                         <exclude>**/exception/*</exclude>
                         <exclude>**/*Config.*</exclude>
                         <exclude>**/*Test.*</exclude>
+                        <!-- quarkus-cxf's build-time ContextUtils transformer reflects over its own replacement class
+                             and expects every declared method to exist in CXF's ContextUtils; JaCoCo's
+                             synthetic $jacocoInit breaks that check (Quarkus platform 3.40+). -->
+                        <exclude>io.quarkiverse.cxf.*</exclude>
                         <!-- Exclude OpenAPI/Protobuf/Avro/JAXB generated models -->
                         <exclude>**/model/api/mcp/**</exclude>
                         <exclude>**/model/api/json/**</exclude>

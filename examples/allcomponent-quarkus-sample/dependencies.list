@@ -78,8 +78,8 @@ The following files have been resolved:
    io.prometheus:simpleclient_tracer_common:jar:0.16.0:compile -- module simpleclient.tracer.common (auto)
    io.prometheus:simpleclient_tracer_otel:jar:0.16.0:compile -- module simpleclient.tracer.otel (auto)
    io.prometheus:simpleclient_tracer_otel_agent:jar:0.16.0:compile -- module simpleclient.tracer.otel.agent (auto)
-   io.quarkiverse.artemis:quarkus-artemis-core:jar:3.14.3:compile -- module quarkus.artemis.core (auto)
-   io.quarkiverse.artemis:quarkus-artemis-jms:jar:3.14.3:compile -- module quarkus.artemis.jms (auto)
+   io.quarkiverse.artemis:quarkus-artemis-core:jar:3.15.0:compile -- module quarkus.artemis.core (auto)
+   io.quarkiverse.artemis:quarkus-artemis-jms:jar:3.15.0:compile -- module quarkus.artemis.jms (auto)
    io.quarkiverse.loggingjson:quarkus-logging-json:jar:3.5.0:compile -- module quarkus.logging.json (auto)
    io.quarkus.arc:arc:jar:3.39.5:compile -- module io.quarkus.arc
    io.quarkus.gizmo:gizmo2:jar:2.1.1:test -- module io.quarkus.gizmo2
@@ -232,10 +232,10 @@ The following files have been resolved:
    org.aesh:terminal-detect:jar:3.18.1:test -- module org.aesh.terminal.detect [auto]
    org.aesh:terminal-tty:jar:3.18.1:test -- module org.aesh.terminal.tty [auto]
    org.antlr:antlr4-runtime:jar:4.13.2:runtime -- module org.antlr.antlr4.runtime [auto]
-   org.apache.artemis:artemis-commons:jar:2.54.0:compile -- module artemis.commons (auto)
-   org.apache.artemis:artemis-core-client:jar:2.54.0:compile -- module artemis.core.client (auto)
-   org.apache.artemis:artemis-jakarta-client:jar:2.54.0:compile -- module artemis.jakarta.client (auto)
-   org.apache.artemis:artemis-selector:jar:2.54.0:compile -- module artemis.selector (auto)
+   org.apache.artemis:artemis-commons:jar:2.57.0:compile -- module artemis.commons (auto)
+   org.apache.artemis:artemis-core-client:jar:2.57.0:compile -- module artemis.core.client (auto)
+   org.apache.artemis:artemis-jakarta-client:jar:2.57.0:compile -- module artemis.jakarta.client (auto)
+   org.apache.artemis:artemis-selector:jar:2.57.0:compile -- module artemis.selector (auto)
    org.apache.camel.quarkus:camel-quarkus-attachments:jar:3.39.0:compile -- module camel.quarkus.attachments (auto)
    org.apache.camel.quarkus:camel-quarkus-bean-validator:jar:3.39.0:compile -- module camel.quarkus.bean.validator (auto)
    org.apache.camel.quarkus:camel-quarkus-bean:jar:3.39.0:compile -- module camel.quarkus.bean (auto)
@@ -329,9 +329,9 @@ The following files have been resolved:
    org.apache.camel:camel-xpath:jar:4.22.0:test -- module camel.xpath (auto)
    org.apache.camel:camel-xslt:jar:4.22.0:test -- module camel.xslt (auto)
    org.apache.commons:commons-compress:jar:1.28.0:test -- module org.apache.commons.compress
-   org.apache.commons:commons-lang3:jar:3.20.0:compile -- module org.apache.commons.lang3
+   org.apache.commons:commons-lang3:jar:3.21.0:compile -- module org.apache.commons.lang3
    org.apache.commons:commons-pool2:jar:2.11.1:compile -- module org.apache.commons.pool2 [auto]
-   org.apache.cxf:cxf-core:jar:4.2.3:compile -- module org.apache.cxf.core [auto]
+   org.apache.cxf:cxf-core:jar:4.2.4:compile -- module org.apache.cxf.core [auto]
    org.apache.groovy:groovy-json:jar:5.0.7:test -- module org.apache.groovy.json [auto]
    org.apache.groovy:groovy-xml:jar:5.0.7:test -- module org.apache.groovy.xml [auto]
    org.apache.groovy:groovy:jar:5.0.7:test -- module org.apache.groovy [auto]
@@ -442,7 +442,7 @@ The following files have been resolved:
    org.mongodb:mongodb-driver-reactivestreams:jar:5.6.5:compile -- module org.mongodb.driver.reactivestreams [auto]
    org.mongodb:mongodb-driver-sync:jar:5.6.5:compile -- module org.mongodb.driver.sync.client [auto]
    org.objenesis:objenesis:jar:3.3:test -- module org.objenesis [auto]
-   org.openapitools:jackson-databind-nullable:jar:0.2.11:compile -- module org.openapitools.jackson.nullable
+   org.openapitools:jackson-databind-nullable:jar:0.2.12:compile -- module org.openapitools.jackson.nullable
    org.opentest4j:opentest4j:jar:1.3.0:test -- module org.opentest4j
    org.osgi:org.osgi.namespace.extender:jar:1.0.1:compile -- module org.osgi.namespace.extender (auto)
    org.osgi:org.osgi.service.component.annotations:jar:1.5.1:compile -- module org.osgi.service.component.annotations [auto]
