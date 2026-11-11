@@ -18,7 +18,7 @@ The following files have been resolved:
    io.micrometer:micrometer-commons:jar:1.17.1:compile -- module micrometer.commons [auto]
    io.micrometer:micrometer-core:jar:1.17.1:compile -- module micrometer.core [auto]
    io.micrometer:micrometer-observation:jar:1.17.1:compile -- module micrometer.observation [auto]
-   io.micrometer:micrometer-registry-prometheus:jar:1.17.1:compile -- module micrometer.registry.prometheus [auto]
+   io.micrometer:micrometer-registry-prometheus:jar:1.17.2:compile -- module micrometer.registry.prometheus [auto]
    io.netty:netty-buffer:jar:4.1.138.Final:compile -- module io.netty.buffer [auto]
    io.netty:netty-codec-dns:jar:4.1.138.Final:compile -- module io.netty.codec.dns [auto]
    io.netty:netty-codec-http2:jar:4.1.138.Final:compile -- module io.netty.codec.http2 [auto]
