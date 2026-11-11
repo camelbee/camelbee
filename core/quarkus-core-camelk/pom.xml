@@ -62,7 +62,7 @@
 	<parent>
 		<groupId>io.camelbee</groupId>
 		<artifactId>camelbee-quarkus-camelk-dependencies</artifactId>
-		<version>4.1.0</version>
+		<version>4.2.0</version>
 		<relativePath>../../dependencies/quarkus-camelk/pom.xml</relativePath>
 	</parent>
 
@@ -92,7 +92,35 @@
 		<jacoco.line.coverage.minimum>0.00</jacoco.line.coverage.minimum>
 
 		<build-helper-maven-plugin.version>3.6.2</build-helper-maven-plugin.version>
+		<byte-buddy.version>1.18.8</byte-buddy.version>
 	</properties>
+
+	<!--
+	  Test-only override. The pinned Quarkus 3.15 BOM manages mockito-core 5.12.0 / byte-buddy 1.15.11,
+	  which cannot instrument classes on a JDK 25 runtime ("Mockito cannot mock this class: interface
+	  org.apache.camel.CamelContext"), so every Mockito test errors when the build runs on JDK 25.
+	  Managed here, not in dependencies/quarkus-camelk, because that BOM is published and importing it
+	  must not push test-tool versions onto consumers. Does not affect the shipped jar (test scope).
+	-->
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+				<version>${mockito-junit-jupiter.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.bytebuddy</groupId>
+				<artifactId>byte-buddy</artifactId>
+				<version>${byte-buddy.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.bytebuddy</groupId>
+				<artifactId>byte-buddy-agent</artifactId>
+				<version>${byte-buddy.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
 

@@ -36,6 +36,6 @@ your BOM decides the Camel / Spring Boot / Quarkus versions. See the
 <dependency>
   <groupId>io.camelbee</groupId>
   <artifactId>camelbee-quarkus-security</artifactId> <!-- or camelbee-springboot-security -->
-  <version>4.1.0</version>
+  <version>4.2.0</version>
 </dependency>
 ```
