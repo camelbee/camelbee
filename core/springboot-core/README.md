@@ -91,7 +91,7 @@ public class YourApplication {
 >
 > | Starter | Pins |
 > |---|---|
-> | `camelbee-springboot-starter` | Spring Boot 4.1.0 · Camel 4.22.0 |
+> | `camelbee-springboot-starter` | Spring Boot 4.1.2 · Camel 4.22.1 |
 >
 > That is the trade-off against [Option 1](#option-1-add-the-core-library-as-a-dependency-recommended): the starter decides your framework versions, so
 > your stack moves when CamelBee releases. If you need to stay on your own versions, use the core as

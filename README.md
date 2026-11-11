@@ -498,9 +498,9 @@ public class YourRoute extends RouteBuilder {
 >
 > | Starter | Pins |
 > |---|---|
-> | `camelbee-springboot-starter` | Spring Boot 4.1.0 · Camel 4.22.0 |
-> | `camelbee-standalone-starter` | Camel 4.22.0 |
-> | `camelbee-quarkus-starter` | Quarkus 3.39.1 · Camel 4.22.0 (the platform decides the Camel version) |
+> | `camelbee-springboot-starter` | Spring Boot 4.1.2 · Camel 4.22.1 |
+> | `camelbee-standalone-starter` | Camel 4.22.1 |
+> | `camelbee-quarkus-starter` | Quarkus 3.40.1.2 · Camel 4.22.1 (the platform decides the Camel version) |
 >
 > That is the trade-off against [Option 1](#option-1-add-the-core-library-as-a-dependency-recommended): the starter decides your framework versions, so
 > your stack moves when CamelBee releases. If you need to stay on your own versions, use the core as

@@ -12,7 +12,7 @@ The two paths differ in **who decides the framework versions**:
 
 | | You get | Versions decided by | Use when |
 |---|---|---|---|
-| **Starter as parent** | Core + embedded UI + every required dependency, fully version-managed | **CamelBee** — Spring Boot 4.1 / Camel 4.22, standalone Camel 4.22, Quarkus 3.39 / Camel 4.22 | Starting a new project and happy on a current stack |
+| **Starter as parent** | Core + embedded UI + every required dependency, fully version-managed | **CamelBee** — Spring Boot 4.1 / Camel 4.22, standalone Camel 4.22, Quarkus 3.40 / Camel 4.22 | Starting a new project and happy on a current stack |
 | **Core as a dependency** | Just the library | **You** — framework deps are `provided`, so your BOM wins | You already have a parent POM, or you are on an older stack |
 
 > **Upgrading from an earlier CamelBee?** In 4.0.0 the cores moved their framework dependencies to
