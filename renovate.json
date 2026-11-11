@@ -62,6 +62,13 @@
       "allowedVersions": "/^3\\.[0-5]\\./"
     },
     {
+      "description": "Byte Buddy publishes every release twice: the normal build (1.18.17) and a legacy Java 5 build with a -jdk5 suffix (1.18.17-jdk5). Maven Central's metadata lists the -jdk5 build as 'latest', so Renovate proposed it (2026-11-11). Ignore -jdk5 versions; only the normal build is wanted.",
+      "matchPackageNames": [
+        "net.bytebuddy:**"
+      ],
+      "allowedVersions": "!/-jdk5$/"
+    },
+    {
       "description": "jacoco-maven-plugin must match the org.jacoco version the io.quarkus:quarkus-jacoco extension bundles (0.8.15 on Quarkus 3.40.1.2). quarkus-jacoco records @QuarkusTest coverage with its own jacoco runtime into target/jacoco.exec; when the plugin's report/check runs a newer jacoco, that data is silently dropped. With 0.8.16, security/quarkus-security fell from ~91% to 19% line coverage (every @QuarkusTest-exercised class at 0 lines) and failed the 0.80 gate, though all tests passed (2026-11-11). Affects security/quarkus-security and starters/camelbee-quarkus-starter. Raise the cap only together with a quarkus.platform.version bump whose quarkus-jacoco pulls the newer org.jacoco (check with 'mvn dependency:tree -pl security/quarkus-security -Dincludes=org.jacoco').",
       "matchPackageNames": [
         "org.jacoco:jacoco-maven-plugin"

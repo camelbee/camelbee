@@ -20,7 +20,7 @@ The following files have been resolved:
    com.github.java-json-tools:jackson-coreutils:jar:2.0:compile -- module jackson.coreutils (auto)
    com.github.java-json-tools:json-patch:jar:1.13:compile -- module json.patch (auto)
    com.github.java-json-tools:msg-simple:jar:1.2:compile -- module msg.simple (auto)
-   com.github.spotbugs:spotbugs-annotations:jar:4.10.4:compile -- module com.github.spotbugs.annotations [auto]
+   com.github.spotbugs:spotbugs-annotations:jar:4.10.5:compile -- module com.github.spotbugs.annotations [auto]
    com.google.code.findbugs:jsr305:jar:3.0.2:compile -- module jsr305 (auto)
    com.google.guava:failureaccess:jar:1.0.1:test -- module failureaccess (auto)
    com.google.guava:guava:jar:33.2.1-jre:test -- module com.google.common [auto]
@@ -144,8 +144,8 @@ The following files have been resolved:
    javax.annotation:javax.annotation-api:jar:1.3.2:test -- module java.annotation [auto]
    javax.inject:javax.inject:jar:1:test -- module javax.inject (auto)
    junit:junit:jar:4.13.2:test -- module junit [auto]
-   net.bytebuddy:byte-buddy-agent:jar:1.18.8:test -- module net.bytebuddy.agent
-   net.bytebuddy:byte-buddy:jar:1.18.8:test -- module net.bytebuddy
+   net.bytebuddy:byte-buddy-agent:jar:1.18.17:test -- module net.bytebuddy.agent
+   net.bytebuddy:byte-buddy:jar:1.18.17:test -- module net.bytebuddy
    net.java.dev.jna:jna:jar:5.8.0:test -- module com.sun.jna [auto]
    org.aesh:aesh:jar:2.8.2:test -- module org.aesh.aesh [auto]
    org.aesh:readline:jar:2.6:test -- module org.aesh.readline [auto]

@@ -92,7 +92,7 @@
 		<jacoco.line.coverage.minimum>0.00</jacoco.line.coverage.minimum>
 
 		<build-helper-maven-plugin.version>3.6.2</build-helper-maven-plugin.version>
-		<byte-buddy.version>1.18.8</byte-buddy.version>
+		<byte-buddy.version>1.18.17</byte-buddy.version>
 	</properties>
 
 	<!--
