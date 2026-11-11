@@ -62,6 +62,13 @@
       "allowedVersions": "/^3\\.[0-5]\\./"
     },
     {
+      "description": "jacoco-maven-plugin must match the org.jacoco version the io.quarkus:quarkus-jacoco extension bundles (0.8.15 on Quarkus 3.40.1.2). quarkus-jacoco records @QuarkusTest coverage with its own jacoco runtime into target/jacoco.exec; when the plugin's report/check runs a newer jacoco, that data is silently dropped. With 0.8.16, security/quarkus-security fell from ~91% to 19% line coverage (every @QuarkusTest-exercised class at 0 lines) and failed the 0.80 gate, though all tests passed (2026-11-11). Affects security/quarkus-security and starters/camelbee-quarkus-starter. Raise the cap only together with a quarkus.platform.version bump whose quarkus-jacoco pulls the newer org.jacoco (check with 'mvn dependency:tree -pl security/quarkus-security -Dincludes=org.jacoco').",
+      "matchPackageNames": [
+        "org.jacoco:jacoco-maven-plugin"
+      ],
+      "allowedVersions": "<0.8.16"
+    },
+    {
       "description": "Avro is capped below 1.12.2 on purpose. 1.12.2 added org.apache.avro.util.ClassSecurityValidator to ClassUtils.forName, which SpecificDatumReader.setSchema reaches via SpecificData.getClass. Its default trust list is JDK scalars only, so camel-avro's data format throws SecurityException on every generated record class ('Forbidden <pkg>.Order! This class is not trusted to be included in Avro schemas'). Archetype scenario 9 caught it: all 28 springboot avro variants failed while quarkus passed on 1.12.1 from the platform BOM. 1.12.1 is the only version with both the Utf8.compareSequences the generated code needs (1.12.0, which apicurio-registry-serdes-avro-serde pulls transitively, lacks it) and no validator. Lifting this cap is not a renovate.json edit: adopting 1.12.2+ means setting org.apache.avro.SERIALIZABLE_CLASSES / SERIALIZABLE_PACKAGES in every generated microservice before the data format initialises. The runtime and the codegen plugin are grouped so they can never drift apart - dependencies/springboot/pom.xml requires avro.version to match avro-maven-plugin.version.",
       "groupName": "Avro (runtime + codegen plugin, must move together)",
       "matchPackageNames": [
