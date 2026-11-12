@@ -154,7 +154,7 @@ The following files have been resolved:
    org.mockito:mockito-core:jar:5.23.0:test -- module org.mockito
    org.mockito:mockito-junit-jupiter:jar:5.23.0:test -- module org.mockito.junit.jupiter
    org.objenesis:objenesis:jar:3.3:test -- module org.objenesis [auto]
-   org.openapitools:jackson-databind-nullable:jar:0.2.12:compile -- module org.openapitools.jackson.nullable
+   org.openapitools:jackson-databind-nullable:jar:0.2.13:compile -- module org.openapitools.jackson.nullable
    org.opentest4j:opentest4j:jar:1.3.0:test -- module org.opentest4j
    org.ow2.asm:asm:jar:9.7.1:test -- module org.objectweb.asm
    org.projectlombok:lombok:jar:1.18.48:provided -- module lombok
