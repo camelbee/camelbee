@@ -91,7 +91,7 @@
 		<!-- Sources are shared with quarkus-core, which holds the coverage gate; no second gate here. -->
 		<jacoco.line.coverage.minimum>0.00</jacoco.line.coverage.minimum>
 
-		<build-helper-maven-plugin.version>3.6.2</build-helper-maven-plugin.version>
+		<build-helper-maven-plugin.version>3.8.0</build-helper-maven-plugin.version>
 		<byte-buddy.version>1.18.17</byte-buddy.version>
 	</properties>
 
