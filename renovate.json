@@ -52,6 +52,16 @@
       "enabled": false
     },
     {
+      "description": "shared-core compiles against the LOWEST Camel version any in-reactor core runs on, which is the Camel that the Quarkus platform (quarkus-camel-bom) ships, not the newest Camel release. Compiling against a newer Camel would let a newer-only method link here and fail on Quarkus at runtime with NoSuchMethodError; pinning to the floor makes the build fail instead (see the comment above shared.camel.version). Renovate bumped it with the apache-camel monorepo group to 4.23.0 while Quarkus 3.40.1.2 was still on 4.22.1 (2026-11-13). Raise shared.camel.version by hand, together with a quarkus.platform.version bump, to the camel-core version that quarkus-camel-bom pins. Test-only deps in this pom are still updated.",
+      "matchFileNames": [
+        "core/shared-core/pom.xml"
+      ],
+      "matchPackageNames": [
+        "org.apache.camel:**"
+      ],
+      "enabled": false
+    },
+    {
       "description": "Surefire, failsafe and the report plugin are held at 3.5.6. 3.6.0's console-output capture (StackWalkerStrategy) loads a class through Quarkus's FacadeClassLoader while the main thread holds its lock waiting on the deployment-dependency resolver; a JDK/JUL log line from a resolver thread then deadlocks the forked test JVM forever (seen in security/quarkus-security, 2026-09-25). Grouped so the three can't drift. Lift the cap only after a fixed surefire/Quarkus release, verified by repeated full 'mvn clean install' runs.",
       "groupName": "Maven surefire/failsafe/report (held below 3.6.0)",
       "matchPackageNames": [
