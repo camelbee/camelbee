@@ -7,6 +7,7 @@
   "baseBranchPatterns": [
     "dev"
   ],
+  "useBaseBranchConfig": "merge",
   "customManagers": [
     {
       "description": "Surface new Camel K runtime releases by watching the version recorded in the quarkus-camelk comment block. This never auto-merges: the matching packageRule holds it behind Dependency Dashboard approval, because bumping this line alone would make the comment describe a platform combination no operator actually reports.",
@@ -52,6 +53,40 @@
       "enabled": false
     },
     {
+      "description": "shared-core compiles against the LOWEST Camel version any in-reactor core runs on, which is the Camel that the Quarkus platform (quarkus-camel-bom) ships, not the newest Camel release. Compiling against a newer Camel would let a newer-only method link here and fail on Quarkus at runtime with NoSuchMethodError; pinning to the floor makes the build fail instead (see the comment above shared.camel.version). Renovate bumped it with the apache-camel monorepo group to 4.23.0 while Quarkus 3.40.1.2 was still on 4.22.1 (2026-11-13). Raise shared.camel.version by hand, together with a quarkus.platform.version bump, to the camel-core version that quarkus-camel-bom pins. Test-only deps in this pom are still updated.",
+      "matchFileNames": [
+        "core/shared-core/pom.xml"
+      ],
+      "matchPackageNames": [
+        "org.apache.camel:**"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "Surefire, failsafe and the report plugin are held at 3.5.6. 3.6.0's console-output capture (StackWalkerStrategy) loads a class through Quarkus's FacadeClassLoader while the main thread holds its lock waiting on the deployment-dependency resolver; a JDK/JUL log line from a resolver thread then deadlocks the forked test JVM forever (seen in security/quarkus-security, 2026-09-25). Grouped so the three can't drift. Lift the cap only after a fixed surefire/Quarkus release, verified by repeated full 'mvn clean install' runs.",
+      "groupName": "Maven surefire/failsafe/report (held below 3.6.0)",
+      "matchPackageNames": [
+        "org.apache.maven.plugins:maven-surefire-plugin",
+        "org.apache.maven.plugins:maven-failsafe-plugin",
+        "org.apache.maven.plugins:maven-surefire-report-plugin"
+      ],
+      "allowedVersions": "/^3\\.[0-5]\\./"
+    },
+    {
+      "description": "Byte Buddy publishes every release twice: the normal build (1.18.17) and a legacy Java 5 build with a -jdk5 suffix (1.18.17-jdk5). Maven Central's metadata lists the -jdk5 build as 'latest', so Renovate proposed it (2026-11-11). Ignore -jdk5 versions; only the normal build is wanted.",
+      "matchPackageNames": [
+        "net.bytebuddy:**"
+      ],
+      "allowedVersions": "!/-jdk5$/"
+    },
+    {
+      "description": "jacoco-maven-plugin must match the org.jacoco version the io.quarkus:quarkus-jacoco extension bundles (0.8.15 on Quarkus 3.40.1.2). quarkus-jacoco records @QuarkusTest coverage with its own jacoco runtime into target/jacoco.exec; when the plugin's report/check runs a newer jacoco, that data is silently dropped. With 0.8.16, security/quarkus-security fell from ~91% to 19% line coverage (every @QuarkusTest-exercised class at 0 lines) and failed the 0.80 gate, though all tests passed (2026-11-11). Affects security/quarkus-security and starters/camelbee-quarkus-starter. Raise the cap only together with a quarkus.platform.version bump whose quarkus-jacoco pulls the newer org.jacoco (check with 'mvn dependency:tree -pl security/quarkus-security -Dincludes=org.jacoco').",
+      "matchPackageNames": [
+        "org.jacoco:jacoco-maven-plugin"
+      ],
+      "allowedVersions": "<0.8.16"
+    },
+    {
       "description": "Avro is capped below 1.12.2 on purpose. 1.12.2 added org.apache.avro.util.ClassSecurityValidator to ClassUtils.forName, which SpecificDatumReader.setSchema reaches via SpecificData.getClass. Its default trust list is JDK scalars only, so camel-avro's data format throws SecurityException on every generated record class ('Forbidden <pkg>.Order! This class is not trusted to be included in Avro schemas'). Archetype scenario 9 caught it: all 28 springboot avro variants failed while quarkus passed on 1.12.1 from the platform BOM. 1.12.1 is the only version with both the Utf8.compareSequences the generated code needs (1.12.0, which apicurio-registry-serdes-avro-serde pulls transitively, lacks it) and no validator. Lifting this cap is not a renovate.json edit: adopting 1.12.2+ means setting org.apache.avro.SERIALIZABLE_CLASSES / SERIALIZABLE_PACKAGES in every generated microservice before the data format initialises. The runtime and the codegen plugin are grouped so they can never drift apart - dependencies/springboot/pom.xml requires avro.version to match avro-maven-plugin.version.",
       "groupName": "Avro (runtime + codegen plugin, must move together)",
       "matchPackageNames": [
@@ -59,6 +94,12 @@
         "org.apache.avro:avro-maven-plugin"
       ],
       "allowedVersions": "<1.12.2"
+    },
+    {
+      "description": "Quarkus langchain4j-bom must equal the langchain4j-core version quarkus-camel-bom pins (1.19.3 on platform 3.39.5). Ahead of it, every Quarkus LANGCHAIN4JAGENT/EMBEDDING project dies at boot with NoClassDefFoundError dev/langchain4j/internal/ProviderJsonSpec. Lift the cap only together with a quarkus.platform.version bump whose bom pins the newer langchain4j-core.",
+      "matchFileNames": ["dependencies/quarkus/pom.xml"],
+      "matchPackageNames": ["dev.langchain4j:langchain4j-bom"],
+      "allowedVersions": "<1.20.0"
     },
     {
       "description": "Notify only. A new camel-k-runtime release appears as an unchecked box on the Dependency Dashboard and creates no branch or PR until someone ticks it. Ticking it is not the fix: re-read a live operator with 'kubectl get camelcatalog -o jsonpath={.items[0].spec.runtime.metadata}' and update the comment block AND quarkus.version / camel-quarkus.version together in one hand-written PR.",
