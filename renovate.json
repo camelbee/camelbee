@@ -53,14 +53,13 @@
       "enabled": false
     },
     {
-      "description": "shared-core compiles against the LOWEST Camel version any in-reactor core runs on, which is the Camel that the Quarkus platform (quarkus-camel-bom) ships, not the newest Camel release. Compiling against a newer Camel would let a newer-only method link here and fail on Quarkus at runtime with NoSuchMethodError; pinning to the floor makes the build fail instead (see the comment above shared.camel.version). Renovate bumped it with the apache-camel monorepo group to 4.23.0 while Quarkus 3.40.1.2 was still on 4.22.1 (2026-11-13). Raise shared.camel.version by hand, together with a quarkus.platform.version bump, to the camel-core version that quarkus-camel-bom pins. Test-only deps in this pom are still updated.",
-      "matchFileNames": [
-        "core/shared-core/pom.xml"
-      ],
+      "description": "One Camel version per CamelBee release, set by the Quarkus platform. Quarkus cannot take a Camel release before Camel Quarkus ships it and the platform picks it up (2-5 weeks after a Camel release), so Spring Boot (camel-spring-boot-bom), standalone (camel.version), camel-maven-plugin and shared-core (shared.camel.version, which must never be ahead of Quarkus or a newer-only API fails there with NoSuchMethodError) are all held at the camel-core version that quarkus-camel-bom pins for quarkus.platform.version. New Camel releases show up on the Dependency Dashboard only. Do not tick them on their own: when a quarkus.platform.version PR brings a newer Camel (check camel-api in quarkus-camel-bom-<version>.pom), move all four to that exact version in the same change. Decided 2026-11-13 after 4.23.0 split the runtimes (Spring Boot/standalone 4.23.0, Quarkus 4.22.1). Does not touch org.apache.camel.quarkus (Camel K rule) or the core-only-* floor samples (examples/ is ignored by config:recommended).",
+      "groupName": "Camel (held to the Quarkus platform's Camel)",
       "matchPackageNames": [
-        "org.apache.camel:**"
+        "org.apache.camel:**",
+        "org.apache.camel.springboot:**"
       ],
-      "enabled": false
+      "dependencyDashboardApproval": true
     },
     {
       "description": "Surefire, failsafe and the report plugin are held at 3.5.6. 3.6.0's console-output capture (StackWalkerStrategy) loads a class through Quarkus's FacadeClassLoader while the main thread holds its lock waiting on the deployment-dependency resolver; a JDK/JUL log line from a resolver thread then deadlocks the forked test JVM forever (seen in security/quarkus-security, 2026-09-25). Grouped so the three can't drift. Lift the cap only after a fixed surefire/Quarkus release, verified by repeated full 'mvn clean install' runs.",
