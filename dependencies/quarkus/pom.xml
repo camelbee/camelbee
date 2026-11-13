@@ -37,7 +37,7 @@
         <quarkiverse-artemis.version>3.0.0</quarkiverse-artemis.version>
         <assertj-core.version>3.27.7</assertj-core.version>
         <mockito-junit-jupiter.version>5.24.0</mockito-junit-jupiter.version>
-        <quarkus-logging-json.version>3.5.0</quarkus-logging-json.version>
+        <quarkus-logging-json.version>3.6.0</quarkus-logging-json.version>
         <quarkiverse-artemis-jms.version>3.15.0</quarkiverse-artemis-jms.version>
         <camel-quarkus-rabbitmq.version>2.16.0</camel-quarkus-rabbitmq.version>
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
@@ -46,10 +46,10 @@
         <camel-quarkus.platform.artifact-id>quarkus-camel-bom</camel-quarkus.platform.artifact-id>
         <org.awaitility.awaitility>4.3.0</org.awaitility.awaitility>
         <org.jetbrains.kotlin.kotlin-reflect.version>2.4.21</org.jetbrains.kotlin.kotlin-reflect.version>
-        <com.google.crypto.tink.version>1.23.0</com.google.crypto.tink.version>
+        <com.google.crypto.tink.version>1.24.0</com.google.crypto.tink.version>
         <!-- MCP support for generated microservices (declared conditionally in the archetype). -->
         <quarkus-mcp-server.version>2.0.4</quarkus-mcp-server.version>
-        <mcp-sdk.version>2.0.1</mcp-sdk.version>
+        <mcp-sdk.version>2.1.0</mcp-sdk.version>
         <!-- langchain4j BOM for the LANGCHAIN4JAGENT / LANGCHAIN4JEMBEDDING backends (declared
              conditionally in the archetype). Verified against the actual 1.15.1 jars (javap on
              AnthropicChatModel$Builder / MistralAiChatModel$Builder etc.) for base URLs, endpoint

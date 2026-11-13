@@ -37,14 +37,14 @@
              (no floor) so modules without Java tests don't fail the build; each
              tested module overrides this with its baseline and ratchets toward 0.80. -->
         <jacoco.line.coverage.minimum>0.00</jacoco.line.coverage.minimum>
-        <build-helper-maven-plugin.version>3.6.2</build-helper-maven-plugin.version>
-        <camel-maven-plugin.version>4.22.1</camel-maven-plugin.version>
+        <build-helper-maven-plugin.version>3.8.0</build-helper-maven-plugin.version>
+        <camel-maven-plugin.version>4.23.0</camel-maven-plugin.version>
         <!-- Version of io.camelbee:common unpacked for the shared checkstyle/spotbugs/formatter
              configs. MUST stay a literal, not ${project.version}: this pom is also the inherited
              grandparent of every generated microservice, where ${project.version} is the user's
              own version (e.g. 1.0-SNAPSHOT) and the unpack fails. Bump with each release. -->
         <camelbee.version>4.2.0</camelbee.version>
-        <checkstyle.version>14.3.0</checkstyle.version>
+        <checkstyle.version>14.4.0</checkstyle.version>
         <commons-io.version>2.22.0</commons-io.version>
         <commons-lang3.version>3.21.0</commons-lang3.version>
         <cxf-core.version>4.2.4</cxf-core.version>
