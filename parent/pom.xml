@@ -38,7 +38,11 @@
              tested module overrides this with its baseline and ratchets toward 0.80. -->
         <jacoco.line.coverage.minimum>0.00</jacoco.line.coverage.minimum>
         <build-helper-maven-plugin.version>3.8.0</build-helper-maven-plugin.version>
-        <camel-maven-plugin.version>4.23.0</camel-maven-plugin.version>
+        <!-- Camel version = the one the Quarkus platform ships (quarkus-camel-bom for
+             quarkus.platform.version), so every runtime and every CamelBee release run one Camel.
+             Don't bump it on its own; move it together with quarkus.platform.version. See the
+             "Camel (held to the Quarkus platform's Camel)" rule in renovate.json. -->
+        <camel-maven-plugin.version>4.22.1</camel-maven-plugin.version>
         <!-- Version of io.camelbee:common unpacked for the shared checkstyle/spotbugs/formatter
              configs. MUST stay a literal, not ${project.version}: this pom is also the inherited
              grandparent of every generated microservice, where ${project.version} is the user's

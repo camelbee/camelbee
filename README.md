@@ -502,6 +502,8 @@ public class YourRoute extends RouteBuilder {
 > | `camelbee-standalone-starter` | Camel 4.22.1 |
 > | `camelbee-quarkus-starter` | Quarkus 3.40.1.2 · Camel 4.22.1 (the platform decides the Camel version) |
 >
+> All three starters use the same Camel version: the one the Quarkus platform ships. A new Camel release reaches CamelBee when Quarkus adopts it, typically a few weeks after Camel publishes it.
+>
 > That is the trade-off against [Option 1](#option-1-add-the-core-library-as-a-dependency-recommended): the starter decides your framework versions, so
 > your stack moves when CamelBee releases. If you need to stay on your own versions, use the core as
 > a dependency instead.
