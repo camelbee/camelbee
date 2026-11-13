@@ -7,6 +7,7 @@
   "baseBranchPatterns": [
     "dev"
   ],
+  "useBaseBranchConfig": "merge",
   "customManagers": [
     {
       "description": "Surface new Camel K runtime releases by watching the version recorded in the quarkus-camelk comment block. This never auto-merges: the matching packageRule holds it behind Dependency Dashboard approval, because bumping this line alone would make the comment describe a platform combination no operator actually reports.",
