@@ -80,7 +80,7 @@ The following files have been resolved:
    io.prometheus:simpleclient_tracer_otel_agent:jar:0.16.0:compile -- module simpleclient.tracer.otel.agent (auto)
    io.quarkiverse.artemis:quarkus-artemis-core:jar:3.15.0:compile -- module quarkus.artemis.core (auto)
    io.quarkiverse.artemis:quarkus-artemis-jms:jar:3.15.0:compile -- module quarkus.artemis.jms (auto)
-   io.quarkiverse.loggingjson:quarkus-logging-json:jar:3.5.0:compile -- module quarkus.logging.json (auto)
+   io.quarkiverse.loggingjson:quarkus-logging-json:jar:3.6.0:compile -- module quarkus.logging.json (auto)
    io.quarkus.arc:arc:jar:3.40.1.2:compile -- module io.quarkus.arc
    io.quarkus.gizmo:gizmo2:jar:2.1.1:test -- module io.quarkus.gizmo2
    io.quarkus.gizmo:gizmo:jar:1.10.1:test -- module io.quarkus.gizmo
