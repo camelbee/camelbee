@@ -58,7 +58,7 @@
         <assertj-core.version>3.27.7</assertj-core.version>
         <mockito-junit-jupiter.version>5.24.0</mockito-junit-jupiter.version>
         <logback-classic.version>1.6.6</logback-classic.version>
-        <jackson-annotations.version>2.22</jackson-annotations.version>
+        <jackson-annotations.version>2.23</jackson-annotations.version>
     </properties>
 
     <dependencies>
