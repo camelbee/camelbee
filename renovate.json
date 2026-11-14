@@ -95,10 +95,19 @@
       "allowedVersions": "<1.12.2"
     },
     {
-      "description": "Quarkus langchain4j-bom must equal the langchain4j-core version quarkus-camel-bom pins (1.19.3 on platform 3.39.5). Ahead of it, every Quarkus LANGCHAIN4JAGENT/EMBEDDING project dies at boot with NoClassDefFoundError dev/langchain4j/internal/ProviderJsonSpec. Lift the cap only together with a quarkus.platform.version bump whose bom pins the newer langchain4j-core.",
+      "description": "Quarkus langchain4j-bom must EQUAL the langchain4j-core version quarkus-camel-bom pins (1.19.3 on platform 3.40.1.2), not merely stay below the next minor. Ahead of it, every Quarkus LANGCHAIN4JAGENT/EMBEDDING project dies at boot with NoClassDefFoundError dev/langchain4j/internal/ProviderJsonSpec. The cap was '<1.20.0' until 2026-11-14, which let a 1.19.6 patch PR through; it is now an exact ceiling. Raise it only together with a quarkus.platform.version bump, to the langchain4j-core version in quarkus-camel-bom-<version>.pom.",
       "matchFileNames": ["dependencies/quarkus/pom.xml"],
       "matchPackageNames": ["dev.langchain4j:langchain4j-bom"],
-      "allowedVersions": "<1.20.0"
+      "allowedVersions": "<=1.19.3"
+    },
+    {
+      "description": "Jackson is held to the jackson2-version that the Camel release we build on manages (camel-parent-<camel.version>.pom; 2.22.1 on Camel 4.22.1). shared-core pins jackson-annotations and standalone pins jackson-datatype-jsr310 only to line them up with the jackson-databind Camel brings (see the comments in core/shared-core/pom.xml and dependencies/standalone/pom.xml); a Renovate bump of either one alone (2.23, 2026-11-14) runs them ahead of databind, the exact mismatch the pin exists to prevent. New Jackson releases show up on the Dependency Dashboard only. Do not tick them on their own: when the Camel rule above moves to a newer Camel, move both properties to that Camel's jackson2-version (same major.minor) in the same change. Quarkus's own jackson (2.21.x from quarkus-bom) is managed by the platform and not touched here.",
+      "groupName": "Jackson (held to Camel's jackson2-version)",
+      "matchPackageNames": [
+        "com.fasterxml.jackson.core:**",
+        "com.fasterxml.jackson.datatype:**"
+      ],
+      "dependencyDashboardApproval": true
     },
     {
       "description": "Notify only. A new camel-k-runtime release appears as an unchecked box on the Dependency Dashboard and creates no branch or PR until someone ticks it. Ticking it is not the fix: re-read a live operator with 'kubectl get camelcatalog -o jsonpath={.items[0].spec.runtime.metadata}' and update the comment block AND quarkus.version / camel-quarkus.version together in one hand-written PR.",
