@@ -652,9 +652,12 @@ describe('WaterfallPanel bar geometry', () => {
 
     render(<WaterfallPanel onClose={() => {}} />);
 
+    // jsdom (like browsers) serializes CSS numbers to 6 significant digits, so the two rounded
+    // percentages can sum to e.g. 100.00001 - allow that rounding, not a real overflow.
+    const ROUNDING = 1e-3;
     for (const { left, width } of bars()) {
       expect(left).toBeGreaterThanOrEqual(0);
-      expect(left + width).toBeLessThanOrEqual(100);
+      expect(left + width).toBeLessThanOrEqual(100 + ROUNDING);
     }
   });
 
