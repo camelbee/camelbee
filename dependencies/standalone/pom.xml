@@ -35,7 +35,7 @@
              Don't bump it on its own; move it together with quarkus.platform.version. See the
              "Camel (held to the Quarkus platform's Camel)" rule in renovate.json. -->
         <camel.version>4.22.1</camel.version>
-        <jackson-jsr310.version>2.22.3</jackson-jsr310.version>
+        <jackson-jsr310.version>2.23.0</jackson-jsr310.version>
         <micrometer.version>1.17.2</micrometer.version>
         <rest-assured.version>6.3.0</rest-assured.version>
         <!-- Test libraries + the runtime logging backend, centralized here (consumed by
