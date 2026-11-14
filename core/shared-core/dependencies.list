@@ -65,7 +65,7 @@ The following files have been resolved:
    org.apache.camel:camel-xslt:jar:4.22.1:provided -- module camel.xslt (auto)
    org.apache.camel:camel-yaml-io:jar:4.22.1:provided -- module camel.yaml.io (auto)
    org.apache.commons:commons-compress:jar:1.28.0:test -- module org.apache.commons.compress
-   org.apache.commons:commons-lang3:jar:3.21.0:compile -- module org.apache.commons.lang3
+   org.apache.commons:commons-lang3:jar:3.22.0:compile -- module org.apache.commons.lang3
    org.apache.cxf:cxf-core:jar:4.2.4:compile -- module org.apache.cxf.core [auto]
    org.apache.ws.xmlschema:xmlschema-core:jar:2.3.3:compile -- module xmlschema.core (auto)
    org.apiguardian:apiguardian-api:jar:1.1.2:test -- module org.apiguardian.api

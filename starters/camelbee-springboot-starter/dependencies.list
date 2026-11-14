@@ -136,7 +136,7 @@ The following files have been resolved:
    org.apache.camel:camel-xpath:jar:4.22.1:compile -- module camel.xpath (auto)
    org.apache.camel:camel-xslt:jar:4.22.1:compile -- module camel.xslt (auto)
    org.apache.commons:commons-compress:jar:1.28.0:test -- module org.apache.commons.compress
-   org.apache.commons:commons-lang3:jar:3.21.0:compile -- module org.apache.commons.lang3
+   org.apache.commons:commons-lang3:jar:3.22.0:compile -- module org.apache.commons.lang3
    org.apache.cxf:cxf-core:jar:4.2.4:compile -- module org.apache.cxf.core [auto]
    org.apache.groovy:groovy-json:jar:5.0.8:test -- module org.apache.groovy.json [auto]
    org.apache.groovy:groovy-xml:jar:5.0.8:test -- module org.apache.groovy.xml [auto]
