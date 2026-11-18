@@ -345,7 +345,6 @@ export function RouteGraph({ context, onDynamicEdgeAdded }: RouteGraphProps) {
         minZoom={0.1}
         maxZoom={2}
         proOptions={{ hideAttribution: true }}
-        colorMode={isDark ? 'dark' : 'light'}
       >
         <Background color={isDark ? '#374151' : '#d1d5db'} gap={20} />
         <Controls showInteractive={false} />
