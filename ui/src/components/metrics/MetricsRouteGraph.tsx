@@ -69,6 +69,7 @@ export function MetricsRouteGraph({ context }: MetricsRouteGraphProps) {
         minZoom={0.1}
         maxZoom={2}
         proOptions={{ hideAttribution: true }}
+        className={isDark ? 'dark' : 'light'}
         nodesDraggable={false}
         nodesConnectable={false}
         edgesFocusable={false}
