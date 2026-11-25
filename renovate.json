@@ -110,6 +110,26 @@
       "dependencyDashboardApproval": true
     },
     {
+      "description": "Spring Boot is held to the 4.1.x line that camel-spring-boot-bom is built on (camel-parent-<camel.version>.pom spring-boot-version: 4.1.1 on Camel 4.22.1, and still 4.1.1 on 4.23.0). Spring Boot 4.2.0 (2026-11-20) moves to Spring Framework 7.1 and micrometer 1.18, a stack no Camel release has been tested on. Lift this cap (and the three Spring Boot 4.2 companion rules below) only when the Camel version the Quarkus platform ships manages spring-boot-version 4.2.x, as part of that Camel bump.",
+      "matchPackageNames": ["org.springframework.boot:**"],
+      "allowedVersions": "<4.2.0"
+    },
+    {
+      "description": "Spring Cloud 2026.0.x is the release train for Spring Boot 4.2; 2025.1.x pairs with the 4.1 line we are held to (see the Spring Boot rule above). Lift together with it.",
+      "matchPackageNames": ["org.springframework.cloud:spring-cloud-dependencies"],
+      "allowedVersions": "<2026.0.0"
+    },
+    {
+      "description": "Spring AI 2.1.x is built against Spring Boot 4.2.0 (its poms reference spring-boot 4.2.0; 2.0.2 used 4.1.2). Held with the Spring Boot rule above; lift together with it.",
+      "matchPackageNames": ["org.springframework.ai:spring-ai-bom"],
+      "allowedVersions": "<2.1.0"
+    },
+    {
+      "description": "Standalone's micrometer-registry-prometheus is held to the 1.17.x line that Camel 4.22.1 (camel-parent micrometer-version 1.17.1) and Spring Boot 4.1 (1.17.2) manage. 1.18 arrives with Spring Boot 4.2; lift together with the Spring Boot rule above.",
+      "matchPackageNames": ["io.micrometer:**"],
+      "allowedVersions": "<1.18.0"
+    },
+    {
       "description": "Notify only. A new camel-k-runtime release appears as an unchecked box on the Dependency Dashboard and creates no branch or PR until someone ticks it. Ticking it is not the fix: re-read a live operator with 'kubectl get camelcatalog -o jsonpath={.items[0].spec.runtime.metadata}' and update the comment block AND quarkus.version / camel-quarkus.version together in one hand-written PR.",
       "matchPackageNames": [
         "org.apache.camel.k:camel-k-runtime"
